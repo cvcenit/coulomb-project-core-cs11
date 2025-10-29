@@ -255,6 +255,7 @@ def move_player(direction):
 
               player_index = mothergrid.index('L')
               grid = lvlmapcontent[lvlmapcontent.index('T'):]
+              history = ['.']
 
           else:
             _move_player(inp)
