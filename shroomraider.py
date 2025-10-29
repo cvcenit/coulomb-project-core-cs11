@@ -142,6 +142,7 @@ def _move_player(direction):
         elif item[0] == 'x':
             moveto('.')
             item.clear()
+            found_item = None
         elif item[0] == '*':
             col = (new_index % (grid_width+1))
             row = (new_index - col) // grid_width
