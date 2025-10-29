@@ -210,7 +210,7 @@ def _move_player(direction):
         elif len(item) == 1:
             print('You already have an item, you can\'t pickup another')
             input("Press Enter to continue: ")
-            moveto('*')
+            moveto('x')
         else:
             moveto('x')
         return
