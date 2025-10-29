@@ -128,9 +128,6 @@ def _move_player(direction):
 
     new_index = player_index + moves[direction]
 
-    print(f"player_index is {player_index}")
-    print(f"new_index is {new_index}")
-
     if not (0 <= new_index < len(grid)):
         print("You can't move outside the grid!")
         return
@@ -262,20 +259,22 @@ def move_player(direction):
           else:
             _move_player(inp)
 
-
+# Outputs args.output_file if -o was called, else run the game.
 if args.output_file != None:
     with open(args.output_file, "w", encoding="utf-8") as output:
         move_player(args.movement)
         output.write("".join(grid))
 else:
     while main == 0:
+        # Clears the terminal at the start, and after inputs
         clear()
 
+        # Prints the map and mushroom count of the level
         print(f"You need {lvl_mushroom_count} mushroom/s to win!")
         print("Grid:")
-
         print(ascii_to_emoji(grid))
 
+        # Prints the collected mushroom count, and the valid moves
         print(f"{player_mushroom_count} out of {lvl_mushroom_count} mushroom/s collected")
         print('''
         [W] Move up
@@ -285,18 +284,20 @@ else:
         [!] Reset
         ''')
 
+        # Prints the available item beneath the player, if any or none
         if not found_item:
             print("No items here")
         else:
             print(f"[P] Pick up {describe_tile(found_item)}")
 
+        # Prints the item currently held by the player, if any or none
         if not item:
             print("Not holding anything")
         else:
             print(f"Currently holding {ascii_to_emoji(item[0])}")
 
+        # Player input
         move = input("What will you do? ").strip().upper()
-
         move_player(move)
 
         if main > 1:
