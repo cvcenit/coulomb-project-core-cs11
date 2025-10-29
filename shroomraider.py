@@ -1,4 +1,3 @@
-
 from argparse import ArgumentParser
 import os
 
@@ -9,7 +8,7 @@ parser.add_argument('-o', '--output_file')
 args = parser.parse_args()
 
 if args.stage_file == None:
-    lvlmap = '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT...~.~+~TTT~T\nT~R~~T~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~.~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
+    lvlmap = '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT.R.~.~+~TTT~T\nT~.~~T~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~.~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
 else:
     with open(args.stage_file, "r", encoding="utf-8") as lvl:
       lvlmap = lvl.read()
@@ -63,13 +62,11 @@ def ascii_to_emoji(map):
       }
   return ''.join(emoji.get(c, c) for c in map if c in emoji) #replaces ascii value from map to corresponding key from dict, but keeps '\n'
 
-
 def pickup(tile):
 
     print(f"You picked up the {describe_tile(tile)}!")
     item.append(tile)
     return ascii_to_emoji(tile)
-
 
 def flame_spread(start_row, start_col):
     #used for item flamethrower
@@ -111,17 +108,19 @@ def describe_tile(tile):
 
 def _move_player(direction):
 
+    global player_index, grid, mothergrid, main, player_mushroom_count, item, history, found_item
+
     def moveto(under_tile):
 
-        global player_index, grid, history
-
+        global player_index, grid, mothergrid, main, player_mushroom_count, item, history
+    
         grid[player_index] = f"{history[-1]}"  # leave floor behind
         grid[new_index] = 'L'     # new position
         player_index = new_index
 
         history.append(under_tile)
 
-    global player_index, grid, mothergrid, main, player_mushroom_count, item, history, found_item
+        print(ascii_to_emoji(grid))
 
     direction = direction.upper()
 
@@ -144,14 +143,13 @@ def _move_player(direction):
         elif item[0] == 'x':
             moveto('.')
             item.clear()
-            found_item = None
         elif item[0] == '*':
             col = (new_index % (grid_width+1))
             row = (new_index - col) // grid_width
             grid = flame_spread(row, col)
             moveto('.')
             item.clear()
-            found_item = None
+        print(ascii_to_emoji(grid))
         return
 
     elif target_tile == 'R':
@@ -160,6 +158,7 @@ def _move_player(direction):
 
         if new_rock_index > len(grid):
             print("You can't move the rock there")
+            print(ascii_to_emoji(grid))
             return
 
         elif grid[new_rock_index] == "~":
@@ -181,7 +180,8 @@ def _move_player(direction):
             return
 
     elif target_tile == '~':
-
+        clear()
+        moveto('~')
         print("---------------------------------")
         print("Game Over! Laro Craft can't swim!")
         print("---------------------------------")
@@ -190,16 +190,14 @@ def _move_player(direction):
         return
 
     elif target_tile == "+":
-
         player_mushroom_count += 1
 
         if player_mushroom_count == lvl_mushroom_count:
-
-
+            clear()
+            moveto('+')
             print("--------")
             print("You Won!")
             print("--------")
-
             main += 1
 
             return
@@ -212,11 +210,9 @@ def _move_player(direction):
         if not item:
             moveto('x')
         elif len(item) == 1:
-            print('You already have an item, you can\'t pickup another')
-            input("Press Enter to continue: ")
             moveto('x')
         else:
-            moveto('x')
+            moveto('.')
         return
 
     elif target_tile == "*":
@@ -224,8 +220,6 @@ def _move_player(direction):
         if not item:
             moveto('*')
         elif len(item) == 1:
-            print('You already have an item, you can\'t pickup another')
-            input("Press Enter to continue: ")
             moveto('*')
         else:
             moveto('.')
@@ -234,8 +228,9 @@ def _move_player(direction):
     elif target_tile == "_":
         moveto('_')
         return
-
-    moveto('.')
+    else:
+        found_item = None
+        moveto('.')
 
 def move_player(direction):
     global player_index, grid, mothergrid, main, player_mushroom_count, item, history, found_item
@@ -253,6 +248,8 @@ def move_player(direction):
                   # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
               else:
                 pickup(found_item)
+                found_item = None
+                history[-1] = '.'
 
           elif inp.upper() == "!":
 
@@ -260,8 +257,9 @@ def move_player(direction):
 
               player_index = mothergrid.index('L')
               grid = lvlmapcontent[lvlmapcontent.index('T'):]
+              found_item = None
+              item = []
               history = ['.']
-              item.clear()
 
           else:
             _move_player(inp)
@@ -305,7 +303,10 @@ else:
 
         # Player input
         move = input("What will you do? ").strip().upper()
+
+
         move_player(move)
+
 
         if main > 1:
             print("Goodbye!")
