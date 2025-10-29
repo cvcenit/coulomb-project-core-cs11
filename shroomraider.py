@@ -248,6 +248,7 @@ def move_player(direction):
                   # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
               else:
                 pickup(found_item)
+                history[-1] = '.'
 
           elif inp.upper() == "!":
 
