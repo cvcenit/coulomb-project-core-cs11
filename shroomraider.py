@@ -8,25 +8,6 @@ parser.add_argument('-m', '--movement')
 parser.add_argument('-o', '--output_file')
 args = parser.parse_args()
 
-def clear():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-def ascii_to_emoji(map):
-  #input and output str
-  emoji = {
-      '.': '⬛',
-      'L': '🧑',
-      'T': '🌲',
-      '+': '🍄',
-      'R': '🪨',
-      '~': '🟦',
-      '_': '⬜',
-      'x': '🪓',
-      '*': '🔥',
-      '\n': '\n'
-      }
-  return ''.join(emoji.get(c, c) for c in map if c in emoji) #replaces ascii value from map to corresponding key from dict, but keeps '\n'
-
 if args.stage_file == None:
     lvlmap = '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT...~.~+~TTT~T\nT~R~~T~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~.~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
 else:
@@ -53,12 +34,6 @@ item = []
 history = ['.']
 found_item = None
 
-def pickup(tile):
-
-    print(f"You picked up the {describe_tile(tile)}!")
-    item.append(tile)
-    return ascii_to_emoji(tile)
-
 player_index = grid.index('L')
 
 moves = {
@@ -68,6 +43,33 @@ moves = {
     'D': 1,
     'P': 0
 }
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def ascii_to_emoji(map):
+  #input and output str
+  emoji = {
+      '.': '⬛',
+      'L': '🧑',
+      'T': '🌲',
+      '+': '🍄',
+      'R': '🪨',
+      '~': '🟦',
+      '_': '⬜',
+      'x': '🪓',
+      '*': '🔥',
+      '\n': '\n'
+      }
+  return ''.join(emoji.get(c, c) for c in map if c in emoji) #replaces ascii value from map to corresponding key from dict, but keeps '\n'
+
+
+def pickup(tile):
+
+    print(f"You picked up the {describe_tile(tile)}!")
+    item.append(tile)
+    return ascii_to_emoji(tile)
+
 
 def flame_spread(start_row, start_col):
     #used for item flamethrower
