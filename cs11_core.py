@@ -7,15 +7,11 @@ parser.add_argument('-m', '--movement')
 parser.add_argument('-o', '--output_file')
 args = parser.parse_args()
 
-# clears the terminal, un daw e
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-clear()
-
 def ascii_to_emoji(map):
   #input and output str
-  # CHIC i added if c in emoji just in case may character na wala sa ascii
   emoji = {
       '.': '⬛',
       'L': '🧑',
@@ -30,14 +26,11 @@ def ascii_to_emoji(map):
       }
   return ''.join(emoji.get(c, c) for c in map if c in emoji) #replaces ascii value from map to corresponding key from dict, but keeps '\n'
 
-# CHIC i added this for the file, -f <stage_file>, -m <moves> (wala pa ata now since di gumagana ang strings of moves), -o <output.txt> (ako naman n bahala dito, ung final grid lang siya)
-#if args.stage_file == None:
-lvlmap = '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT...~.~+~TTT~T\nT~R~~T~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~.~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
-#else:
-    #with open(args.stage_file, "r", encoding="utf-8") as lvl:
-      #lvlmap = lvl.read()
-#if args.output_file != None:
-    #with open(output_file, "w", encoding="utf-8"):
+if args.stage_file == None:
+    lvlmap = '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT...~.~+~TTT~T\nT~R~~T~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~.~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
+else:
+    with open(args.stage_file, "r", encoding="utf-8") as lvl:
+      lvlmap = lvl.read()
 
 lvlmapcontent = list(lvlmap)
 
@@ -252,58 +245,63 @@ def move_player(direction):
 
     moveto('.')
 
-while main == 0:
+if args.output_file != None:
+    with open(args.output_file, "w", encoding="utf-8") as output:
+        move_player(args.movement)
+        output.write("".join(grid))
+else:
+    while main == 0:
 
-    print(f"You need {lvl_mushroom_count} mushroom/s to win!")
-    print("Grid:")
+        print(f"You need {lvl_mushroom_count} mushroom/s to win!")
+        print("Grid:")
 
-    print(ascii_to_emoji(grid))
+        print(ascii_to_emoji(grid))
 
-    print(f"{player_mushroom_count} out of {lvl_mushroom_count} mushroom/s collected")
-    print('''
-    [W] Move up
-    [A] Move left
-    [S] Move down
-    [D] Move right
-    [!] Reset
-    ''')
+        print(f"{player_mushroom_count} out of {lvl_mushroom_count} mushroom/s collected")
+        print('''
+        [W] Move up
+        [A] Move left
+        [S] Move down
+        [D] Move right
+        [!] Reset
+        ''')
 
-    if not found_item:
-        print("No items here")
-    else:
-        print(f"[P] Pick up {describe_tile(found_item)}")
+        if not found_item:
+            print("No items here")
+        else:
+            print(f"[P] Pick up {describe_tile(found_item)}")
 
-    if not item:
-        print("Not holding anything")
-    else:
-        print(f"Currently holding {ascii_to_emoji(item[0])}")
+        if not item:
+            print("Not holding anything")
+        else:
+            print(f"Currently holding {ascii_to_emoji(item[0])}")
 
-    move = input("What will you do? ").strip().upper()
+        move = input("What will you do? ").strip().upper()
 
-    for inp in move:
+        for inp in move:
 
-      if inp.upper() == 'Q':
-        print("Goodbye!")
-        main += 1
+          if inp.upper() == 'Q':
+            print("Goodbye!")
+            main += 1
 
-      elif inp.upper() == 'P':
-          if not found_item:
-              print("Invalid move. Use W, A, S, D.")
-          elif len(item) == 1:
-              print('You already have an item, you can\'t pickup another')
-              # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
+          elif inp.upper() == 'P':
+              if not found_item:
+                  print("Invalid move. Use W, A, S, D.")
+              elif len(item) == 1:
+                  print('You already have an item, you can\'t pickup another')
+                  # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
+              else:
+                pickup(found_item)
+
+          elif inp.upper() == "!":
+
+              print("Restart Successful:")
+
+              player_index = mothergrid.index('L')
+              grid = lvlmapcontent[lvlmapcontent.index('T'):]
+
           else:
-            pickup(found_item)
+            move_player(inp)
 
-      elif inp.upper() == "!":
-
-          print("Restart Successful:")
-
-          player_index = mothergrid.index('L')
-          grid = lvlmapcontent[lvlmapcontent.index('T'):]
-
-      else:
-        move_player(inp)
-
-if main > 1:
-    print("Goodbye!")
+        if main > 1:
+            print("Goodbye!")
