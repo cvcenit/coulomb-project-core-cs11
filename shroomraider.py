@@ -120,12 +120,9 @@ def _move_player(direction):
 
         history.append(under_tile)
 
-        print(ascii_to_emoji(grid))
-
     direction = direction.upper()
 
     if direction not in moves:
-        print("Invalid move. Use W, A, S, D.")
         return
 
     new_index = player_index + moves[direction]
@@ -149,7 +146,6 @@ def _move_player(direction):
             grid = flame_spread(row, col)
             moveto('.')
             item.clear()
-        print(ascii_to_emoji(grid))
         return
 
     elif target_tile == 'R':
@@ -158,7 +154,6 @@ def _move_player(direction):
 
         if new_rock_index > len(grid):
             print("You can't move the rock there")
-            print(ascii_to_emoji(grid))
             return
 
         elif grid[new_rock_index] == "~":
@@ -182,6 +177,8 @@ def _move_player(direction):
     elif target_tile == '~':
         clear()
         moveto('~')
+        print("Grid:")
+        print(ascii_to_emoji(grid))
         print("---------------------------------")
         print("Game Over! Laro Craft can't swim!")
         print("---------------------------------")
@@ -195,9 +192,11 @@ def _move_player(direction):
         if player_mushroom_count == lvl_mushroom_count:
             clear()
             moveto('+')
-            print("--------")
-            print("You Won!")
-            print("--------")
+            print("Grid:")
+            print(ascii_to_emoji(grid))
+            print("-" * grid_width * 2)
+            print(" " * (grid_width), "You Won!")
+            print("-" * grid_width * 2)
             main += 1
 
             return
@@ -236,33 +235,39 @@ def move_player(direction):
     global player_index, grid, mothergrid, main, player_mushroom_count, item, history, found_item
 
     for inp in direction:
-          if inp.upper() == 'Q':
-            print("Goodbye!")
-            main += 1
+        if main == 0:
+            if inp.upper() == 'Q':
+                print("Goodbye!")
+                main += 1
 
-          elif inp.upper() == 'P':
-              if not found_item:
-                  print("Invalid move. Use W, A, S, D.")
-              elif len(item) == 1:
-                  print('You already have an item, you can\'t pickup another')
-                  # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
-              else:
-                pickup(found_item)
+            elif inp.upper() == 'P':
+                if not found_item:
+                    print("Invalid move. Use W, A, S, D.")
+                elif len(item) == 1:
+                    print('You already have an item, you can\'t pickup another')
+                    # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
+                else:
+                    pickup(found_item)
+                    found_item = None
+                    history[-1] = '.'
+
+            elif inp.upper() == "!":
+
+                print("Restart Successful:")
+
+                player_index = mothergrid.index('L')
+                grid = lvlmapcontent[lvlmapcontent.index('T'):]
                 found_item = None
-                history[-1] = '.'
+                item = []
+                history = ['.']
 
-          elif inp.upper() == "!":
+            elif inp not in moves:
+                break
 
-              print("Restart Successful:")
-
-              player_index = mothergrid.index('L')
-              grid = lvlmapcontent[lvlmapcontent.index('T'):]
-              found_item = None
-              item = []
-              history = ['.']
-
-          else:
-            _move_player(inp)
+            else:
+                _move_player(inp)
+        else:
+            break
 
 # Outputs args.output_file if -o was called, else run the game.
 if args.output_file != None:
