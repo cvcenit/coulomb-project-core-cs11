@@ -7,35 +7,11 @@ parser.add_argument('-m', '--movement')
 parser.add_argument('-o', '--output_file')
 args = parser.parse_args()
 
-# clears the terminal, un daw e
-def clear():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
-clear()
-
-def ascii_to_emoji(map):
-  #input and output str
-  # CHIC i added if c in emoji just in case may character na wala sa ascii
-  emoji = {
-      '.': '⬛',
-      'L': '🧑',
-      'T': '🌲',
-      '+': '🍄',
-      'R': '🪨',
-      '~': '🟦',
-      '_': '⬜',
-      'x': '🪓',
-      '*': '🔥',
-      '\n': '\n'
-      }
-  return ''.join(emoji.get(c, c) for c in map if c in emoji) #replaces ascii value from map to corresponding key from dict, but keeps '\n'
-
-# CHIC i added this for the file, -f <stage_file>, -m <moves> (wala pa ata now since di gumagana ang strings of moves), -o <output.txt> (ako naman n bahala dito, ung final grid lang siya)
-#if args.stage_file == None:
-lvlmap = "99\nTTTTTTTTT\nT...+...T\nT...~...T\nT...R.T.T\nT.T.LTT.T\nT.x...*.T\nT.......T\nT.......T\nTTTTTTTTT"
-#else:
-    #with open(args.stage_file, encoding="utf-8", "r") as lvl:
-      #lvlmap = lvl.read()
+if args.stage_file == None:
+    lvlmap = "99\nTTTTTTTTT\nT...++..T\nT...~...T\nT...R.T.T\nT.T.LTT.T\nT.x...*.T\nT.......T\nT.......T\nTTTTTTTTT"
+else:
+    with open(args.stage_file, "r", encoding="utf-8") as lvl:
+      lvlmap = lvl.read()
 
 lvlmapcontent = list(lvlmap)
 
@@ -60,12 +36,6 @@ item = []
 history = ['.']
 found_item = None
 
-def pickup(tile):
-
-    print(f"You picked up the {describe_tile(tile)}!")
-    item.append(tile)
-    return ascii_to_emoji(tile)
-
 player_index = grid.index('L')
 
 moves = {
@@ -75,6 +45,30 @@ moves = {
     'D': 1,
     'P': 0
 }
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def ascii_to_emoji(map):
+  emoji = {
+      '.': '⬛',
+      'L': '🧑',
+      'T': '🌲',
+      '+': '🍄',
+      'R': '🪨',
+      '~': '🟦',
+      '_': '⬜',
+      'x': '🪓',
+      '*': '🔥',
+      '\n': '\n'
+      }
+  return ''.join(emoji.get(c, c) for c in map if c in emoji) #replaces ascii value from map to corresponding key from dict, but keeps '\n'
+
+def pickup(tile):
+
+    print(f"You picked up the {describe_tile(tile)}!")
+    item.append(tile)
+    return ascii_to_emoji(tile)
 
 def flame_spread(start_row, start_col):
     #used for item flamethrower
@@ -116,8 +110,6 @@ def describe_tile(tile):
     }.get(tile, 'unknown')
 
 def move_player(direction):
-    # clear terminal kada galaw, may mga moves na nawawala yung map and i cant fix it
-    clear()
 
     global player_index, grid, mothergrid, main, player_mushroom_count, item, history, found_item
 
@@ -291,9 +283,7 @@ while main == 0:
         print("Goodbye!")
         break
     elif move == 'P':
-        if not found_item:
-            print("Invalid move. Use W, A, S, D.")
-        elif len(item) == 1:
+        if len(item) == 1:
             print('You already have an item, you can\'t pickup another')
             # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
         else:
