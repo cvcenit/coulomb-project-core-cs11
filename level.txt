@@ -1,0 +1,10 @@
+99
+TTTTTTTTT
+T...+...T
+T...~...T
+T...R.T.T
+T.T..TT.T
+T.x.L.*.T
+T.......T
+T.......T
+TTTTTTTTT
