@@ -149,6 +149,7 @@ def _move_player(direction):
             grid = flame_spread(row, col)
             moveto('.')
             item.clear()
+            found_item = None
         return
 
     elif target_tile == 'R':
