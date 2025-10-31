@@ -13,6 +13,11 @@ else:
     with open(args.stage_file, "r", encoding="utf-8") as lvl:
       lvlmap = lvl.read()
 
+mode = ""
+
+if args.output_file == None:
+    mode = "play"
+
 lvlmapcontent = list(lvlmap)
 
 grid_height = int(lvlmap[:lvlmap.index(' ')])
@@ -24,6 +29,7 @@ grid = lvlmapcontent[lvlmapcontent.index('T'):]
 main = 0
 player_mushroom_count = 0
 lvl_mushroom_count = 0
+drown = False
 
 for x in mothergrid:
     if x == "+":
@@ -108,12 +114,13 @@ def describe_tile(tile):
 
 def _move_player(direction):
 
-    global player_index, grid, mothergrid, main, player_mushroom_count, item, history, found_item
+    global player_index, grid, mothergrid, main, player_mushroom_count, item, history, found_item, drown, mode
 
     def moveto(under_tile):
 
         global player_index, grid, mothergrid, main, player_mushroom_count, item, history
-    
+
+
         grid[player_index] = f"{history[-1]}"  # leave floor behind
         grid[new_index] = 'L'     # new position
         player_index = new_index
@@ -122,11 +129,7 @@ def _move_player(direction):
 
     direction = direction.upper()
 
-    if direction not in moves:
-        return
-
     new_index = player_index + moves[direction]
-
     if not (0 <= new_index < len(grid)):
         print("You can't move outside the grid!")
         return
@@ -152,54 +155,51 @@ def _move_player(direction):
 
         new_rock_index = new_index + moves[direction]
 
-        if new_rock_index > len(grid):
-            print("You can't move the rock there")
-            return
+        if mode == "play":
+            if new_rock_index > len(grid):
+                print("You can't move the rock there")
+                return
 
-        elif grid[new_rock_index] == "~":
-            grid[new_rock_index] = "_"
-            moveto('.')
-            return
+            elif grid[new_rock_index] == "~":
+                grid[new_rock_index] = "_"
+                moveto('.')
+                return
 
-        elif grid[new_rock_index] == "." or grid[new_rock_index] == "_":
-            grid[new_rock_index] = "R"
-            moveto('.')
-            return
+            elif grid[new_rock_index] == "." or grid[new_rock_index] == "_":
+                grid[new_rock_index] = "R"
+                moveto('.')
+                return
 
-        elif grid[new_rock_index] == "R":
-            print("You don't have the strength to push more than one rocks!")
-            return
+            elif grid[new_rock_index] == "R":
+                print("You don't have the strength to push more than one rocks!")
+                return
 
+            else:
+                print("You can't move the rock there!")
+                return
         else:
-            print("You can't move the rock there!")
-            return
+            if grid[new_rock_index] == "~":
+                grid[new_rock_index] = "_"
+                moveto('.')
+                return
+
+            elif grid[new_rock_index] == "." or grid[new_rock_index] == "_":
+                grid[new_rock_index] = "R"
+                moveto('.')
+                return
 
     elif target_tile == '~':
-        clear()
         moveto('~')
-        print("Grid:")
-        print(ascii_to_emoji(grid))
-        print("---------------------------------")
-        print("Game Over! Laro Craft can't swim!")
-        print("---------------------------------")
+        drown = True
         main += 1
-
         return
 
     elif target_tile == "+":
         player_mushroom_count += 1
 
         if player_mushroom_count == lvl_mushroom_count:
-            clear()
             moveto('+')
-            print("Grid:")
-            print(ascii_to_emoji(grid))
-            print("-" * grid_width * 2)
-            print(" " * (grid_width), "You Won!")
-            print("-" * grid_width * 2)
             main += 1
-
-            return
 
         moveto('.')
         return
@@ -237,23 +237,29 @@ def move_player(direction):
     for inp in direction:
         if main == 0:
             if inp.upper() == 'Q':
-                print("Goodbye!")
                 main += 1
 
             elif inp.upper() == 'P':
-                if not found_item:
-                    print("Invalid move. Use W, A, S, D.")
-                elif len(item) == 1:
-                    print('You already have an item, you can\'t pickup another')
-                    # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
+                if mode == "play":
+                    if not found_item:
+                        print("Invalid move. Use W, A, S, D.")
+                    elif len(item) == 1:
+                        print('You already have an item, you can\'t pickup another')
+                        # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
+                    else:
+                        pickup(found_item)
+                        found_item = None
+                        history[-1] = '.'
                 else:
-                    pickup(found_item)
-                    found_item = None
-                    history[-1] = '.'
+                    if found_item and len(item) != 1:
+                        pickup(found_item)
+                        found_item = None
+                        history[-1] = '.'
 
             elif inp.upper() == "!":
 
-                print("Restart Successful:")
+                if mode == "play":
+                    print("Restart Successful:")
 
                 player_index = mothergrid.index('L')
                 grid = lvlmapcontent[lvlmapcontent.index('T'):]
@@ -261,11 +267,11 @@ def move_player(direction):
                 item = []
                 history = ['.']
 
-            elif inp not in moves:
-                break
+            elif inp.upper() in moves:
+                _move_player(inp.upper())
 
             else:
-                _move_player(inp)
+                break
         else:
             break
 
@@ -273,7 +279,13 @@ def move_player(direction):
 if args.output_file != None:
     with open(args.output_file, "w", encoding="utf-8") as output:
         move_player(args.movement)
-        output.write("".join(grid))
+
+        # Contents of the output file: no/clear and grid
+        if player_mushroom_count == lvl_mushroom_count:
+            output.write(f"CLEAR\n{"".join(grid)}")
+        else:
+            output.write((f"NO CLEAR\n{"".join(grid)}"))
+
 else:
     while main == 0:
         # Clears the terminal at the start, and after inputs
@@ -308,10 +320,25 @@ else:
 
         # Player input
         move = input("What will you do? ").strip().upper()
-
-
         move_player(move)
 
+        if player_mushroom_count == lvl_mushroom_count:
+            clear()
+            print("Grid:")
+            print(ascii_to_emoji(grid))
+            print("-" * grid_width * 2)
+            print(" " * ((grid_width // 2) + 1), "You Won!")
+            print("-" * grid_width * 2, "\n")
 
-        if main > 1:
+        if drown:
+            clear()
+            print(f"You need {lvl_mushroom_count} mushroom/s to win!")
+            print("Grid:")
+            print(ascii_to_emoji(grid))
+            print("---------------------------------")
+            print("Game Over! Laro Craft can't swim!")
+            print("---------------------------------")
+            print(f"{player_mushroom_count} out of {lvl_mushroom_count} mushroom/s collected\n")
+
+        if main > 0:
             print("Goodbye!")
