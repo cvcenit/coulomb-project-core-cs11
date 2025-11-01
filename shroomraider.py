@@ -1,23 +1,28 @@
 from argparse import ArgumentParser
 import os
 
+# Add arguments for the command
 parser = ArgumentParser(add_help=False)
 parser.add_argument('-f', '--stage_file')
 parser.add_argument('-m', '--movement')
 parser.add_argument('-o', '--output_file')
 args = parser.parse_args()
 
+# Checks if stage_file will be loaded, else load default map
 if args.stage_file == None:
+    # Default map
     lvlmap = '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT.R.~.~+~TTT~T\nT~.~~T~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~.~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
 else:
+    # Load stage_file
     with open(args.stage_file, "r", encoding="utf-8") as lvl:
       lvlmap = lvl.read()
 
+# Mode whether the player will "play" or will output a file
 mode = ""
-
 if args.output_file == None:
     mode = "play"
 
+# DUSTIN KIM JOSEP AUSIN M SINASABI Q SAU :ANGRY:
 lvlmapcontent = list(lvlmap)
 
 GRID_HEIGHT = int(lvlmap[:lvlmap.index(' ')])
@@ -51,29 +56,30 @@ moves = {
 }
 
 def clear():
+    """This function clears the terminal, it does not return anything"""
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def ascii_to_emoji(map):
-  #input and output str
-  emoji = {
-      '.': '⬛',
-      'L': '🧑',
-      'T': '🌲',
-      '+': '🍄',
-      'R': '🪨',
-      '~': '🟦',
-      '_': '⬜',
-      'x': '🪓',
-      '*': '🔥',
-      '\n': '\n'
-      }
-  return ''.join(emoji.get(c, c) for c in map if c in emoji) #replaces ascii value from map to corresponding key from dict, but keeps '\n'
+def char_to_emoji(map):
+    """Returns the map converted from text characters to emoji"""
+    emoji = {
+        '.': '⬛',
+        'L': '🧑',
+        'T': '🌲',
+        '+': '🍄',
+        'R': '🪨',
+        '~': '🟦',
+        '_': '⬜',
+        'x': '🪓',
+        '*': '🔥',
+        '\n': '\n'
+        }
+    return ''.join(emoji.get(c, c) for c in map if c in emoji)
 
 def pickup(tile):
 
     print(f"You picked up the {describe_tile(tile)}!")
     item.append(tile)
-    return ascii_to_emoji(tile)
+    return char_to_emoji(tile)
 
 def flame_spread(start_row, start_col):
     #used for item flamethrower
@@ -298,7 +304,7 @@ else:
         # Prints the map and mushroom count of the level
         print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
         print("Grid:")
-        print(ascii_to_emoji(grid))
+        print(char_to_emoji(grid))
 
         # Prints the collected mushroom count, and the valid moves
         print(f"{player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected")
@@ -320,7 +326,7 @@ else:
         if not item:
             print("Not holding anything")
         else:
-            print(f"Currently holding {ascii_to_emoji(item[0])}")
+            print(f"Currently holding {char_to_emoji(item[0])}")
 
         # Player input
         move = input("What will you do? ").strip().upper()
@@ -329,7 +335,7 @@ else:
         if player_mushroom_count == LVL_MUSHROOMS:
             clear()
             print("Grid:")
-            print(ascii_to_emoji(grid))
+            print(char_to_emoji(grid))
             print("-" * GRID_WIDTH * 2)
             print(" " * ((GRID_WIDTH // 2) + 1), "You Won!")
             print("-" * GRID_WIDTH * 2, "\n")
@@ -338,7 +344,7 @@ else:
             clear()
             print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
             print("Grid:")
-            print(ascii_to_emoji(grid))
+            print(char_to_emoji(grid))
             print("---------------------------------")
             print("Game Over! Laro Craft can't swim!")
             print("---------------------------------")
