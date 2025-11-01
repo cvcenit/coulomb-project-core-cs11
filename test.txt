@@ -1,7 +1,7 @@
 NO CLEAR
-TTTT~~~~~TTTTT
-T...~.xT~~~~~T
-T..L_.~+~TTT~T
+TT.T~~~~~TTTTT
+.L..~.xT~~~~~T
+T.R.~.~+~TTT~T
 T~.~~T~.~T~T~T
 T~~~~.~R~T~T~T
 T...~x~~~T~T~T
