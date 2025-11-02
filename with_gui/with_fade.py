@@ -239,13 +239,15 @@ def _create_player_menu():
                 already_plr = False
             inc_len = False
         else:
+            already_plr = False
             inc_len = True
         create_plr_done_btn_state = False
 
     if already_plr:
         screen.blit(create_text("Already a player", 32, white)[0], (256, 384))
     if inc_len:
-        screen.blit(create_text("Name must have a minimum of one character, and a maximum of 15 character", 32, white)[0], (256, 384))
+        screen.blit(create_text("Name must have a minimum of one character,", 24, white)[0], (256, 384))
+        screen.blit(create_text("and a maximum of 15 character", 24, white)[0], (256, 408))
 
 def level_menu():
     global menu_state, fade_count, create_plr_btn_state
@@ -316,6 +318,7 @@ while True:
 
     if menu_state == "play":
         if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+            create_plr_btn_state = False
             menu_state = "main"
             fade_count = 0
         if fade_count == 1:
