@@ -60,7 +60,7 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def char_to_emoji(map):
-    """Returns the map converted from text characters to emoji"""
+    # Returns the map converted from text characters to emoji
     emoji = {
         '.': '⬛',
         'L': '🧑',
@@ -76,13 +76,14 @@ def char_to_emoji(map):
     return ''.join(emoji.get(c, c) for c in map if c in emoji)
 
 def pickup(tile):
-
+    # Adds current tile to the list of items held by the player
     print(f"You picked up the {describe_tile(tile)}!")
     item.append(tile)
+    # Returns the current tile in emoji form
     return char_to_emoji(tile)
 
 def flame_spread(start_row, start_col):
-    #used for item flamethrower
+    # Returns the new map when flamethrower is used, or when player approaches tree while holding flamethrower
     global grid
 
     grid_string = ''.join(grid)
@@ -90,15 +91,20 @@ def flame_spread(start_row, start_col):
     row, col = len(grid_2d_list), len(grid_2d_list[0])
 
     def in_bounds(r, c):
+        # Returns True if 2d index is within the range of row and column
         return 0 <= r < row and 0 <= c < col
 
     def flamethrowed(r, c):
+        # Replaces 'T' to '.' if another 'T' shares the same side with the initial approached 'T' and is within the bounds else the recursion stops
         if not in_bounds(r, c) or grid_2d_list[r][c] != 'T':
             return
         grid_2d_list[r][c] = '.'
+
+        # Continously calls itself for every direction 
         for change_row, change_col in [(-1,0), (1,0), (0,-1), (0,1)]:
             flamethrowed(r + change_row, c + change_col)
 
+    # Will only call flamethrowed if the player is approaching 'T'
     if grid_2d_list[start_row][start_col] == 'T':
         flamethrowed(start_row, start_col)
 
@@ -107,6 +113,7 @@ def flame_spread(start_row, start_col):
     return list(new_grid_string)
 
 def describe_tile(tile):
+    # Returns a tile converted from ASCII character to its tile name
     return {
         '.': 'empty',
         'T': 'tree',
@@ -254,7 +261,6 @@ def move_player(direction):
                         print("Invalid move. Use W, A, S, D.")
                     elif len(item) == 1:
                         print('You already have an item, you can\'t pickup another')
-                        # jane: d q pa naaayos dto if may hawak sha tas pinindot 'p', hnde nmn sha gagalaw sa map pero magdidisplay 'you moved onto a player tile' intentional b un ?
                     else:
                         pickup(found_item)
                         found_item = None
