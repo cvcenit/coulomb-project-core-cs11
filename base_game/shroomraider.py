@@ -174,19 +174,18 @@ def _move_player(direction):
 
         # Checks the nature of the targeted tile
         if target_tile == 'T':
-            remove_tree = new_index + moves[direction]
-            if not item:
+            if not item: # Player will not move anywhere if not holding an axe
                 if mode == "play":
                     print("You bumped into a tree!")
-            elif item[0] == 'x':
+            elif item[0] == 'x': # Tree will turn into empty space if player is holding an axe
                 moveto('.')
-                item.clear()
-            elif item[0] == '*':
+                item.clear() # Item is cleared every time after used
+            elif item[0] == '*': # flame_spread function is called when player is holding flamethrower
                 col = (new_index % (GRID_WIDTH+1))
                 row = (new_index - col) // GRID_WIDTH
                 grid = flame_spread(row, col)
                 moveto('.')
-                item.clear()
+                item.clear() # Item is cleared every time after used
             return
 
         elif target_tile == 'R':
