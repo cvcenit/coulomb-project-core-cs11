@@ -22,33 +22,43 @@ mode = ""
 if args.output_file == None:
     mode = "play"
 
-# DUSTIN KIM JOSEP AUSIN M SINASABI Q SAU :ANGRY:
-lvlmapcontent = list(lvlmap)
+# Makes a list with the tiles as its elements from "lvlmap" excluding the values for the height and width
+lvlmapcontent = list(lvlmap[lvlmap.index('\n')+1:])
 
+# Takes the integer strings at their respective indices (height before ' '; width after ' ' and before the first \n) and converts into integers
 GRID_HEIGHT = int(lvlmap[:lvlmap.index(' ')])
 GRID_WIDTH = int(lvlmap[lvlmap.index(' ')+1: lvlmap.index('\n')])
 
-MOTHERGRID = lvlmapcontent[lvlmapcontent.index('\n') + 1:]
+# Serves as the base grid for the level (will not be mutated)
+MOTHERGRID = lvlmapcontent
 
+# Serves as the working grid for the level (will be mutated)
+grid = lvlmapcontent
+
+# Counts the amount of mushrooms needed to win the level
 LVL_MUSHROOMS = 0
-DROWNED = False
-
-grid = lvlmapcontent[lvlmapcontent.index('\n') + 1:]
-main = 0
-
-player_mushroom_count = 0
 for x in lvlmap:
     if x == "+":
         LVL_MUSHROOMS += 1
 
+# Lists the indices of '\n' characters
+_n_indices = range(lvlmapcontent.index('\n'), len(lvlmapcontent), GRID_WIDTH + 1)
+
+# Main loop
+main = 0
+
+#Default player attributes
 item = []
 history = ['.']
 found_item = None
+DROWNED = False
+player_mushroom_count = 0
 
 player_index = grid.index('L')
 
+# Library of inputs with their corresponding change in index (+1 in width to accommodate for the '\n' characters)
 moves = {
-    'W': -GRID_WIDTH - 1,
+    'W': -(GRID_WIDTH + 1),
     'S': GRID_WIDTH + 1,
     'A': -1,
     'D': 1,
@@ -128,27 +138,41 @@ def describe_tile(tile):
 
 def _move_player(direction):
 
+    # Takes the directional input of the player and moves the player accordingly
+
     global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history, found_item, DROWNED, mode
 
     def moveto(under_tile):
 
+        # Mutates the grid; Doesn't return anything
         global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history
 
-        grid[player_index] = f"{history[-1]}"  # leave floor behind
-        grid[new_index] = 'L'     # new position
+        # Sets the tile left behind by the player as the tile it previously was based on the history list
+        grid[player_index] = f"{history[-1]}" 
+
+        # Sets the tile at new_index as the player tile
+        grid[new_index] = 'L'
+
+        # Updates the current player_index
         player_index = new_index
 
+        # Appends the under_tile(the tile the player moved to) into the history list
         history.append(under_tile)
 
+    # The targeted index of the player based on the move
     new_index = player_index + moves[direction]
 
-    if not ((0 <= new_index < len(grid))):
+    # Checks if either the targeted index is out of bounds
+    if not (0 <= new_index < len(grid)) or new_index in _n_indices # Avoids the mutation of \n indices: 
         if mode == "play":
             print("You can't move outside the grid!")
         return
+
     else:
+        # Gets the tile of the targeted index
         target_tile = grid[new_index]
 
+        # Checks the nature of the targeted tile
         if target_tile == 'T':
             remove_tree = new_index + moves[direction]
             if not item:
@@ -167,88 +191,96 @@ def _move_player(direction):
 
         elif target_tile == 'R':
 
+            # New position of the rock as it moves along with the player
             new_rock_index = new_index + moves[direction]
 
             if mode == "play":
-                if new_rock_index > len(grid):
+
+                # Checks if it is possible to move the rock to the new index
+
+                if new_rock_index > len(grid) or in _n_indices: # Checks if it will go out of bounds or in a '\n' index
                     print("You can't move the rock there")
                     return
 
-                elif grid[new_rock_index] == "~":
+                elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
                     grid[new_rock_index] = "_"
                     moveto('.')
                     return
 
-                elif grid[new_rock_index] == "." or grid[new_rock_index] == "_":
+                elif grid[new_rock_index] == "." or grid[new_rock_index] == "_":    # Moves the rock along
                     grid[new_rock_index] = "R"
                     moveto('.')
                     return
 
-                elif grid[new_rock_index] == "R":
+                elif grid[new_rock_index] == "R":   # Checks if the player is trying to move two rocks at the same time
                     print("You don't have the strength to push more than one rocks!")
                     return
 
-                else:
-                    print("You can't move the rock there!")
-                    return
-            else:
-                if grid[new_rock_index] == "~":
-                    grid[new_rock_index] = "_"
-                    moveto('.')
-                    return
-
-                elif grid[new_rock_index] == "." or grid[new_rock_index] == "_":
-                    grid[new_rock_index] = "R"
-                    moveto('.')
-                    return
+            return
 
         elif target_tile == '~':
+
+            # Moves the player into the water
             moveto('~')
+
+            # Changes the following player attributes
             DROWNED = True
             main += 1
+
             return
 
         elif target_tile == "+":
+
+            # Increases the collected mushroom count of the player
             player_mushroom_count += 1
 
+            # Checks if the player has reached the required amount of mushrooms
             if player_mushroom_count == LVL_MUSHROOMS:
                 moveto('+')
                 main += 1
 
+            # Moves the player and leaves an empty tile
             moveto('.')
             return
 
         elif target_tile == "x":
+
+            # Updates the found item as an axe
             found_item = 'x'
-            if not item:
-                moveto('x')
-            elif len(item) == 1:
-                moveto('x')
-            else:
-                moveto('.')
+            moveto('x')
+
             return
 
         elif target_tile == "*":
+
+            # Updates the found item as a flamethrower
             found_item = '*'
-            if not item:
-                moveto('*')
-            elif len(item) == 1:
-                moveto('*')
-            else:
-                moveto('.')
+            moveto('*')
+
             return
 
         elif target_tile == "_":
+
+            # No items in a paved tile
+            found_item = None
             moveto('_')
+
             return
 
         else:
+
+            # No items in an empty tile
             found_item = None
             moveto('.')
 
+            return
+
 def move_player(direction):
+
+    # Takes the user input and proceeds accordingly
     global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history, found_item
 
+    # Processes each input in a string of inputs
     for inp in direction:
         inp = inp.upper()
         if main == 0:
@@ -256,6 +288,7 @@ def move_player(direction):
                 main += 1
 
             elif inp == 'P':
+                # Picks up the found item
                 if mode == "play":
                     if not found_item:
                         print("Invalid move. Use W, A, S, D.")
@@ -264,18 +297,14 @@ def move_player(direction):
                     else:
                         pickup(found_item)
                         found_item = None
-                        history[-1] = '.'
-                else:
-                    if found_item and len(item) != 1:
-                        pickup(found_item)
-                        found_item = None
-                        history[-1] = '.'
+                        history[-1] = '.' # Sets the previous tile as an empty tile after picking up the item
 
             elif inp == "!":
-
+                # Restarts the game
                 if mode == "play":
                     print("Restart Successful:")
 
+                # Restores the player attributes back to default
                 player_index = MOTHERGRID.index('L')
                 grid = lvlmapcontent[lvlmapcontent.index("\n") + 1:]
                 found_item = None
@@ -286,6 +315,7 @@ def move_player(direction):
             elif inp in moves:
                 _move_player(inp)
 
+            # Breaks the loop when an invalid input is detected
             else:
                 break
         else:
