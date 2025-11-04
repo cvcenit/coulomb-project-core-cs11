@@ -94,6 +94,71 @@ def test_pickup():
 
 
 def test_flame_spread():
-    test1 = 
+    #jane: hindi q pa to natetest pero if may error prolly sa leading or trailing spaces. grid is same sa defined grid sa shroomraider.py
+    assert ''.join(flame_spread(0, 1)) == """
+....~~~~~.....
+..L.~.xT~~~~~.
+..R.~.~+~TTT~.
+.~.~~T~.~T~T~.
+.~~~~.~R~T~T~.
+....~x~~~T~T~.
+...T~.~.~T~T~.
+.~+...~..*~+~.
+.~~~~~~~~~~~~.
+..............
+"""
+    assert ''.join(flame_spread(1, 7)) == """
+TTTT~~~~~TTTTT
+T.L.~.x.~~~~~T
+T.R.~.~+~TTT~T
+T~.~~T~.~T~T~T
+T~~~~.~R~T~T~T
+T...~x~~~T~T~T
+TT.T~.~.~T~T~T
+T~+...~..*~+~T
+T~~~~~~~~~~~~T
+TTTTTTTTTTTTTT
+"""
+    assert ''.join(flame_spread(5, 9)) == """
+TTTT~~~~~TTTTT
+T.L.~.xT~~~~~T
+T.R.~.~+~...~T
+T~.~~T~.~.~.~T
+T~~~~.~R~.~.~T
+T...~x~~~.~.~T
+TT.T~.~.~.~.~T
+T~+...~..*~+~T
+T~~~~~~~~~~~~T
+TTTTTTTTTTTTTT
+"""
+    assert ''.join(flame_spread(5, 6)) == """
+TTTT~~~~~TTTTT
+T.L.~.xT~~~~~T
+T.R.~.~+~TTT~T
+T~.~~T~.~T~T~T
+T~~~~.~R~T~T~T
+T...~x~~~T~T~T
+TT.T~.~.~T~T~T
+T~+...~..*~+~T
+T~~~~~~~~~~~~T
+TTTTTTTTTTTTTT
+"""
+
+
+def test_describe_tile():
+    assert describe_tile('.') == 'empty'
+    assert describe_tile('T') == 'tree'
+    assert describe_tile('+') == 'mushroom'
+    assert describe_tile('R') == 'rock'
+    assert describe_tile('L') == 'player'
+    assert describe_tile('`') == 'water'
+    assert describe_tile('_') == 'paved'
+    assert describe_tile('x') == 'axe'
+    assert describe_tile('*') == 'flamethrower'
+
+
+def test_move_player():
+    
+        
   
 
