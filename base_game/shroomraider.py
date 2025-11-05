@@ -30,10 +30,10 @@ GRID_HEIGHT = int(lvlmap[:lvlmap.index(' ')])
 GRID_WIDTH = int(lvlmap[lvlmap.index(' ')+1: lvlmap.index('\n')])
 
 # Serves as the base grid for the level (will not be mutated)
-MOTHERGRID = lvlmapcontent
+MOTHERGRID = list(''.join(lvlmapcontent))
 
 # Serves as the working grid for the level (will be mutated)
-grid = lvlmapcontent
+grid = list(''.join(lvlmapcontent))
 
 # Counts the amount of mushrooms needed to win the level
 LVL_MUSHROOMS = 0
@@ -65,7 +65,7 @@ moves = {
     'P': 0
 }
 
-def clear():
+def clear_terminal():
     """This function clears the terminal, it does not return anything"""
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -163,7 +163,7 @@ def _move_player(direction):
     new_index = player_index + moves[direction]
 
     # Checks if either the targeted index is out of bounds
-    if not (0 <= new_index < len(grid)) or new_index in _n_indices # Avoids the mutation of \n indices: 
+    if not (0 <= new_index < len(grid)) or new_index in _n_indices: # Avoids the mutation of \n indices: 
         if mode == "play":
             print("You can't move outside the grid!")
         return
@@ -197,7 +197,7 @@ def _move_player(direction):
 
                 # Checks if it is possible to move the rock to the new index
 
-                if new_rock_index > len(grid) or in _n_indices: # Checks if it will go out of bounds or in a '\n' index
+                if new_rock_index > len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
                     print("You can't move the rock there")
                     return
 
@@ -213,6 +213,16 @@ def _move_player(direction):
 
                 elif grid[new_rock_index] == "R":   # Checks if the player is trying to move two rocks at the same time
                     print("You don't have the strength to push more than one rocks!")
+                    return
+            else:
+                if grid[new_rock_index] == "~":    # Converts a water tile into a paved tile
+                    grid[new_rock_index] = "_"
+                    moveto('.')
+                    return
+
+                elif grid[new_rock_index] == "." or grid[new_rock_index] == "_":    # Moves the rock along
+                    grid[new_rock_index] = "R"
+                    moveto('.')
                     return
 
             return
@@ -300,12 +310,10 @@ def move_player(direction):
 
             elif inp == "!":
                 # Restarts the game
-                if mode == "play":
-                    print("Restart Successful:")
 
                 # Restores the player attributes back to default
                 player_index = MOTHERGRID.index('L')
-                grid = lvlmapcontent[lvlmapcontent.index("\n") + 1:]
+                grid = list(MOTHERGRID)
                 found_item = None
                 item = []
                 history = ['.']
@@ -334,7 +342,7 @@ if mode == "":
 else:
     while main == 0:
         # Clears the terminal at the start, and after inputs
-        clear()
+        clear_terminal()
 
         # Prints the map and mushroom count of the level
         print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
@@ -349,6 +357,7 @@ else:
         [S] Move down
         [D] Move right
         [!] Reset
+        [Q] Quit
         ''')
 
         # Prints the available item beneath the player, if any or none
@@ -368,7 +377,7 @@ else:
         move_player(move)
 
         if player_mushroom_count == LVL_MUSHROOMS:
-            clear()
+            clear_terminal()
             print("Grid:")
             print(char_to_emoji(grid))
             print("-" * GRID_WIDTH * 2)
@@ -376,7 +385,7 @@ else:
             print("-" * GRID_WIDTH * 2, "\n")
 
         if DROWNED:
-            clear()
+            clear_terminal()
             print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
             print("Grid:")
             print(char_to_emoji(grid))
