@@ -44,10 +44,10 @@ for x in lvlmap:
 # Lists the indices of '\n' characters
 _n_indices = range(lvlmapcontent.index('\n'), len(lvlmapcontent), GRID_WIDTH + 1)
 
-# Main loop
+# Main loop 'count'
 main = 0
 
-#Default player attributes
+# Default player attributes
 item = []
 history = ['.']
 found_item = None
@@ -87,7 +87,8 @@ def char_to_emoji(map):
 
 def pickup(tile):
     # Adds current tile to the list of items held by the player
-    print(f"You picked up the {describe_tile(tile)}!")
+    if mode == "play":
+        print(f"You picked up the {describe_tile(tile)}!")
     item.append(tile)
     # Returns the current tile in emoji form
     return char_to_emoji(tile)
@@ -303,6 +304,15 @@ def move_player(direction):
                         print("Invalid move. Use W, A, S, D.")
                     elif len(item) == 1:
                         print('You already have an item, you can\'t pickup another')
+                    else:
+                        pickup(found_item)
+                        found_item = None
+                        history[-1] = '.' # Sets the previous tile as an empty tile after picking up the item
+                else:
+                    if not found_item:
+                        pass
+                    elif len(item) == 1:
+                        pass
                     else:
                         pickup(found_item)
                         found_item = None

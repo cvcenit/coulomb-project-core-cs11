@@ -1,4 +1,4 @@
-from shroomraider import char_to_emoji, flame_spread, pickup, describe_tile, item
+from shroomraider import char_to_emoji, flame_spread, pickup, describe_tile, item, mode
 
 def test_char_to_emoji():
     test1 = '''\
@@ -64,26 +64,40 @@ def test_pickup():
     test1, test2, test3 = 'x', '*', '.' 
     
     item.clear()
-    pickup('test1')
-    assert 'test1' in item
+    pickup(test1)
+    assert test1 in item
     assert len(item) == 1
-    assert pickup('test1') == '🪓'
+    assert pickup(test1) == '🪓'
 
     item.clear()
-    pickup('test2')
-    assert 'test2' in item
+    pickup(test2)
+    assert test2 in item
     assert len(item) == 1
-    assert pickup('test2') == '🔥'
+    assert pickup(test2) == '🔥'
 
     item.clear()
-    pickup('test3')
-    assert 'test3' in item
+    pickup(test3)
+    assert test3 in item
     assert len(item) == 1
-    assert pickup('test3') == '⬛'
+    assert pickup(test3) == '⬛'
 
 
 def test_flame_spread():
     #jane: hindi q pa to natetest pero if may error prolly sa leading or trailing spaces. grid is same sa defined grid sa shroomraider.py
+    
+    print(''.join(flame_spread(0, 1)))
+    print("""\
+....~~~~~.....
+..L.~.xT~~~~~.
+..R.~.~+~TTT~.
+.~.~~T~.~T~T~.
+.~~~~.~R~T~T~.
+....~x~~~T~T~.
+...T~.~.~T~T~.
+.~+...~..*~+~.
+.~~~~~~~~~~~~.
+..............
+""")
     assert ''.join(flame_spread(0, 1)) == """\
 ....~~~~~.....
 ..L.~.xT~~~~~.
@@ -148,8 +162,3 @@ def test_describe_tile():
 
 def test_move_player():
     ...
-
-test_char_to_emoji()
-test_pickup()
-test_flame_spread()
-test_describe_tile()

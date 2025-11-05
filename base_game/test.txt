@@ -1,11 +1,11 @@
 NO CLEAR
 TTTT~~~~~TTTTT
-T...~.xT~~~~~T
-T...~.~+~TTT~T
+T...~..L~~~~~T
+T..._.~+~TTT~T
 T~.~~T~.~T~T~T
-T~_~~.~R~T~T~T
+T~~~~.~R~T~T~T
 T...~x~~~T~T~T
-TTLT~.~.~T~T~T
+TT.T~.~.~T~T~T
 T~+...~..*~+~T
 T~~~~~~~~~~~~T
 TTTTTTTTTTTTTT
