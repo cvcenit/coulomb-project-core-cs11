@@ -1,26 +1,48 @@
 from argparse import ArgumentParser
 import os
 
-# Add arguments for the command
-parser = ArgumentParser(add_help=False)
-parser.add_argument('-f', '--stage_file')
-parser.add_argument('-m', '--movement')
-parser.add_argument('-o', '--output_file')
-args = parser.parse_args()
+def add_args():
+    ''' Adds arguments, will only be called if __name__ == "__main__" below '''
+    parser = ArgumentParser(add_help=False)
+    parser.add_argument('-f', '--stage_file')
+    parser.add_argument('-m', '--movement')
+    parser.add_argument('-o', '--output_file')
+    return parser.parse_args()
 
-# Checks if stage_file will be loaded, else load default map
-if args.stage_file == None:
-    # Default map
-    lvlmap = '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT.R.~.~+~TTT~T\nT~.~~T~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~.~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
+def pick_map(stage_file=None):
+    ''' Returns default map if there's no stage_file, else returns the stage file '''
+    if stage_file == None:
+        return '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT.R.~.~+~TTT~T\nT~.~~T~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~.~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
+    else:
+        with open(stage_file, "r", encoding="utf-8") as lvl:
+          return lvl.read()
+
+def choose_mode(output_file=None):
+    ''' Checks if -o has an argument, returns either "play" or an empty string to determine the mode'''
+    return 'play' if output_file is None else ''
+
+
+def clear_terminal():
+    """This function clears the terminal, it does not return anything"""
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+if __name__ == "__main__":
+    args = add_args()
+    mode = choose_mode(args.output_file) # Mode if to play or to output
+    lvlmap = pick_map(args.stage_file) # Map as string/raw
 else:
-    # Load stage_file
-    with open(args.stage_file, "r", encoding="utf-8") as lvl:
-      lvlmap = lvl.read()
+    mode = choose_mode() # Mode if to play or to output
+    lvlmap = pick_map() # Map as string/raw
 
-# Mode whether the player will "play" or will output a file
-mode = ""
-if args.output_file == None:
-    mode = "play"
+# Main loop 'count'
+main = 0
+
+# Default player attributes
+item = []
+history = ['.']
+found_item = None
+DROWNED = False
+player_mushroom_count = 0
 
 # Makes a list with the tiles as its elements from "lvlmap" excluding the values for the height and width
 lvlmapcontent = list(lvlmap[lvlmap.index('\n')+1:])
@@ -44,16 +66,6 @@ for x in lvlmap:
 # Lists the indices of '\n' characters
 _n_indices = range(lvlmapcontent.index('\n'), len(lvlmapcontent), GRID_WIDTH + 1)
 
-# Main loop 'count'
-main = 0
-
-# Default player attributes
-item = []
-history = ['.']
-found_item = None
-DROWNED = False
-player_mushroom_count = 0
-
 player_index = grid.index('L')
 
 # Library of inputs with their corresponding change in index (+1 in width to accommodate for the '\n' characters)
@@ -64,10 +76,6 @@ moves = {
     'D': 1,
     'P': 0
 }
-
-def clear_terminal():
-    """This function clears the terminal, it does not return anything"""
-    os.system('cls' if os.name == 'nt' else 'clear')
 
 def char_to_emoji(map):
     # Returns the map converted from text characters to emoji
@@ -87,8 +95,6 @@ def char_to_emoji(map):
 
 def pickup(tile):
     # Adds current tile to the list of items held by the player
-    if mode == "play":
-        print(f"You picked up the {describe_tile(tile)}!")
     item.append(tile)
     # Returns the current tile in emoji form
     return char_to_emoji(tile)
@@ -338,71 +344,72 @@ def move_player(direction):
         else:
             break
 
-# Outputs args.output_file if -o was called, else run the game.
-if mode == "":
-    with open(args.output_file, "w", encoding="utf-8") as output:
-        move_player(args.movement)
+if __name__ == "__main__":
+    # Outputs args.output_file if -o was called, else run the game.
+    if mode == "":
+        with open(args.output_file, "w", encoding="utf-8") as output:
+            move_player(args.movement)
 
-        # Contents of the output file: no/clear and grid
-        if player_mushroom_count == LVL_MUSHROOMS:
-            output.write(f"CLEAR\n{"".join(grid)}")
-        else:
-            output.write((f"NO CLEAR\n{"".join(grid)}"))
+            # Contents of the output file: no/clear and grid
+            if player_mushroom_count == LVL_MUSHROOMS:
+                output.write(f"CLEAR\n{"".join(grid)}")
+            else:
+                output.write((f"NO CLEAR\n{"".join(grid)}"))
 
-else:
-    while main == 0:
-        # Clears the terminal at the start, and after inputs
-        clear_terminal()
-
-        # Prints the map and mushroom count of the level
-        print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
-        print("Grid:")
-        print(char_to_emoji(grid))
-
-        # Prints the collected mushroom count, and the valid moves
-        print(f"{player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected")
-        print('''
-        [W] Move up
-        [A] Move left
-        [S] Move down
-        [D] Move right
-        [!] Reset
-        [Q] Quit
-        ''')
-
-        # Prints the available item beneath the player, if any or none
-        if not found_item:
-            print("No items here")
-        else:
-            print(f"[P] Pick up {describe_tile(found_item)}")
-
-        # Prints the item currently held by the player, if any or none
-        if not item:
-            print("Not holding anything")
-        else:
-            print(f"Currently holding {char_to_emoji(item[0])}")
-
-        # Player input
-        move = input("What will you do? ").strip().upper()
-        move_player(move)
-
-        if player_mushroom_count == LVL_MUSHROOMS:
+    else:
+        while main == 0:
+            # Clears the terminal at the start, and after inputs
             clear_terminal()
-            print("Grid:")
-            print(char_to_emoji(grid))
-            print("-" * GRID_WIDTH * 2)
-            print(" " * ((GRID_WIDTH // 2) + 1), "You Won!")
-            print("-" * GRID_WIDTH * 2, "\n")
 
-        if DROWNED:
-            clear_terminal()
+            # Prints the map and mushroom count of the level
             print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
             print("Grid:")
             print(char_to_emoji(grid))
-            print("---------------------------------")
-            print("Game Over! Laro Craft can't swim!")
-            print("---------------------------------")
-            print(f"{player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected\n")
 
-        if main > 0:
-            print("Goodbye!")
+            # Prints the collected mushroom count, and the valid moves
+            print(f"{player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected")
+            print('''
+            [W] Move up
+            [A] Move left
+            [S] Move down
+            [D] Move right
+            [!] Reset
+            [Q] Quit
+            ''')
+
+            # Prints the available item beneath the player, if any or none
+            if not found_item:
+                print("No items here")
+            else:
+                print(f"[P] Pick up {describe_tile(found_item)}")
+
+            # Prints the item currently held by the player, if any or none
+            if not item:
+                print("Not holding anything")
+            else:
+                print(f"Currently holding {char_to_emoji(item[0])}")
+
+            # Player input
+            move = input("What will you do? ").strip().upper()
+            move_player(move)
+
+            if player_mushroom_count == LVL_MUSHROOMS:
+                clear_terminal()
+                print("Grid:")
+                print(char_to_emoji(grid))
+                print("-" * GRID_WIDTH * 2)
+                print(" " * ((GRID_WIDTH // 2) + 1), "You Won!")
+                print("-" * GRID_WIDTH * 2, "\n")
+
+            if DROWNED:
+                clear_terminal()
+                print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
+                print("Grid:")
+                print(char_to_emoji(grid))
+                print("---------------------------------")
+                print("Game Over! Laro Craft can't swim!")
+                print("---------------------------------")
+                print(f"{player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected\n")
+
+            if main > 0:
+                print("Goodbye!")

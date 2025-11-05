@@ -1,4 +1,4 @@
-from shroomraider import char_to_emoji, flame_spread, pickup, describe_tile, item, mode
+from shroom_raider import char_to_emoji, flame_spread, pickup, describe_tile, item
 
 def test_char_to_emoji():
     test1 = '''\
@@ -81,23 +81,8 @@ def test_pickup():
     assert len(item) == 1
     assert pickup(test3) == '⬛'
 
-
 def test_flame_spread():
     #jane: hindi q pa to natetest pero if may error prolly sa leading or trailing spaces. grid is same sa defined grid sa shroomraider.py
-    
-    print(''.join(flame_spread(0, 1)))
-    print("""\
-....~~~~~.....
-..L.~.xT~~~~~.
-..R.~.~+~TTT~.
-.~.~~T~.~T~T~.
-.~~~~.~R~T~T~.
-....~x~~~T~T~.
-...T~.~.~T~T~.
-.~+...~..*~+~.
-.~~~~~~~~~~~~.
-..............
-""")
     assert ''.join(flame_spread(0, 1)) == """\
 ....~~~~~.....
 ..L.~.xT~~~~~.
@@ -108,8 +93,7 @@ def test_flame_spread():
 ...T~.~.~T~T~.
 .~+...~..*~+~.
 .~~~~~~~~~~~~.
-..............
-"""
+.............."""
     assert ''.join(flame_spread(1, 7)) == """\
 TTTT~~~~~TTTTT
 T.L.~.x.~~~~~T
@@ -120,8 +104,7 @@ T...~x~~~T~T~T
 TT.T~.~.~T~T~T
 T~+...~..*~+~T
 T~~~~~~~~~~~~T
-TTTTTTTTTTTTTT
-"""
+TTTTTTTTTTTTTT"""
     assert ''.join(flame_spread(5, 9)) == """\
 TTTT~~~~~TTTTT
 T.L.~.xT~~~~~T
@@ -132,8 +115,7 @@ T...~x~~~.~.~T
 TT.T~.~.~.~.~T
 T~+...~..*~+~T
 T~~~~~~~~~~~~T
-TTTTTTTTTTTTTT
-"""
+TTTTTTTTTTTTTT"""
     assert ''.join(flame_spread(5, 6)) == """\
 TTTT~~~~~TTTTT
 T.L.~.xT~~~~~T
@@ -144,8 +126,7 @@ T...~x~~~T~T~T
 TT.T~.~.~T~T~T
 T~+...~..*~+~T
 T~~~~~~~~~~~~T
-TTTTTTTTTTTTTT
-"""
+TTTTTTTTTTTTTT"""
 
 
 def test_describe_tile():
@@ -158,7 +139,3 @@ def test_describe_tile():
     assert describe_tile('_') == 'paved'
     assert describe_tile('x') == 'axe'
     assert describe_tile('*') == 'flamethrower'
-
-
-def test_move_player():
-    ...
