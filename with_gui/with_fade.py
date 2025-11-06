@@ -1,4 +1,5 @@
-import sys, pygame, time, datetime, os
+import sys, pygame, datetime, os, json
+import time as pythontime
 from pygame import *
 
 pygame.init()
@@ -12,14 +13,83 @@ screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Shroomraider")
 
 menu_state = "main"
-
 clock = pygame.time.Clock()
 
+class player_on_list():
+    def __init__(self, name, count):
+        self.name = name
+        self.count = count
+        width, height = 728, 80
+        x, y = 148, 148 + (100 * count)
+        self.width, self.height, self.x, self.y = width, height, x ,y
+        self.clicked, self.hovered = False, False
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+
+    def draw(self):
+        action = False
+        pos = pygame.mouse.get_pos()
+
+        # Hover effects
+        if self.rect.collidepoint(pos):
+            bg_outer = pygame.Surface((self.width + 8, self.height + 8), pygame.SRCALPHA)
+            bg_outer.fill((0, 0, 0, 0))
+            pygame.draw.rect(bg_outer, (main_color), bg_outer.get_rect(), border_radius=16)
+            screen.blit(bg_outer, (self.x - 4, self.y - 4))
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
+                action = True
+            self.hovered = True
+
+        if not self.rect.collidepoint(pos) and self.hovered == True:
+            self.hovered = False
+
+
+        # Background
+        bg = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        bg.fill((0, 0, 0, 0))
+        pygame.draw.rect(bg, (255, 255, 255), bg.get_rect(), border_radius=16)
+        screen.blit(bg, (self.x, self.y))
+
+        # Player data
+        with open(f"data/players/{self.name}.json", "r") as f:
+            loaded_data = json.load(f)
+        
+        try:
+            plr = loaded_data["name"]
+            dt_created = loaded_data["time_created"]
+            s = loaded_data["since_epoch"]
+            maps = loaded_data["maps_finished"]
+            ply_time = loaded_data["playing_time"]
+            mush_tot = loaded_data["mush_collected"]
+        except Exception as e:
+            print(f"Invalid player file, error={e}")
+
+        # Show data on screen
+        plr_text_outer = create_text(plr, 32, black)[0]
+        screen.blit(plr_text_outer, (self.x + 13, self.y + 4))
+        plr_text = create_text(plr, 32, main_color)[0]
+        screen.blit(plr_text, (self.x + 12, self.y + 4))
+        dt_created_text = create_text(dt_created, 24, black)[0]
+        screen.blit(dt_created_text, (self.x + 12, self.y + self.height//2))
+        ply_time_text = create_text(f"| Play time: {ply_time}", 24, black)[0]
+        screen.blit(ply_time_text, (self.x + 32 + dt_created_text.get_width(), self.y + self.height//2))
+        mush_tot_text = create_text(f"| Mushrooms: {mush_tot} |", 24, black)[0]
+        screen.blit(mush_tot_text, (self.x + 48 + dt_created_text.get_width() + ply_time_text.get_width(), self.y + self.height//2))
+
+        # Delete button
+        plr_del_btn = text_Button_1(self.x + self.width - (32 * 6), self.y + 4, "Delete", 32, (255, 100, 100))
+        if plr_del_btn.draw():
+            os.remove(f"data/players/{self.name}.json")
+
+
 class text_Button_1():
-    def __init__(self, x, y, text, s):
-        text, capt = create_text(text, s, white)
+    def __init__(self, x, y, t, s, col):
+        self.col = col
+        text, capt = create_text(t, s, col)
+        outer, capt = create_text(t, s, black)
         self.s = s
         self.capt = capt
+        self.outer = outer
         self.width = text.get_width()
         self.height = text.get_height()
         self.text = text
@@ -43,19 +113,23 @@ class text_Button_1():
             self.clicked = False
 
         if not self.rect.collidepoint(pos) and self.hovered == True:
-            self.text, s = create_text(self.capt, self.s, white)
+            self.text, s = create_text(self.capt, self.s, self.col)
+            self.outer, s = create_text(self.capt, self.s, black)
             self.hovered = False
 
+        screen.blit(self.outer, (self.rect.x + 2, self.rect.y))
         screen.blit(self.text, (self.rect.x, self.rect.y))
 
         return action
 
 
 class text_Button():
-    def __init__(self, x, y, text, s):
-        text, capt = create_text(text, s, main_color)
+    def __init__(self, x, y, t, s):
+        text, capt = create_text(t, s, main_color)
+        outer, capt = create_text(t, s, black)
         self.s = s
         self.capt = capt
+        self.outer = outer
         self.width = text.get_width()
         self.height = text.get_height()
         self.text = text
@@ -70,6 +144,7 @@ class text_Button():
 
         if self.rect.collidepoint(pos):
             self.text, s = create_text(self.capt, self.s + 12, white)
+            self.outer, s = create_text(self.capt, self.s + 12, black)
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 self.clicked = True
                 action = True
@@ -80,8 +155,10 @@ class text_Button():
 
         if not self.rect.collidepoint(pos) and self.hovered == True:
             self.text, s = create_text(self.capt, self.s, main_color)
+            self.outer, s = create_text(self.capt, self.s, black)
             self.hovered = False
 
+        screen.blit(self.outer, (self.rect.x + 4, self.rect.y))
         screen.blit(self.text, (self.rect.x, self.rect.y))
 
         return action
@@ -95,7 +172,6 @@ def create_text(text, s, color):
 def fade_black():
     alphaSurface = Surface((1024, 768), pygame.SRCALPHA) # The custom-surface of the size of the screen.
     alph = 0 # Set alpha to 0 before the main-loop.
-    clock = pygame.time.Clock()
 
     while alph < 245:
         alph += 10  # Increment alpha by a really small value
@@ -115,7 +191,6 @@ def fade_black():
 def fade_in(surf):
     alphaSurface = Surface((1024, 768), pygame.SRCALPHA) # The custom-surface of the size of the screen.
     alph = 255 # Set alpha to 0 before the main-loop.
-    clock = pygame.time.Clock()
 
     while alph > 10:
         alph -= 10  # Increment alpha by a really small value
@@ -135,10 +210,6 @@ def fade_in(surf):
 
 fade_count = 0
 
-# Data
-players = [player for player in os.listdir("data/players")]
-
-
 # Images
 menu_bg_img1 = pygame.image.load("assets/bg/1st Layer.png")
 menu_bg_img2 = pygame.image.load("assets/bg/2nd Layer.png")
@@ -154,14 +225,17 @@ options_btn = text_Button(128, 504, "Options", 60)
 quit_btn = text_Button(128, 576, "Quit", 60)
 
 # Play menu buttons
-create_plr_btn = text_Button_1(512, 640, "New Player", 48)
-create_plr_done_btn = text_Button_1(512, 448, "Done", 48)
-create_plr_back_btn = text_Button_1(256, 448, "Back", 48)
-play_menu_back_btn = text_Button_1(128, 640, "Back", 48)
+create_plr_btn = text_Button_1(512, 640, "New Player", 48, white)
+create_plr_done_btn = text_Button_1(512, 448, "Done", 48, white)
+create_plr_back_btn = text_Button_1((1000 - (24 * 16))//2, 448, "Back", 48, white)
+play_menu_back_btn = text_Button_1(148, 640, "Back", 48, white)
 create_plr_btn_state = False
 create_plr_done_btn_state = False
 already_plr = False
 inc_len = False
+
+def menu_background():
+    ...
 
 def main_menu():
     global menu_state
@@ -173,10 +247,22 @@ def main_menu():
     screen.blit(menu_bg_img2, (0, 0))
     screen.blit(menu_bg_img1, (0, 0))
 
+    # 'Blur' background
+    blur = pygame.Surface((1024, 768), pygame.SRCALPHA)
+    blur.fill((0, 0, 0, 150))
+    screen.blit(blur, (0, 0))
+
     # Semi-background
-    semibg = pygame.Surface((1024 - 256 - 128, 768 - 348), pygame.SRCALPHA)
-    semibg.fill((0, 0, 0, 150))
+    semibg = pygame.Surface((1024 - 64 - 128, 768 - 348), pygame.SRCALPHA)
+    semibg.fill((0, 0, 0, 160))
     screen.blit(semibg, (92, 264))
+
+    # Title
+    title = create_text("SHROOM RAIDER", 112, main_color)[0]
+    title_outer = create_text("SHROOM RAIDER", 112, black)[0]
+    screen.blit(title_outer, ((1024 - title_outer.get_width()) // 2, 92))
+    screen.blit(title, (((1024 - title.get_width()) // 2) - 4, 92))
+
 
     # Buttons
     if play_btn.draw():
@@ -194,34 +280,56 @@ def main_menu():
     elif quit_btn.draw():
         sys.exit()
 
-def _create_player(name, date):
+players = [player for player in os.listdir("data/players")]
+
+def _create_player(name, date, s):
     """Creates a player file as .txt"""
-    data = [name, date]
-    with open(f"data/players/{name}.txt", "w", encoding="utf-8") as player_data:
-        player_data.write("\n".join(data))
+    data = {"name": name, "time_created": date, "since_epoch": s, "maps_finished": [], "playing_time": 0, "mush_collected": 0}
+    with open(f"data/players/{name}.json", "w") as f:
+        json.dump(data, f, indent=4)
 
 player_name_input = ""
 def _create_player_menu():
     global player_name_input, create_plr_done_btn_state, players, create_plr_btn_state, already_plr, inc_len
 
+    # Semi-background
+    semibg = pygame.Surface((512, 256), pygame.SRCALPHA)
+    semibg.fill((20, 100, 50, 0))
 
-    # Background
-    pygame.draw.rect(screen, black, pygame.Rect(256, 256, 512, 256))
+    pygame.draw.rect(semibg, (0, 0, 0, 200), semibg.get_rect(), border_radius=16)
+    screen.blit(semibg, (256, 256))
 
     # Text
-    label = create_text("Name your player", 32, white)[0]
-    screen.blit(label, (256, 256))
-    text = create_text(player_name_input, 24, white)[0]
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_BACKSPACE:
-                player_name_input = player_name_input[:-1]
-            elif event.key != pygame.K_ESCAPE:
-                player_name_input += event.unicode
-    screen.blit(text, (256, 320))
+    label_outer = create_text("Name your player", 48, black)[0]
+    screen.blit(label_outer, (((1012 - label_outer.get_width())//2) + 2, 268))
+    label = create_text("Name your player", 48, white)[0]
+    screen.blit(label, ((1012 - label.get_width())//2, 268))
+    text_outer = create_text(player_name_input, 32, main_color)[0]
+    text = create_text(player_name_input, 32, white)[0]
+
+    if max_plrs:
+        screen.blit(create_text("Maximum of 10 players only", 22, white)[0], ((1000 - (24 * 16))//2, 408))
+    else:
+        if 0 <= len(player_name_input) < 16:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_BACKSPACE:
+                        player_name_input = player_name_input[:-1]
+                        inc_len = False
+                    elif event.key != pygame.K_ESCAPE:
+                        player_name_input += event.unicode
+        else:
+            player_name_input = player_name_input[:-1]
+            inc_len = True
+
+    screen.blit(text_outer, (((1000 - (24 * 16))//2) + 2, 336))
+    screen.blit(text, ((1000 - (24 * 16))//2, 336))
 
     if create_plr_back_btn.draw():
         create_plr_btn_state = False
+        inc_len = False
+        already_plr = False
+        player_name_input = ""
 
     if create_plr_done_btn.draw():
         create_plr_done_btn_state = True
@@ -229,14 +337,15 @@ def _create_player_menu():
     if create_plr_done_btn_state:
         current_time = datetime.datetime.now()
         if 0 < len(player_name_input) < 16:
-            if player_name_input + ".txt" in players:
+            if player_name_input + ".json" in players:
                 already_plr = True
             else:
-                _create_player(player_name_input, str(current_time)[:19])
-                players.append(player_name_input + ".txt")
+                _create_player(player_name_input, str(current_time)[:19], pythontime.time()//1)
+                players.append(player_name_input + ".json")
                 create_plr_done_btn_state = False
                 create_plr_btn_state = False
                 already_plr = False
+                player_name_input = ""
             inc_len = False
         else:
             already_plr = False
@@ -244,10 +353,20 @@ def _create_player_menu():
         create_plr_done_btn_state = False
 
     if already_plr:
-        screen.blit(create_text("Already a player", 32, white)[0], (256, 384))
+        screen.blit(create_text("Already a player", 22, white)[0], ((1000 - (24 * 16))//2, 408))
     if inc_len:
-        screen.blit(create_text("Name must have a minimum of one character,", 24, white)[0], (256, 384))
-        screen.blit(create_text("and a maximum of 15 character", 24, white)[0], (256, 408))
+        screen.blit(create_text("Name must have at least 1 character,", 22, white)[0], ((1000 - (24 * 16))//2, 384))
+        screen.blit(create_text("and a maximum of 15 characters", 22, white)[0], ((1000 - (24 * 16))//2, 408))
+
+def players_list(page):
+    # page is 0-indexed
+    i = page * 5
+    count = 0
+    for player in players[i:i + 5]:
+        p = player_on_list(str(player)[:-5], count)
+        if p.draw():
+            ...
+        count += 1
 
 def level_menu():
     global menu_state, fade_count, create_plr_btn_state
@@ -258,10 +377,20 @@ def level_menu():
     screen.blit(menu_bg_img2, (0, 0))
     screen.blit(menu_bg_img1, (0, 0))
 
+    # 'Blur' background
+    blur = pygame.Surface((1024, 768), pygame.SRCALPHA)
+    blur.fill((0, 0, 0, 50))
+    screen.blit(blur, (0, 0))
+
+    # Background surface
+    bg_surf = pygame.Surface((1024 - 192, 768 - 96), pygame.SRCALPHA)
+    bg_surf.fill((0, 0, 0, 0))
+
     # Semi-background
-    pygame.draw.rect(screen, (75, 75, 75), pygame.Rect(96, 48, 1024 - 192, 768 - 96), border_radius=32)
+    pygame.draw.rect(bg_surf, (75, 75, 75, 100), bg_surf.get_rect(), border_radius=32)
+    screen.blit(bg_surf, (96, 48))
     
-    pygame.draw.rect(screen, white, pygame.Rect(128, 128, 768, 768-256))
+    players_list(0)
 
     text = create_text("Players", 60, white)[0]
     screen.blit(text, ((SCREEN_WIDTH - text.get_width())// 2, 60))
@@ -304,6 +433,12 @@ def options_menu():
 
 while True:
 
+    players = [player for player in os.listdir("data/players")]
+    if len(players) >= 10:
+        max_plrs = True
+    else:
+        max_plrs = False
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -339,13 +474,19 @@ while True:
     if menu_state == "create":
         if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             menu_state = "main"
-            fade_black()
-        fade_in()
+            fade_count = 0
+        if fade_count == 1:
+            fade_in(create_menu)
+            fade_count += 1
+        create_menu()
 
     if menu_state == "options":
         if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             menu_state = "main"
-            fade_black()
-        fade_in()
+            fade_count = 0
+        if fade_count == 1:
+            fade_in(options_menu)
+            fade_count += 1
+        options_menu()
 
     pygame.display.flip()
