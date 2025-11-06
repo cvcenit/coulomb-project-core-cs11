@@ -80,7 +80,7 @@ moves = {
 def char_to_emoji(map):
     # Returns the map converted from text characters to emoji
     emoji = {
-        '.': '⬛',
+        '.': '　',
         'L': '🧑',
         'T': '🌲',
         '+': '🍄',
