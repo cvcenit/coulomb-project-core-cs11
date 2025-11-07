@@ -24,7 +24,8 @@ def choose_mode(output_file=None):
 
 def clear_terminal():
     """This function clears the terminal, it does not return anything"""
-    os.system('cls' if os.name == 'nt' else 'clear')
+    #os.system('cls' if os.name == 'nt' else 'clear')
+    print('clear')
 
 if __name__ == "__main__":
     args = add_args()
@@ -36,13 +37,6 @@ else:
 
 # Main loop 'count'
 main = 0
-
-# Default player attributes
-item = []
-history = ['.']
-found_item = None
-DROWNED = False
-player_mushroom_count = 0
 
 # Makes a list with the tiles as its elements from "lvlmap" excluding the values for the height and width
 lvlmapcontent = list(lvlmap[lvlmap.index('\n')+1:])
@@ -66,6 +60,12 @@ for x in lvlmap:
 # Lists the indices of '\n' characters
 _n_indices = range(lvlmapcontent.index('\n'), len(lvlmapcontent), GRID_WIDTH + 1)
 
+# Default player attributes
+item = []
+history = {'player': ['.']}
+found_item = None
+DROWNED = False
+player_mushroom_count = 0
 player_index = grid.index('L')
 
 # Library of inputs with their corresponding change in index (+1 in width to accommodate for the '\n' characters)
@@ -155,8 +155,8 @@ def _move_player(direction):
         global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history
 
         # Sets the tile left behind by the player as the tile it previously was based on the history list
-        grid[player_index] = f"{history[0]}" 
-        history.pop()
+        grid[player_index] = f"{history['player'][0]}" 
+        history['player'].pop()
 
         # Sets the tile at new_index as the player tile
         grid[new_index] = 'L'
@@ -165,7 +165,7 @@ def _move_player(direction):
         player_index = new_index
 
         # Appends the under_tile(the tile the player moved to) into the history list
-        history.append(under_tile)
+        history['player'].append(under_tile)
 
     # The targeted index of the player based on the move
     new_index = player_index + moves[direction]
@@ -206,6 +206,10 @@ def _move_player(direction):
             if mode == "play":
 
                 # Checks if it is possible to move the rock to the new index
+                rock_under_tile = '.'
+
+                if f"Rock {new_index}" in history:  # Sets the tile under the rock based on history, so that the 'moveto' function appends the correct under_tile when the player moves
+                    rock_under_tile = history[f"Rock {new_index}"]
 
                 if new_rock_index > len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
                     print("You can't move the rock there")
@@ -213,27 +217,46 @@ def _move_player(direction):
 
                 elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
                     grid[new_rock_index] = "_"
-                    moveto('.')
-                    return
+                    moveto(rock_under_tile)
 
-                elif grid[new_rock_index] == "." or grid[new_rock_index] == "_":    # Moves the rock along
+                elif grid[new_rock_index] == ".":    # Moves the rock along an empty tile
                     grid[new_rock_index] = "R"
-                    moveto('.')
+                    moveto(rock_under_tile)
+
+                elif grid[new_rock_index] == "_":   # Moves the rock along a paved tile
+                    grid[new_rock_index] = "R"
+                    history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
+                    moveto(rock_under_tile)
+
+                elif grid[new_rock_index] == "R" or 'x' or '*':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
+                    print("You can't push the rock there!")
                     return
 
-                elif grid[new_rock_index] == "R":   # Checks if the player is trying to move two rocks at the same time
-                    print("You don't have the strength to push more than one rocks!")
-                    return
+                if f"Rock {new_index}" in history:    # Removes the Rock at index new_index from history after it gets moved
+                    del history[f"Rock {new_index}"]
+
+                return
+
             else:
-                if grid[new_rock_index] == "~":    # Converts a water tile into a paved tile
+                if grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
                     grid[new_rock_index] = "_"
-                    moveto('.')
+                    moveto(rock_under_tile)
+
+                elif grid[new_rock_index] == ".":    # Moves the rock along an empty tile
+                    grid[new_rock_index] = "R"
+                    moveto(rock_under_tile)
+
+                elif grid[new_rock_index] == "_":   # Moves the rock along a paved tile
+                    grid[new_rock_index] = "R"
+                    history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
+                    moveto(rock_under_tile)
+
+                elif grid[new_rock_index] == "R" or 'x' or '*':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
+                    print("You can't push the rock there!")
                     return
 
-                elif grid[new_rock_index] == "." or grid[new_rock_index] == "_":    # Moves the rock along
-                    grid[new_rock_index] = "R"
-                    moveto('.')
-                    return
+            if f"Rock {new_index}" in history:  # Removes the Rock at index new_index from history after it gets moved
+                    del history[f"Rock {new_index}"]
 
             return
 
@@ -316,7 +339,7 @@ def move_player(direction):
                     else:
                         pickup(found_item)
                         found_item = None
-                        history[-1] = '.' # Sets the previous tile as an empty tile after picking up the item
+                        history['player'][-1] = '.' # Sets the previous tile as an empty tile after picking up the item
                 else:
                     if not found_item:
                         pass
@@ -325,7 +348,7 @@ def move_player(direction):
                     else:
                         pickup(found_item)
                         found_item = None
-                        history[-1] = '.' # Sets the previous tile as an empty tile after picking up the item
+                        history['player'][-1] = '.' # Sets the previous tile as an empty tile after picking up the item
 
             elif inp == "!":
                 # Restarts the game
@@ -335,7 +358,7 @@ def move_player(direction):
                 grid = list(MOTHERGRID)
                 found_item = None
                 item = []
-                history = ['.']
+                history = {'player': ['.']}
                 player_mushroom_count = 0
 
             elif inp in moves:
