@@ -155,7 +155,8 @@ def _move_player(direction):
         global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history
 
         # Sets the tile left behind by the player as the tile it previously was based on the history list
-        grid[player_index] = f"{history[-1]}" 
+        grid[player_index] = f"{history[0]}" 
+        history.pop()
 
         # Sets the tile at new_index as the player tile
         grid[new_index] = 'L'
