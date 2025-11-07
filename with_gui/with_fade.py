@@ -26,7 +26,9 @@ class player_on_list():
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def draw(self):
+        global delete_pop_up, create_plr_btn_state, inc_len, already_plr, player_name_input
         action = False
+        delete = False
         pos = pygame.mouse.get_pos()
 
         # Hover effects
@@ -73,13 +75,20 @@ class player_on_list():
         screen.blit(dt_created_text, (self.x + 12, self.y + self.height//2))
         ply_time_text = create_text(f"| Play time: {ply_time}", 24, black)[0]
         screen.blit(ply_time_text, (self.x + 32 + dt_created_text.get_width(), self.y + self.height//2))
-        mush_tot_text = create_text(f"| Mushrooms: {mush_tot} |", 24, black)[0]
+        mush_tot_text = create_text(f"| Mushrooms: {mush_tot}", 24, black)[0]
         screen.blit(mush_tot_text, (self.x + 48 + dt_created_text.get_width() + ply_time_text.get_width(), self.y + self.height//2))
 
         # Delete button
         plr_del_btn = text_Button_1(self.x + self.width - (32 * 6), self.y + 4, "Delete", 32, (255, 100, 100))
         if plr_del_btn.draw():
-            os.remove(f"data/players/{self.name}.json")
+            delete_pop_up = True, self.name
+            create_plr_btn_state = False
+            inc_len = False
+            already_plr = False
+            player_name_input = ""
+            # os.remove(f"data/players/{self.name}.json")
+
+        return action, delete
 
 
 class text_Button_1():
@@ -217,6 +226,12 @@ menu_bg_img3 = pygame.image.load("assets/bg/3rd Layer.png")
 menu_bg_img4 = pygame.image.load("assets/bg/4th Layer.png")
 menu_bg_img5 = pygame.image.load("assets/bg/5th Layer.png")
 
+menu_bg_img1 = pygame.transform.scale(menu_bg_img1, (1024, 768))
+menu_bg_img2 = pygame.transform.scale(menu_bg_img2, (1024, 768))
+menu_bg_img3 = pygame.transform.scale(menu_bg_img3, (1024, 768))
+menu_bg_img4 = pygame.transform.scale(menu_bg_img4, (1024, 768))
+menu_bg_img5 = pygame.transform.scale(menu_bg_img5, (1024, 768))
+
 # Main menu buttons
 play_btn = text_Button(128, 288, "Play", 60)
 create_btn = text_Button(128, 360, "Create Levels", 60)
@@ -229,17 +244,19 @@ create_plr_btn = text_Button_1(512, 640, "New Player", 48, white)
 create_plr_done_btn = text_Button_1(512, 448, "Done", 48, white)
 create_plr_back_btn = text_Button_1((1000 - (24 * 16))//2, 448, "Back", 48, white)
 play_menu_back_btn = text_Button_1(148, 640, "Back", 48, white)
+delete_pop_up_back = text_Button_1((1000 - (24 * 16))//2, 448, "Back", 48, white)
+delete_pop_up_confirm = text_Button_1(512, 448, "Confirm", 48, white)
+page_back = text_Button_1(304, 640, "<", 48, white)
+page_next = text_Button_1(352, 640, ">", 48, white)
 create_plr_btn_state = False
 create_plr_done_btn_state = False
 already_plr = False
 inc_len = False
+delete_pop_up = False, ""
+delete_pop_up_back_state = False
+delete_pop_up_confirm_state = False
 
 def menu_background():
-    ...
-
-def main_menu():
-    global menu_state
-
     # Background
     screen.blit(menu_bg_img5, (0, 0))
     screen.blit(menu_bg_img4, (0, 0))
@@ -249,13 +266,21 @@ def main_menu():
 
     # 'Blur' background
     blur = pygame.Surface((1024, 768), pygame.SRCALPHA)
-    blur.fill((0, 0, 0, 150))
+    blur.fill((0, 0, 0, 50))
     screen.blit(blur, (0, 0))
+
+def main_menu():
+    global menu_state
+
+    # Background
+    menu_background()
 
     # Semi-background
     semibg = pygame.Surface((1024 - 64 - 128, 768 - 348), pygame.SRCALPHA)
-    semibg.fill((0, 0, 0, 160))
+    semibg.fill((0, 0, 0, 0))
+    pygame.draw.rect(semibg, (20, 50, 30, 150), semibg.get_rect(), border_radius=32)
     screen.blit(semibg, (92, 264))
+
 
     # Title
     title = create_text("SHROOM RAIDER", 112, main_color)[0]
@@ -290,13 +315,13 @@ def _create_player(name, date, s):
 
 player_name_input = ""
 def _create_player_menu():
-    global player_name_input, create_plr_done_btn_state, players, create_plr_btn_state, already_plr, inc_len
+    global player_name_input, create_plr_done_btn_state, players, create_plr_btn_state, already_plr, inc_len, delete_pop_up, delete_pop_up_back_state, delete_pop_up_confirm_state
 
     # Semi-background
     semibg = pygame.Surface((512, 256), pygame.SRCALPHA)
     semibg.fill((20, 100, 50, 0))
 
-    pygame.draw.rect(semibg, (0, 0, 0, 200), semibg.get_rect(), border_radius=16)
+    pygame.draw.rect(semibg, (0, 0, 0, 225), semibg.get_rect(), border_radius=16)
     screen.blit(semibg, (256, 256))
 
     # Text
@@ -304,8 +329,7 @@ def _create_player_menu():
     screen.blit(label_outer, (((1012 - label_outer.get_width())//2) + 2, 268))
     label = create_text("Name your player", 48, white)[0]
     screen.blit(label, ((1012 - label.get_width())//2, 268))
-    text_outer = create_text(player_name_input, 32, main_color)[0]
-    text = create_text(player_name_input, 32, white)[0]
+    text = create_text(player_name_input, 32, main_color)[0]
 
     if max_plrs:
         screen.blit(create_text("Maximum of 10 players only", 22, white)[0], ((1000 - (24 * 16))//2, 408))
@@ -322,7 +346,6 @@ def _create_player_menu():
             player_name_input = player_name_input[:-1]
             inc_len = True
 
-    screen.blit(text_outer, (((1000 - (24 * 16))//2) + 2, 336))
     screen.blit(text, ((1000 - (24 * 16))//2, 336))
 
     if create_plr_back_btn.draw():
@@ -358,29 +381,46 @@ def _create_player_menu():
         screen.blit(create_text("Name must have at least 1 character,", 22, white)[0], ((1000 - (24 * 16))//2, 384))
         screen.blit(create_text("and a maximum of 15 characters", 22, white)[0], ((1000 - (24 * 16))//2, 408))
 
+player_page = 1
 def players_list(page):
     # page is 0-indexed
     i = page * 5
     count = 0
     for player in players[i:i + 5]:
         p = player_on_list(str(player)[:-5], count)
-        if p.draw():
+        if p.draw()[0]:
             ...
         count += 1
 
-def level_menu():
-    global menu_state, fade_count, create_plr_btn_state
-    # Background
-    screen.blit(menu_bg_img5, (0, 0))
-    screen.blit(menu_bg_img4, (0, 0))
-    screen.blit(menu_bg_img3, (0, 0))
-    screen.blit(menu_bg_img2, (0, 0))
-    screen.blit(menu_bg_img1, (0, 0))
+def delete_player_confirmation(player):
+    global delete_pop_up
+    # Semi-background
+    semibg = pygame.Surface((512, 256), pygame.SRCALPHA)
+    semibg.fill((20, 100, 50, 0))
 
-    # 'Blur' background
-    blur = pygame.Surface((1024, 768), pygame.SRCALPHA)
-    blur.fill((0, 0, 0, 50))
-    screen.blit(blur, (0, 0))
+    pygame.draw.rect(semibg, (0, 0, 0, 225), semibg.get_rect(), border_radius=16)
+    screen.blit(semibg, (256, 256))
+
+    # Label
+    title1 = create_text("Are you sure you", 48, white)[0]
+    title2 = create_text(f"want to delete", 48, white)[0]
+    title3 = create_text(f"'{player}'?", 48, main_color)[0]
+    screen.blit(title1, ((1000 - (24 * 16))//2, 268))
+    screen.blit(title2, ((1000 - (24 * 16))//2, 316))
+    screen.blit(title3, ((1000 - (24 * 16))//2, 364))
+
+    if delete_pop_up_back.draw():
+        delete_pop_up = False, ""
+
+    if delete_pop_up_confirm.draw():
+        os.remove(f"data/players/{player}.json")
+        delete_pop_up = False, ""
+
+def level_menu():
+    global menu_state, fade_count, create_plr_btn_state, delete_pop_up, player_page
+
+    # Background
+    menu_background()
 
     # Background surface
     bg_surf = pygame.Surface((1024 - 192, 768 - 96), pygame.SRCALPHA)
@@ -390,10 +430,10 @@ def level_menu():
     pygame.draw.rect(bg_surf, (75, 75, 75, 100), bg_surf.get_rect(), border_radius=32)
     screen.blit(bg_surf, (96, 48))
     
-    players_list(0)
-
-    text = create_text("Players", 60, white)[0]
-    screen.blit(text, ((SCREEN_WIDTH - text.get_width())// 2, 60))
+    if player_page == 1:
+        players_list(0)
+    elif player_page == 2:
+        players_list(1)
 
     if create_plr_btn.draw():
         create_plr_btn_state = True
@@ -401,12 +441,27 @@ def level_menu():
     # Buttons
     if create_plr_btn_state:
         _create_player_menu()
+        delete_pop_up = False, ""
 
     if play_menu_back_btn.draw():
         create_plr_btn_state = False
+        delete_pop_up = False, ""
         menu_state = "main"
         fade_count = 0
 
+    if delete_pop_up[0]:
+        delete_player_confirmation(delete_pop_up[1])
+
+    if page_back.draw():
+        player_page = 1
+    if page_next.draw():
+        player_page = 2
+
+    # Title
+    text2 = create_text(f"PLAYERS      Page {player_page}/2", 60, black)[0]
+    screen.blit(text2, ((148) + 4, 60))
+    text1 = create_text(f"PLAYERS      Page {player_page}/2", 60, white)[0]
+    screen.blit(text1, (148, 60))
 
 def create_menu():
     text = create_text("Create", 60, main_color)[0]
