@@ -1,7 +1,5 @@
 from argparse import ArgumentParser
-from with_fade import text_Button_1, menu_state
 import os, sys, pygame
-
 
 pygame.init()
 
@@ -12,6 +10,50 @@ main_color = (180, 30, 20)
 
 screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Shroomraider")
+
+class _text_Button_1():
+    def __init__(self, x, y, t, s, col):
+        self.col = col
+        text, capt = _create_text(t, s, col)
+        outer, capt = _create_text(t, s, black)
+        self.s = s
+        self.capt = capt
+        self.outer = outer
+        self.width = text.get_width()
+        self.height = text.get_height()
+        self.text = text
+        self.rect = self.text.get_rect()
+        self.rect.topleft = (x, y)
+        self.clicked = False
+        self.hovered = False
+
+    def draw(self):
+        action = False
+        pos = pygame.mouse.get_pos()
+
+        if self.rect.collidepoint(pos):
+            self.text, s = _create_text(self.capt, self.s, main_color)
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
+                action = True
+            self.hovered = True
+
+        if pygame.mouse.get_pressed()[0] == 0:
+            self.clicked = False
+
+        if not self.rect.collidepoint(pos) and self.hovered == True:
+            self.text, s = _create_text(self.capt, self.s, self.col)
+            self.outer, s = _create_text(self.capt, self.s, black)
+            self.hovered = False
+
+        screen.blit(self.outer, (self.rect.x + 2, self.rect.y))
+        screen.blit(self.text, (self.rect.x, self.rect.y))
+
+        return (action,)
+
+def _create_text(text, s, color):
+    font = pygame.font.Font("Syne_Mono/SyneMono-Regular.ttf", size=s)
+    return font.render(text, True, color), text
 
 
 def add_args():
@@ -33,11 +75,6 @@ def pick_map(stage_file=None):
 def choose_mode(output_file=None):
     ''' Checks if -o has an argument, returns either "play" or an empty string to determine the mode'''
     return 'play' if output_file is None else ''
-
-
-def clear_terminal():
-    """This function clears the terminal, it does not return anything"""
-    os.system('cls' if os.name == 'nt' else 'clear')
 
 if __name__ == "__main__":
     args = add_args()
@@ -394,10 +431,10 @@ substitute = pygame.Surface((50, 50))
 substitute.fill((255, 0, 0))
 
 # Pause menu buttons
-menu_resume_btn = text_Button_1((6 * 48)//4 + (SCREEN_WIDTH - (6 * 48))//2, 192, "Resume", 48, white)
-menu_controls_btn = text_Button_1((8 * 48)//4 + (SCREEN_WIDTH - (8 * 48))//2, 252, "Controls", 48, white)
-menu_return_btn = text_Button_1((14 * 48)//4 + (SCREEN_WIDTH - (14 * 48))//2, 310, "Back to Levels", 48, white)
-controls_back_btn = text_Button_1((4 * 48)//4 + (SCREEN_WIDTH - (4 * 48))//2, 512, "Back", 48, white)
+menu_resume_btn = _text_Button_1((6 * 48)//4 + (SCREEN_WIDTH - (6 * 48))//2, 192, "Resume", 48, white)
+menu_controls_btn = _text_Button_1((8 * 48)//4 + (SCREEN_WIDTH - (8 * 48))//2, 252, "Controls", 48, white)
+menu_return_btn = _text_Button_1((15 * 48)//4 + (SCREEN_WIDTH - (15 * 48))//2, 310, "Back to Levels", 48, white)
+controls_back_btn = _text_Button_1((4 * 48)//4 + (SCREEN_WIDTH - (4 * 48))//2, 368, "Back", 48, white)
 menu_btn_state = False
 menu_controls_btn_state = False
 controls_popup_state = False
@@ -415,6 +452,8 @@ def main_loop():
     scale1 = 704 // (GRID_WIDTH)
     y_offset = (768 - (GRID_HEIGHT * scale1)) // 2
     x_offset = (768 - 704) // 2
+
+    # 320 px left for width
 
     scale = (scale1, scale1)
 
@@ -443,14 +482,34 @@ def main_loop():
                 current_col = 0
 
     def controls_popup():
-        global controls_back_btn, controls_popup_state, menu_btn_state
+        global controls_back_btn, controls_popup_state, menu_btn_state, SCREEN_WIDTH
         
         # Cover
         cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
         cover.fill((0, 0, 0, 100))
         screen.blit(cover, (0, 0))
 
-        if controls_back_btn.draw():
+        # Background
+        bg = pygame.Surface((464, 368), pygame.SRCALPHA)
+        bg.fill((0, 0, 0, 0))
+        pygame.draw.rect(bg, (0, 0, 0), bg.get_rect(), border_radius=24)
+        pygame.draw.rect(bg, (255, 255, 255), bg.get_rect(), width=1, border_radius=24)
+        screen.blit(bg, (((SCREEN_WIDTH - 464)//2), 96))
+
+        # Texts
+        w = _create_text("W: Move upward", 32, white)[0]
+        a = _create_text("A: Move leftward", 32, white)[0]
+        s = _create_text("S: Move southward", 32, white)[0]
+        d = _create_text("D: Move rightward", 32, white)[0]
+        p = _create_text("P: Pickup item", 32, white)[0]
+
+        screen.blit(w, ((SCREEN_WIDTH - w.get_width())//2, 120))
+        screen.blit(a, ((SCREEN_WIDTH - a.get_width())//2, 164))
+        screen.blit(s, ((SCREEN_WIDTH - s.get_width())//2, 208))
+        screen.blit(d, ((SCREEN_WIDTH - d.get_width())//2, 252))
+        screen.blit(p, ((SCREEN_WIDTH - p.get_width())//2, 296))
+
+        if controls_back_btn.draw()[0]:
             controls_popup_state = False
             menu_btn_state = True
 
@@ -463,37 +522,38 @@ def main_loop():
         screen.blit(cover, (0, 0))
 
         # Background
-        bg = pygame.Surface((512, 256), pygame.SRCALPHA)
+        bg = pygame.Surface((464, 232), pygame.SRCALPHA)
         bg.fill((0, 0, 0, 0))
         pygame.draw.rect(bg, (0, 0, 0), bg.get_rect(), border_radius=24)
-        screen.blit(bg, (((SCREEN_WIDTH - 512)//2), 168))
+        pygame.draw.rect(bg, (255, 255, 255), bg.get_rect(), width=1, border_radius=24)
+        screen.blit(bg, (((SCREEN_WIDTH - 464)//2), 168))
 
-        if menu_resume_btn.draw():
+        if menu_resume_btn.draw()[0]:
             menu_btn_state = False
             controls_popup_state = False
 
-        if menu_return_btn.draw():
+        if menu_return_btn.draw()[0]:
             menu_btn_state = False
             menu_controls_btn_state = False
-            menu_state = "levels"
+            menu_state = "play"
 
-        if menu_controls_btn.draw():
+        if menu_controls_btn.draw()[0]:
             menu_btn_state = False
             controls_popup_state = True
 
     def side_bar():
         global menu_btn_state, controls_popup_state
         # Main bg
-        bg = pygame.Surface((256 - y_offset, (GRID_HEIGHT * scale1) + 24), pygame.SRCALPHA)
+        bg = pygame.Surface((224, (GRID_HEIGHT * scale1) + 24), pygame.SRCALPHA)
         bg.fill((0, 0, 0, 0))
         pygame.draw.rect(bg, (0, 0, 0, 150), bg.get_rect(), border_radius=24)
         pygame.draw.rect(bg, (*white, 255), bg.get_rect(), width=1, border_radius=24)
         screen.blit(bg, (768, (y_offset - 12)))
 
         # Menu button
-        menu_btn = text_Button_1(768 + (((256 - y_offset) - (2 * 64)) // 2) - 6, y_offset, "Menu", 64, white)
+        menu_btn = _text_Button_1(768 + (212 - (2 * 64))//2, y_offset, "Menu", 64, white)
         
-        if menu_btn.draw():
+        if menu_btn.draw()[0]:
             menu_btn_state = True
             controls_popup_state = False
 
@@ -543,8 +603,6 @@ def main_loop():
             game_screen()
         
         pygame.display.flip()
-
-
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-import sys, pygame, datetime, os, json
+import sys, pygame, datetime, os, json, shroom_raider
 import time as pythontime
 from pygame import *
 
@@ -32,18 +32,19 @@ class player_on_list():
         pos = pygame.mouse.get_pos()
 
         # Hover effects
-        if self.rect.collidepoint(pos):
-            bg_outer = pygame.Surface((self.width + 8, self.height + 8), pygame.SRCALPHA)
-            bg_outer.fill((0, 0, 0, 0))
-            pygame.draw.rect(bg_outer, (main_color), bg_outer.get_rect(), border_radius=16)
-            screen.blit(bg_outer, (self.x - 4, self.y - 4))
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-                self.clicked = True
-                action = True
-            self.hovered = True
+        if not create_plr_btn_state and not delete_pop_up[0]:
+            if self.rect.collidepoint(pos):
+                bg_outer = pygame.Surface((self.width + 8, self.height + 8), pygame.SRCALPHA)
+                bg_outer.fill((0, 0, 0, 0))
+                pygame.draw.rect(bg_outer, (main_color), bg_outer.get_rect(), border_radius=16)
+                screen.blit(bg_outer, (self.x - 4, self.y - 4))
+                if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                    self.clicked = True
+                    action = True
+                self.hovered = True
 
-        if not self.rect.collidepoint(pos) and self.hovered == True:
-            self.hovered = False
+            if not self.rect.collidepoint(pos) and self.hovered == True:
+                self.hovered = False
 
 
         # Background
@@ -80,13 +81,16 @@ class player_on_list():
 
         # Delete button
         plr_del_btn = text_Button_1(self.x + self.width - (32 * 6), self.y + 4, "Delete", 32, (255, 100, 100))
+        
         if plr_del_btn.draw():
             delete_pop_up = True, self.name
             create_plr_btn_state = False
             inc_len = False
             already_plr = False
             player_name_input = ""
-            # os.remove(f"data/players/{self.name}.json")
+        
+        if action:
+            print(f"hi {self.name}")
 
         return action, delete
 
@@ -402,9 +406,9 @@ def delete_player_confirmation(player):
     screen.blit(semibg, (256, 256))
 
     # Label
-    title1 = create_text("Are you sure you", 48, white)[0]
-    title2 = create_text(f"want to delete", 48, white)[0]
-    title3 = create_text(f"'{player}'?", 48, main_color)[0]
+    title1 = create_text("Are you sure you", 40, white)[0]
+    title2 = create_text(f"want to delete", 40, white)[0]
+    title3 = create_text(f"'{player}'?", 40, main_color)[0]
     screen.blit(title1, ((1000 - (24 * 16))//2, 268))
     screen.blit(title2, ((1000 - (24 * 16))//2, 316))
     screen.blit(title3, ((1000 - (24 * 16))//2, 364))

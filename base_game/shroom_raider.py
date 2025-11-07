@@ -370,6 +370,7 @@ def move_player(direction):
         else:
             break
 
+
 if __name__ == "__main__":
     # Outputs args.output_file if -o was called, else run the game.
     if mode == "":
@@ -438,6 +439,8 @@ if __name__ == "__main__":
                 print("Game Over! Laro Craft can't swim!")
                 print("---------------------------------")
                 print(f"{player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected\n")
+
+            clear_terminal()
 
             if main > 0:
                 print("Goodbye!")
