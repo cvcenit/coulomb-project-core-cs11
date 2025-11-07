@@ -486,7 +486,7 @@ def options_menu():
     screen.blit(top_bar, (128, 128))
     screen.blit(text, (128, 48))
 
-while True:
+while __name__ == "__main__":
 
     players = [player for player in os.listdir("data/players")]
     if len(players) >= 10:

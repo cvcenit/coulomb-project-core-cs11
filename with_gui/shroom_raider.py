@@ -1,5 +1,18 @@
 from argparse import ArgumentParser
-import os
+from with_fade import text_Button_1, menu_state
+import os, sys, pygame
+
+
+pygame.init()
+
+SCREEN_SIZE = SCREEN_WIDTH, SCREEN_HEIGHT = 1024, 768
+black = (0, 0, 0)
+white = (255, 255, 255)
+main_color = (180, 30, 20)
+
+screen = pygame.display.set_mode(SCREEN_SIZE)
+pygame.display.set_caption("Shroomraider")
+
 
 def add_args():
     ''' Adds arguments, will only be called if __name__ == "__main__" below '''
@@ -41,15 +54,19 @@ main = 0
 item = []
 history = ['.']
 found_item = None
-DROWNED = False
+drowned = False
 player_mushroom_count = 0
 
 # Makes a list with the tiles as its elements from "lvlmap" excluding the values for the height and width
 lvlmapcontent = list(lvlmap[lvlmap.index('\n')+1:])
 
 # Takes the integer strings at their respective indices (height before ' '; width after ' ' and before the first \n) and converts into integers
-GRID_HEIGHT = int(lvlmap[:lvlmap.index(' ')])
-GRID_WIDTH = int(lvlmap[lvlmap.index(' ')+1: lvlmap.index('\n')])
+try:
+    GRID_HEIGHT = int(lvlmap[:lvlmap.index(' ')])
+    GRID_WIDTH = int(lvlmap[lvlmap.index(' ')+1: lvlmap.index('\n')])
+except TypeError:
+    print("INVALID MAP")
+    raise TypeError
 
 # Serves as the base grid for the level (will not be mutated)
 MOTHERGRID = list(''.join(lvlmapcontent))
@@ -77,8 +94,8 @@ moves = {
     'P': 0
 }
 
-def char_to_emoji(map):
-    # Returns the map converted from text characters to emoji
+def char_to_emoji(level):
+    # Returns the level converted from text characters to emoji
     emoji = {
         '.': '　',
         'L': '🧑',
@@ -91,7 +108,7 @@ def char_to_emoji(map):
         '*': '🔥',
         '\n': '\n'
         }
-    return ''.join(emoji.get(c, c) for c in map if c in emoji)
+    return ''.join(emoji.get(c, c) for c in level if c in emoji)
 
 def pickup(tile):
     # Adds current tile to the list of items held by the player
@@ -147,7 +164,7 @@ def _move_player(direction):
 
     # Takes the directional input of the player and moves the player accordingly
 
-    global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history, found_item, DROWNED, mode
+    global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history, found_item, drowned, mode
 
     def moveto(under_tile):
 
@@ -243,7 +260,7 @@ def _move_player(direction):
             moveto('~')
 
             # Changes the following player attributes
-            DROWNED = True
+            drowned = True
             main += 1
 
             return
@@ -347,6 +364,189 @@ def move_player(direction):
         else:
             break
 
+
+# Assets: Tiles
+tree_img = pygame.image.load("assets/tiles/tree.png")
+plr_img = pygame.image.load("assets/tiles/plr.png")
+empty_img = pygame.Surface((50, 50))
+pavement_img = pygame.image.load("assets/tiles/pavement.png")
+water_img = pygame.image.load("assets/tiles/water.png")
+rock_img = pygame.image.load("assets/tiles/rock.gif")
+axe_img = pygame.image.load("assets/tiles/axe.png")
+flamethrower_img = pygame.image.load("assets/tiles/flamethrower.png")
+mush_img = pygame.image.load("assets/tiles/mush.png")
+
+
+
+water_img = pygame.Surface((50, 50))
+water_img.fill((50, 180, 240))
+
+empty_img = pygame.Surface((50, 50), pygame.SRCALPHA)
+empty_img.fill((0, 0, 0, 100))
+
+pavement_img = pygame.Surface((50, 50))
+pavement_img.fill((100, 100, 100))
+
+mush_img = pygame.Surface((50, 50))
+mush_img.fill((0, 200, 0))
+
+substitute = pygame.Surface((50, 50))
+substitute.fill((255, 0, 0))
+
+# Pause menu buttons
+menu_resume_btn = text_Button_1((6 * 48)//4 + (SCREEN_WIDTH - (6 * 48))//2, 192, "Resume", 48, white)
+menu_controls_btn = text_Button_1((8 * 48)//4 + (SCREEN_WIDTH - (8 * 48))//2, 252, "Controls", 48, white)
+menu_return_btn = text_Button_1((14 * 48)//4 + (SCREEN_WIDTH - (14 * 48))//2, 310, "Back to Levels", 48, white)
+controls_back_btn = text_Button_1((4 * 48)//4 + (SCREEN_WIDTH - (4 * 48))//2, 512, "Back", 48, white)
+menu_btn_state = False
+menu_controls_btn_state = False
+controls_popup_state = False
+
+# level bg
+level_bg = pygame.image.load("assets/cave_bluelarge.png")
+level_bg = pygame.transform.scale(level_bg, (1024, 1024))
+
+def main_loop():
+    global main, grid, drowned, LVL_MUSHROOMS, player_mushroom_count, GRID_WIDTH, GRID_HEIGHT, menu_state
+    global mush_img, flamethrower_img, axe_img, rock_img, water_img, pavement_img, empty_img, plr_img, tree_img
+    global menu_resume_btn, menu_return_btn, menu_controls_btn, controls_back_btn, menu_btn_state, controls_popup_state, menu_controls_btn_state
+    global level_bg
+
+    scale1 = 704 // (GRID_WIDTH)
+    y_offset = (768 - (GRID_HEIGHT * scale1)) // 2
+    x_offset = (768 - 704) // 2
+
+    scale = (scale1, scale1)
+
+    tile_assets = {
+    '.': pygame.transform.scale(empty_img, scale),
+    'L': pygame.transform.scale(substitute, scale),
+    'T': pygame.transform.scale(tree_img, scale),
+    '+': pygame.transform.scale(mush_img, scale),
+    'R': pygame.transform.scale(rock_img, scale),
+    '~': pygame.transform.scale(water_img, scale),
+    '_': pygame.transform.scale(pavement_img, scale),
+    'x': pygame.transform.scale(axe_img, scale),
+    '*': pygame.transform.scale(flamethrower_img, scale),
+    '\n': '\n'
+    }
+
+    def load_map(level):
+        current_row = 0
+        current_col = 0
+        for tile in level:
+            if tile != '\n':
+                screen.blit(tile_assets.get(tile, tile), (x_offset + (scale1 * current_col), y_offset + (scale1 * current_row)))
+                current_col += 1
+            else:
+                current_row += 1
+                current_col = 0
+
+    def controls_popup():
+        global controls_back_btn, controls_popup_state, menu_btn_state
+        
+        # Cover
+        cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
+        cover.fill((0, 0, 0, 100))
+        screen.blit(cover, (0, 0))
+
+        if controls_back_btn.draw():
+            controls_popup_state = False
+            menu_btn_state = True
+
+    def pause_menu():
+        global menu_resume_btn, menu_return_btn, menu_controls_btn, controls_back_btn, menu_btn_state, controls_popup_state, menu_controls_btn_state
+        
+        # Cover
+        cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
+        cover.fill((0, 0, 0, 100))
+        screen.blit(cover, (0, 0))
+
+        # Background
+        bg = pygame.Surface((512, 256), pygame.SRCALPHA)
+        bg.fill((0, 0, 0, 0))
+        pygame.draw.rect(bg, (0, 0, 0), bg.get_rect(), border_radius=24)
+        screen.blit(bg, (((SCREEN_WIDTH - 512)//2), 168))
+
+        if menu_resume_btn.draw():
+            menu_btn_state = False
+            controls_popup_state = False
+
+        if menu_return_btn.draw():
+            menu_btn_state = False
+            menu_controls_btn_state = False
+            menu_state = "levels"
+
+        if menu_controls_btn.draw():
+            menu_btn_state = False
+            controls_popup_state = True
+
+    def side_bar():
+        global menu_btn_state, controls_popup_state
+        # Main bg
+        bg = pygame.Surface((256 - y_offset, (GRID_HEIGHT * scale1) + 24), pygame.SRCALPHA)
+        bg.fill((0, 0, 0, 0))
+        pygame.draw.rect(bg, (0, 0, 0, 150), bg.get_rect(), border_radius=24)
+        pygame.draw.rect(bg, (*white, 255), bg.get_rect(), width=1, border_radius=24)
+        screen.blit(bg, (768, (y_offset - 12)))
+
+        # Menu button
+        menu_btn = text_Button_1(768 + (((256 - y_offset) - (2 * 64)) // 2) - 6, y_offset, "Menu", 64, white)
+        
+        if menu_btn.draw():
+            menu_btn_state = True
+            controls_popup_state = False
+
+        if menu_btn_state:
+            pause_menu()
+
+        if controls_popup_state:
+            controls_popup()
+
+    def win():
+        ...
+
+    def lose():
+        ...
+
+    def game_screen():
+        screen.blit(level_bg, (0, 0))
+        gray_bg = pygame.Surface((1024, 1024), pygame.SRCALPHA)
+        gray_bg.fill((0, 0, 0, 50))
+        screen.blit(gray_bg, (0, 0))
+
+        map_bg = pygame.Surface(((GRID_WIDTH * scale1) + 24, (GRID_HEIGHT * scale1) + 24), pygame.SRCALPHA)
+        map_bg.fill((0, 0, 0, 0))
+        pygame.draw.rect(map_bg, (0, 0, 0, 150), map_bg.get_rect(), border_radius=24)
+        pygame.draw.rect(map_bg, (*white, 255), map_bg.get_rect(), width=1, border_radius=24)
+        screen.blit(map_bg, (x_offset - 12, y_offset - 12))
+
+
+        load_map(grid)
+        side_bar()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if not menu_btn_state and not controls_popup_state:
+                if LVL_MUSHROOMS == player_mushroom_count:
+                    win()
+                elif drowned:
+                    lose()
+                else:
+                    if event.type == pygame.KEYDOWN:
+                        if event.unicode.upper() in moves:
+                            print(event.unicode.upper())
+                            move_player(event.unicode.upper())
+            game_screen()
+        
+        pygame.display.flip()
+
+
+
+
 if __name__ == "__main__":
     # Outputs args.output_file if -o was called, else run the game.
     if mode == "":
@@ -358,63 +558,5 @@ if __name__ == "__main__":
                 output.write(f"CLEAR\n{"".join(grid)}")
             else:
                 output.write((f"NO CLEAR\n{"".join(grid)}"))
-
     else:
-        while main == 0:
-            # Clears the terminal at the start, and after inputs
-            clear_terminal()
-
-            # Prints the map and mushroom count of the level
-            print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
-            print("Grid:")
-            print(char_to_emoji(grid))
-
-            # Prints the collected mushroom count, and the valid moves
-            print(f"{player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected")
-            print('''
-            [W] Move up
-            [A] Move left
-            [S] Move down
-            [D] Move right
-            [!] Reset
-            [Q] Quit
-            ''')
-
-            # Prints the available item beneath the player, if any or none
-            if not found_item:
-                print("No items here")
-            elif len(item) == 1:
-                print('You already have an item, you can\'t pickup another')
-            else:
-                print(f"[P] Pick up {describe_tile(found_item)}")
-
-            # Prints the item currently held by the player, if any or none
-            if not item:
-                print("Not holding anything")
-            else:
-                print(f"Currently holding {char_to_emoji(item[0])}")
-
-            # Player input
-            move = input("What will you do? ").strip().upper()
-            move_player(move)
-
-            if player_mushroom_count == LVL_MUSHROOMS:
-                clear_terminal()
-                print("Grid:")
-                print(char_to_emoji(grid))
-                print("-" * GRID_WIDTH * 2)
-                print(" " * ((GRID_WIDTH // 2) + 1), "You Won!")
-                print("-" * GRID_WIDTH * 2, "\n")
-
-            if DROWNED:
-                clear_terminal()
-                print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
-                print("Grid:")
-                print(char_to_emoji(grid))
-                print("---------------------------------")
-                print("Game Over! Laro Craft can't swim!")
-                print("---------------------------------")
-                print(f"{player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected\n")
-
-            if main > 0:
-                print("Goodbye!")
+        main_loop()
