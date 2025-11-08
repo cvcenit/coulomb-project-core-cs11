@@ -359,7 +359,7 @@ def load_editor_assets():
     # Load tile images
     editor_img_list = []
     for x in range(EDITOR_TILE_TYPES):
-        img = pygame.image.load(f'img/tile/{x}.png').convert_alpha()
+        img = pygame.image.load(f'img/{x}.png').convert_alpha()
         img = pygame.transform.scale(img, (EDITOR_TILE_SIZE, EDITOR_TILE_SIZE))
         editor_img_list.append(img)
 
@@ -1132,3 +1132,4 @@ while True:
         map_level_menu()
 
     pygame.display.flip()
+
