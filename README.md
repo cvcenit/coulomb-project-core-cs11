@@ -23,3 +23,7 @@
   * [Level Creation]
 
 ## User Manual
+
+_Hello, aspiring adventurer. Welcome to Shroom Raider! Here's how to get started on your adventure:_
+
+### Start Up
