@@ -2,8 +2,8 @@
 
 ## Table of Contents
 
-* [User Manual](#user_manual)
-  * [Startup](#start_up)
+* [User Manual](##user_manual)
+  * [Startup](##start_up)
   * [Controls]
     * [Movement]
     * [Pickup]
