@@ -61,13 +61,13 @@ _Here are the following ways you can run the game:_
     > Sample:\
     > TTTT~~~~\~TTTTT\
     > T.L.~.xT~~\~~~T\
-    > T.R.~.~+~TTT~T\
-    > T~.~~.~.~T~T~T\
-    > T~\~~~.~R~T~T~T\
-    > T...~x~~\~T~T~T\
-    > TT.T~.~T~T~T~T\
-    > T~+...~..*~+~T\
-    > T~~~~~~~~~~~~T\
+    > T.R.\~.~+\~TTT~T\
+    > T\~.~\~.~.\~T~T\~T\
+    > T~\~~\~.~R\~T~T\~T\
+    > T...~x\~~\~T~T\~T\
+    > TT.T~.\~T~T\~T~T\
+    > T\~+...~..*\~+~T\
+    > T~\~~\~~\~~\~~\~~\~T\
     > TTTTTTTTTTTTTT
 
   - Count the number of rows and collumns.
