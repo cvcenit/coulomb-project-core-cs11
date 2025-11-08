@@ -57,6 +57,18 @@ _Here are the following ways you can run the game:_
     > Items:\
     > Axe ('x') - Used to cut down a tree the player moves to.\
     > Flamethrower ('*') - Used to burn down all the trees connected to the one the player moves to.
+    >
+    > Sample:\
+    > TTTT~~~~\~TTTTT\
+    > T.L.~.xT~~\~~~T\
+    > T.R.~.~+~TTT~T\
+    > T~.~~.~.~T~T~T\
+    > T~\~~~.~R~T~T~T\
+    > T...~x~~\~T~T~T\
+    > TT.T~.~T~T~T~T\
+    > T~+...~..*~+~T\
+    > T~~~~~~~~~~~~T\
+    > TTTTTTTTTTTTTT
   - On
   - 
 
