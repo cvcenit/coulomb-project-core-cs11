@@ -115,11 +115,11 @@ _After arriving into location of your adventure, here's how to navigate around t
   * Player to Tree Tile - Player cannot pass through tree tiles unless holding an item.
   * Player to Rock Tile - Player can only push the rock to a non-empty tile, a water tile, or a paved tile.
   * Player to Mushroom Tile - Player will automatically pickup the mushroom upon stepping on it.
-  * Rock tile to Water Tile - Converts the water tile into a paved tile.
+  * Rock Tile to Water Tile - Converts the water tile into a paved tile.
 
 ### Pickup
 
-_Press P to pick up the following items:_
+_Press P to pick up the following items you can encounter during your journey:_
 
 * Axe - Cuts down the tree along the player's path allowing them to pass through; Can only be used once.
 * Flamethrower - Burns down all the trees connected to the one along the player's path; Can only be used once.\
