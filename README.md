@@ -63,9 +63,9 @@ _Here are the following ways you can run the game:_
     > T.L.\~.xT\~\~\~\~\~T\
     > T.R.\~.\~+\~TTT\~T\
     > T\~.\~\~.\~.\~T\~T\~T\
-    > T\~\~\~\~.\~R\~T\~T\~T\
+    > T\~\~\~\~T\~R\~T\~T\~T\
     > T...\~x\~\~\~T\~T\~T\
-    > TT.T\~.\~T\~T\~T\~T\
+    > TT.T\~.\~.\~T\~T\~T\
     > T\~+...~..*\~+\~T\
     > T\~\~\~\~\~\~\~\~\~\~\~\~T\
     > TTTTTTTTTTTTTT
@@ -87,5 +87,11 @@ _Here are the following ways you can run the game:_
   - Navigate through the computer's directory using the terminal until the directory that contains the game file.
   - Run the following command:
     > python3 shroom_raider.py -f name.txt
+
+* With a Movement File
+  - Create a text (.txt) file in the same directory as the game file.
+  - Open the file in a text editor.
+  - Input your sequence of moves in a single line. (Note: An invalid move will stop processing the succeeding moves.)
+    > 
 
 
