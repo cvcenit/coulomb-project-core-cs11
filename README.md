@@ -30,11 +30,17 @@ _Hello, aspiring adventurer. Welcome to Shroom Raider! Here's a quick rundown on
 
 _Here are the following ways you can run the game:_
 
-* Raw Game - This method will run the game with its presets
-  - Download the game file and put it in an accessible folder.
+* Pre-requisites
+  - [Download python](https://realpython.com/installing-python/) in your computer.
+  - Navigating the computer using the [terminal.](https://terminalcheatsheet.com/guides/navigate-terminal) 
+
+* Raw Game - This method will run the game with its presets.
+  - Download the whole game folder.
   - Open up your operating system's terminal by using the search bar.
-  - Navigate through the computer's directory using the [terminal](https://terminalcheatsheet.com/guides/navigate-terminal) until the directory that contains the game file.
+  - Navigate through the computer's directory using the terminal until the directory that contains the game file.
   - Run the following command:
     > python3 shroomraider.py
+
+ * Custom 
 
 
