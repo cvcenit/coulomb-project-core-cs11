@@ -69,7 +69,8 @@ _Here are the following ways you can run the game:_
     > T~+...~..*~+~T\
     > T~~~~~~~~~~~~T\
     > TTTTTTTTTTTTTT
-  - On
+
+  - Count the number of rows and collumns.
   - 
 
 
