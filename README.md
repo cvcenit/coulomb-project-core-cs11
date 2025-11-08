@@ -125,3 +125,9 @@ _Press P to pick up the following items:_
 * Flamethrower - Burns down all the trees connected to the one along the player's path; Can only be used once.\
   (_Note: For all mentioned items, only one can be equipped at a time._)
 
+### Restart and Exit
+
+_Unfortunate events are unavoidable during an adventurer's journey, here are the controls if you wish to regroup for a while:_
+
+* Restart ('!') - Immediately go back at the start of your journey; Resets the loaded level and undos all progress made.
+* Exit ('Q') - Take some time off from your journey to regroup; Exits the program.
