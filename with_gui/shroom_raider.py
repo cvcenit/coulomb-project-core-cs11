@@ -1,5 +1,7 @@
+import os
+import sys
+import pygame
 from argparse import ArgumentParser
-import os, sys, pygame
 
 pygame.init()
 
@@ -11,11 +13,11 @@ main_color = (180, 30, 20)
 screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Shroomraider")
 
-class _text_Button_1():
+class gameplay_text_button():
     def __init__(self, x, y, t, s, col):
         self.col = col
-        text, capt = _create_text(t, s, col)
-        outer, capt = _create_text(t, s, black)
+        text, capt = create_text(t, s, col)
+        outer, capt = create_text(t, s, black)
         self.s = s
         self.capt = capt
         self.outer = outer
@@ -28,30 +30,48 @@ class _text_Button_1():
         self.hovered = False
 
     def draw(self):
+        global menu_btn_state, controls_popup_state
         action = False
         pos = pygame.mouse.get_pos()
 
-        if self.rect.collidepoint(pos):
-            self.text, s = _create_text(self.capt, self.s, main_color)
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-                self.clicked = True
-                action = True
-            self.hovered = True
+        if self.capt == "MENU" or self.capt == "RESTART":
+            if not menu_btn_state and not controls_popup_state:
+                if self.rect.collidepoint(pos):
+                    self.text, s = create_text(self.capt, self.s, main_color)
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        self.clicked = True
+                        action = True
+                    self.hovered = True
 
-        if pygame.mouse.get_pressed()[0] == 0:
-            self.clicked = False
+                if pygame.mouse.get_pressed()[0] == 0:
+                    self.clicked = False
 
-        if not self.rect.collidepoint(pos) and self.hovered == True:
-            self.text, s = _create_text(self.capt, self.s, self.col)
-            self.outer, s = _create_text(self.capt, self.s, black)
-            self.hovered = False
+                if not self.rect.collidepoint(pos) and self.hovered == True:
+                    self.text, s = create_text(self.capt, self.s, self.col)
+                    self.outer, s = create_text(self.capt, self.s, black)
+                    self.hovered = False
+        else:
+            if self.rect.collidepoint(pos):
+                self.text, s = create_text(self.capt, self.s, main_color)
+                if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                    self.clicked = True
+                    action = True
+                self.hovered = True
+
+            if pygame.mouse.get_pressed()[0] == 0:
+                self.clicked = False
+
+            if not self.rect.collidepoint(pos) and self.hovered == True:
+                self.text, s = create_text(self.capt, self.s, self.col)
+                self.outer, s = create_text(self.capt, self.s, black)
+                self.hovered = False
 
         screen.blit(self.outer, (self.rect.x + 2, self.rect.y))
         screen.blit(self.text, (self.rect.x, self.rect.y))
 
-        return (action,)
+        return action
 
-def _create_text(text, s, color):
+def create_text(text, s, color):
     font = pygame.font.Font("Syne_Mono/SyneMono-Regular.ttf", size=s)
     return font.render(text, True, color), text
 
@@ -67,7 +87,7 @@ def add_args():
 def pick_map(stage_file=None):
     ''' Returns default map if there's no stage_file, else returns the stage file '''
     if stage_file == None:
-        return '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT.R.~.~+~TTT~T\nT~.~~.~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~T~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
+        return '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT.R.~.~+~TTT~T\nT~.~~.~.~T~T~T\nT~~~~.~R~T~T~T\nT.~.Tx~~~T~T~T\nT...T.~T~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
     else:
         with open(stage_file, "r", encoding="utf-8") as lvl:
           return lvl.read()
@@ -194,7 +214,8 @@ def describe_tile(tile):
         '`': 'water',
         '_': 'paved',
         'x': 'axe',
-        '*': 'flamethrower'
+        '*': 'flamethrower',
+        None: 'Nothing',
     }.get(tile, 'unknown')
 
 def _move_player(direction):
@@ -405,7 +426,7 @@ def move_player(direction):
 # Assets: Tiles
 tree_img = pygame.image.load("assets/tiles/tree.png")
 plr_img = pygame.image.load("assets/tiles/plr.png")
-empty_img = pygame.Surface((50, 50))
+empty_img = pygame.image.load("assets/tiles/empty.png")
 pavement_img = pygame.image.load("assets/tiles/pavement.png")
 water_img = pygame.image.load("assets/tiles/water.png")
 rock_img = pygame.image.load("assets/tiles/rock.gif")
@@ -413,31 +434,18 @@ axe_img = pygame.image.load("assets/tiles/axe.png")
 flamethrower_img = pygame.image.load("assets/tiles/flamethrower.png")
 mush_img = pygame.image.load("assets/tiles/mush.png")
 
-
-
-water_img = pygame.Surface((50, 50))
-water_img.fill((50, 180, 240))
-
-empty_img = pygame.Surface((50, 50), pygame.SRCALPHA)
-empty_img.fill((0, 0, 0, 100))
-
-pavement_img = pygame.Surface((50, 50))
-pavement_img.fill((100, 100, 100))
-
-mush_img = pygame.Surface((50, 50))
-mush_img.fill((0, 200, 0))
-
-substitute = pygame.Surface((50, 50))
-substitute.fill((255, 0, 0))
-
 # Pause menu buttons
-menu_resume_btn = _text_Button_1((6 * 48)//4 + (SCREEN_WIDTH - (6 * 48))//2, 192, "Resume", 48, white)
-menu_controls_btn = _text_Button_1((8 * 48)//4 + (SCREEN_WIDTH - (8 * 48))//2, 252, "Controls", 48, white)
-menu_return_btn = _text_Button_1((15 * 48)//4 + (SCREEN_WIDTH - (15 * 48))//2, 310, "Back to Levels", 48, white)
-controls_back_btn = _text_Button_1((4 * 48)//4 + (SCREEN_WIDTH - (4 * 48))//2, 368, "Back", 48, white)
+menu_resume_btn = gameplay_text_button((6 * 48)//4 + (SCREEN_WIDTH - (6 * 48))//2, 192, "Resume", 48, white)
+menu_controls_btn = gameplay_text_button((8 * 48)//4 + (SCREEN_WIDTH - (8 * 48))//2, 252, "Controls", 48, white)
+menu_return_btn = gameplay_text_button((15 * 48)//4 + (SCREEN_WIDTH - (15 * 48))//2, 310, "Back to Levels", 48, white)
+controls_back_btn = gameplay_text_button((4 * 48)//4 + (SCREEN_WIDTH - (4 * 48))//2, 368, "Back", 48, white)
 menu_btn_state = False
 menu_controls_btn_state = False
 controls_popup_state = False
+
+# Lose popup
+
+lose_state = False
 
 # level bg
 level_bg = pygame.image.load("assets/cave_bluelarge.png")
@@ -447,7 +455,7 @@ def main_loop():
     global main, grid, drowned, LVL_MUSHROOMS, player_mushroom_count, GRID_WIDTH, GRID_HEIGHT, menu_state
     global mush_img, flamethrower_img, axe_img, rock_img, water_img, pavement_img, empty_img, plr_img, tree_img
     global menu_resume_btn, menu_return_btn, menu_controls_btn, controls_back_btn, menu_btn_state, controls_popup_state, menu_controls_btn_state
-    global level_bg
+    global level_bg, item, player_index, grid, MOTHERGRID, found_item, history
 
     scale1 = 704 // (GRID_WIDTH)
     y_offset = (768 - (GRID_HEIGHT * scale1)) // 2
@@ -458,10 +466,23 @@ def main_loop():
     scale = (scale1, scale1)
 
     tile_assets = {
+    '.': empty_img,
+    'L': plr_img,
+    'T': tree_img,
+    '+': mush_img,
+    'R': rock_img,
+    '~': water_img,
+    '_': pavement_img,
+    'x': axe_img,
+    '*': flamethrower_img,
+    '\n': '\n'
+    }
+
+    tile_assets_scaled = {
     '.': pygame.transform.scale(empty_img, scale),
-    'L': pygame.transform.scale(substitute, scale),
+    'L': pygame.transform.scale(plr_img, scale),
     'T': pygame.transform.scale(tree_img, scale),
-    '+': pygame.transform.scale(mush_img, scale),
+    '+': pygame.transform.scale(mush_img, (scale1//2, scale1//2)),
     'R': pygame.transform.scale(rock_img, scale),
     '~': pygame.transform.scale(water_img, scale),
     '_': pygame.transform.scale(pavement_img, scale),
@@ -471,15 +492,28 @@ def main_loop():
     }
 
     def load_map(level):
+        global drowned
+        map_surface = pygame.Surface((704, (GRID_HEIGHT * scale1)), pygame.SRCALPHA)
+        map_surface.fill((0, 0, 0, 0))
         current_row = 0
         current_col = 0
         for tile in level:
             if tile != '\n':
-                screen.blit(tile_assets.get(tile, tile), (x_offset + (scale1 * current_col), y_offset + (scale1 * current_row)))
-                current_col += 1
+                if tile == '+':
+                    map_surface.blit(tile_assets_scaled.get('.'), ((scale1 * current_col), (scale1 * current_row)))
+                    map_surface.blit(tile_assets_scaled.get(tile, tile), ((scale1 * current_col) + (scale1 // 4), (scale1 * current_row ) + (scale1 // 4)))
+                    current_col += 1
+                else:
+                    if tile == 'L' and drowned:
+                        map_surface.blit(tile_assets_scaled.get('~'), ((scale1 * current_col), (scale1 * current_row)))
+                    else:
+                        map_surface.blit(tile_assets_scaled.get('.'), ((scale1 * current_col), (scale1 * current_row)))
+                    map_surface.blit(tile_assets_scaled.get(tile, tile), ((scale1 * current_col), (scale1 * current_row)))
+                    current_col += 1
             else:
                 current_row += 1
                 current_col = 0
+        return map_surface
 
     def controls_popup():
         global controls_back_btn, controls_popup_state, menu_btn_state, SCREEN_WIDTH
@@ -497,11 +531,11 @@ def main_loop():
         screen.blit(bg, (((SCREEN_WIDTH - 464)//2), 96))
 
         # Texts
-        w = _create_text("W: Move upward", 32, white)[0]
-        a = _create_text("A: Move leftward", 32, white)[0]
-        s = _create_text("S: Move southward", 32, white)[0]
-        d = _create_text("D: Move rightward", 32, white)[0]
-        p = _create_text("P: Pickup item", 32, white)[0]
+        w = create_text("W: Move upward", 32, white)[0]
+        a = create_text("A: Move leftward", 32, white)[0]
+        s = create_text("S: Move southward", 32, white)[0]
+        d = create_text("D: Move rightward", 32, white)[0]
+        p = create_text("P: Pickup item", 32, white)[0]
 
         screen.blit(w, ((SCREEN_WIDTH - w.get_width())//2, 120))
         screen.blit(a, ((SCREEN_WIDTH - a.get_width())//2, 164))
@@ -509,13 +543,13 @@ def main_loop():
         screen.blit(d, ((SCREEN_WIDTH - d.get_width())//2, 252))
         screen.blit(p, ((SCREEN_WIDTH - p.get_width())//2, 296))
 
-        if controls_back_btn.draw()[0]:
+        if controls_back_btn.draw():
             controls_popup_state = False
             menu_btn_state = True
 
     def pause_menu():
         global menu_resume_btn, menu_return_btn, menu_controls_btn, controls_back_btn, menu_btn_state, controls_popup_state, menu_controls_btn_state
-        
+        global player_mushroom_count, LVL_MUSHROOMS, found_item
         # Cover
         cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
         cover.fill((0, 0, 0, 100))
@@ -528,32 +562,65 @@ def main_loop():
         pygame.draw.rect(bg, (255, 255, 255), bg.get_rect(), width=1, border_radius=24)
         screen.blit(bg, (((SCREEN_WIDTH - 464)//2), 168))
 
-        if menu_resume_btn.draw()[0]:
+        if menu_resume_btn.draw():
             menu_btn_state = False
             controls_popup_state = False
 
-        if menu_return_btn.draw()[0]:
+        if menu_return_btn.draw():
             menu_btn_state = False
             menu_controls_btn_state = False
             menu_state = "play"
 
-        if menu_controls_btn.draw()[0]:
+        if menu_controls_btn.draw():
             menu_btn_state = False
             controls_popup_state = True
 
     def side_bar():
-        global menu_btn_state, controls_popup_state
+        global menu_btn_state, controls_popup_state, mush_img, item, player_index, grid, MOTHERGRID, found_item, history, player_mushroom_count, LVL_MUSHROOMS, drowned
         # Main bg
-        bg = pygame.Surface((224, (GRID_HEIGHT * scale1) + 24), pygame.SRCALPHA)
+        bg = pygame.Surface((224, (GRID_HEIGHT * scale1) + 2), pygame.SRCALPHA)
         bg.fill((0, 0, 0, 0))
-        pygame.draw.rect(bg, (0, 0, 0, 150), bg.get_rect(), border_radius=24)
-        pygame.draw.rect(bg, (*white, 255), bg.get_rect(), width=1, border_radius=24)
-        screen.blit(bg, (768, (y_offset - 12)))
+        pygame.draw.rect(bg, (0, 0, 0, 150), bg.get_rect())
+        pygame.draw.rect(bg, (*white, 200), bg.get_rect(), width=1)
+        screen.blit(bg, (768, (y_offset - 1)))
 
         # Menu button
-        menu_btn = _text_Button_1(768 + (212 - (2 * 64))//2, y_offset, "Menu", 64, white)
+        menu_btn = gameplay_text_button(768 + (212 - (2 * 64))//2, y_offset, "MENU", 64, white)
+
+        # Mushroom count
+        text_lvlmush = create_text(f": {player_mushroom_count}/{LVL_MUSHROOMS}", 48, white)[0]
+        screen.blit(pygame.transform.scale(mush_img, (50, 50)), (768 - 40 + (212 - (2 * 48))//2, y_offset + (96 * 1)))
+        screen.blit(text_lvlmush, (768 + (212 - (2 * 40))//2, y_offset + (96 * 1 - 3)))
+
+        # On ground
+        text_item_ground = create_text("On ground:", 28, white)[0]
+        text_found_on_ground = create_text(describe_tile(found_item).title(), 28, white)[0]
+        screen.blit(text_item_ground, (768 + (212 - (5 * 28))//2, y_offset + (96 * 2)))
+        screen.blit(text_found_on_ground, (768 + (212 - (5 * 28))//2, y_offset + (96 * 2 + 28)))
+
+        # Holding
+        text_holding = create_text("Holding:", 28, white)[0]
+        if not item:
+            text_item_held = create_text("Nothing", 28, white)[0]
+        else:
+            text_item_held = create_text(f"{describe_tile(*item)}".title(), 28, white)[0]
+        screen.blit(text_holding, (768 + (212 - (5 * 28))//2, y_offset + (96 * 3)))
+        screen.blit(text_item_held, (768 + (212 - (5 * 28))//2, y_offset + (96 * 3 + 28)))
+
+        # Restart button
+        restart_btn = gameplay_text_button(768 + (212 - (4 * 40))//2, y_offset + (96 * 4), "RESTART", 40, white)
+
+        if restart_btn.draw():
+            # Restores the player attributes back to default
+            player_index = MOTHERGRID.index('L')
+            grid = list(MOTHERGRID)
+            found_item = None
+            item = []
+            history = ['.']
+            player_mushroom_count = 0
+            drowned = False
         
-        if menu_btn.draw()[0]:
+        if menu_btn.draw():
             menu_btn_state = True
             controls_popup_state = False
 
@@ -567,40 +634,64 @@ def main_loop():
         ...
 
     def lose():
-        ...
+        found_item = None
 
+        # Cover
+        cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
+        cover.fill((0, 0, 0, 100))
+        screen.blit(cover, (0, 0))
+
+        # Background
+        bg = pygame.Surface((464, 232), pygame.SRCALPHA)
+        bg.fill((0, 0, 0, 0))
+        pygame.draw.rect(bg, (0, 0, 0), bg.get_rect(), border_radius=24)
+        pygame.draw.rect(bg, (255, 255, 255), bg.get_rect(), width=1, border_radius=24)
+        screen.blit(bg, (((SCREEN_WIDTH - 464)//2), 168))
+
+    current_map = load_map(grid)
     def game_screen():
         screen.blit(level_bg, (0, 0))
         gray_bg = pygame.Surface((1024, 1024), pygame.SRCALPHA)
         gray_bg.fill((0, 0, 0, 50))
         screen.blit(gray_bg, (0, 0))
 
-        map_bg = pygame.Surface(((GRID_WIDTH * scale1) + 24, (GRID_HEIGHT * scale1) + 24), pygame.SRCALPHA)
+        map_bg = pygame.Surface(((GRID_WIDTH * scale1) + 2, (GRID_HEIGHT * scale1) + 2), pygame.SRCALPHA)
         map_bg.fill((0, 0, 0, 0))
-        pygame.draw.rect(map_bg, (0, 0, 0, 150), map_bg.get_rect(), border_radius=24)
-        pygame.draw.rect(map_bg, (*white, 255), map_bg.get_rect(), width=1, border_radius=24)
-        screen.blit(map_bg, (x_offset - 12, y_offset - 12))
+        pygame.draw.rect(map_bg, (0, 0, 0, 150), map_bg.get_rect())
+        pygame.draw.rect(map_bg, (*white, 200), map_bg.get_rect(), width=1)
+        screen.blit(map_bg, (x_offset - 1, y_offset - 1))
 
-
-        load_map(grid)
+        screen.blit(current_map, (x_offset, y_offset))
         side_bar()
 
+        if LVL_MUSHROOMS == player_mushroom_count:
+            win()
+        if drowned:
+            lose()
+
     while True:
+        if pygame.KEYDOWN and not menu_btn_state:
+            current_map = load_map(grid)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    if menu_btn_state == True:
+                        menu_btn_state = False
+                    else:
+                        menu_btn_state = True
+                    controls_popup_state = False
             if not menu_btn_state and not controls_popup_state:
-                if LVL_MUSHROOMS == player_mushroom_count:
-                    win()
-                elif drowned:
-                    lose()
-                else:
+                if not (LVL_MUSHROOMS == player_mushroom_count or drowned):
                     if event.type == pygame.KEYDOWN:
                         if event.unicode.upper() in moves:
                             print(event.unicode.upper())
                             move_player(event.unicode.upper())
-            game_screen()
+        
+        game_screen()
         
         pygame.display.flip()
 

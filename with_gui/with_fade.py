@@ -1,6 +1,10 @@
-import sys, pygame, datetime, os, json, shroom_raider
-import time as pythontime
-from pygame import *
+import sys
+import pygame
+import datetime
+import os
+import json
+import shroom_raider
+import time
 
 pygame.init()
 
@@ -26,17 +30,21 @@ class player_on_list():
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def draw(self):
-        global delete_pop_up, create_plr_btn_state, inc_len, already_plr, player_name_input
+        global delete_pop_up, create_plr_btn_state, inc_len, already_plr, player_name_input, plr_del_btn_state
         action = False
-        delete = False
         pos = pygame.mouse.get_pos()
 
+        if plr_del_btn_state:
+            outer_color = main_color
+        else:
+            outer_color = (100, 200, 100)
+
         # Hover effects
-        if not create_plr_btn_state and not delete_pop_up[0]:
+        if not create_plr_btn_state and not delete_pop_up:
             if self.rect.collidepoint(pos):
                 bg_outer = pygame.Surface((self.width + 8, self.height + 8), pygame.SRCALPHA)
                 bg_outer.fill((0, 0, 0, 0))
-                pygame.draw.rect(bg_outer, (main_color), bg_outer.get_rect(), border_radius=16)
+                pygame.draw.rect(bg_outer, outer_color, bg_outer.get_rect(), border_radius=16)
                 screen.blit(bg_outer, (self.x - 4, self.y - 4))
                 if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                     self.clicked = True
@@ -79,23 +87,10 @@ class player_on_list():
         mush_tot_text = create_text(f"| Mushrooms: {mush_tot}", 24, black)[0]
         screen.blit(mush_tot_text, (self.x + 48 + dt_created_text.get_width() + ply_time_text.get_width(), self.y + self.height//2))
 
-        # Delete button
-        plr_del_btn = text_Button_1(self.x + self.width - (32 * 6), self.y + 4, "Delete", 32, (255, 100, 100))
-        
-        if plr_del_btn.draw():
-            delete_pop_up = True, self.name
-            create_plr_btn_state = False
-            inc_len = False
-            already_plr = False
-            player_name_input = ""
-        
-        if action:
-            print(f"hi {self.name}")
-
-        return action, delete
+        return action
 
 
-class text_Button_1():
+class TextButton():
     def __init__(self, x, y, t, s, col):
         self.col = col
         text, capt = create_text(t, s, col)
@@ -136,7 +131,7 @@ class text_Button_1():
         return action
 
 
-class text_Button():
+class MenuTextButton():
     def __init__(self, x, y, t, s):
         text, capt = create_text(t, s, main_color)
         outer, capt = create_text(t, s, black)
@@ -183,7 +178,7 @@ def create_text(text, s, color):
 
 
 def fade_black():
-    alphaSurface = Surface((1024, 768), pygame.SRCALPHA) # The custom-surface of the size of the screen.
+    alphaSurface = pygame.Surface((1024, 768), pygame.SRCALPHA) # The custom-surface of the size of the screen.
     alph = 0 # Set alpha to 0 before the main-loop.
 
     while alph < 245:
@@ -202,7 +197,7 @@ def fade_black():
         clock.tick(480)  # Limit frame rate
 
 def fade_in(surf):
-    alphaSurface = Surface((1024, 768), pygame.SRCALPHA) # The custom-surface of the size of the screen.
+    alphaSurface = pygame.Surface((1024, 768), pygame.SRCALPHA) # The custom-surface of the size of the screen.
     alph = 255 # Set alpha to 0 before the main-loop.
 
     while alph > 10:
@@ -237,28 +232,36 @@ menu_bg_img4 = pygame.transform.scale(menu_bg_img4, (1024, 768))
 menu_bg_img5 = pygame.transform.scale(menu_bg_img5, (1024, 768))
 
 # Main menu buttons
-play_btn = text_Button(128, 288, "Play", 60)
-create_btn = text_Button(128, 360, "Create Levels", 60)
-lb_btn = text_Button(128, 432, "Leaderboards", 60)
-options_btn = text_Button(128, 504, "Options", 60)
-quit_btn = text_Button(128, 576, "Quit", 60)
+play_btn = MenuTextButton(128, 288, "Play", 60)
+create_btn = MenuTextButton(128, 360, "Create Levels", 60)
+lb_btn = MenuTextButton(128, 432, "Leaderboards", 60)
+options_btn = MenuTextButton(128, 504, "Options", 60)
+quit_btn = MenuTextButton(128, 576, "Quit", 60)
 
 # Play menu buttons
-create_plr_btn = text_Button_1(512, 640, "New Player", 48, white)
-create_plr_done_btn = text_Button_1(512, 448, "Done", 48, white)
-create_plr_back_btn = text_Button_1((1000 - (24 * 16))//2, 448, "Back", 48, white)
-play_menu_back_btn = text_Button_1(148, 640, "Back", 48, white)
-delete_pop_up_back = text_Button_1((1000 - (24 * 16))//2, 448, "Back", 48, white)
-delete_pop_up_confirm = text_Button_1(512, 448, "Confirm", 48, white)
-page_back = text_Button_1(304, 640, "<", 48, white)
-page_next = text_Button_1(352, 640, ">", 48, white)
+play_menu_back_btn = TextButton(148, 640, "Back", 48, white)
+page_back = TextButton(278, 640, "<", 48, white)
+page_next = TextButton(304, 640, ">", 48, white)
+# Create player button
+create_plr_btn = TextButton(584, 640, "New Player", 48, white)
+create_plr_done_btn = TextButton(512, 448, "Done", 48, white)
+create_plr_back_btn = TextButton((1000 - (24 * 16))//2, 448, "Back", 48, white)
+# Delete button
+plr_del_btn = TextButton(352, 640, "Delete", 48, white)
+delete_pop_up_back = TextButton((1000 - (24 * 16))//2, 448, "Back", 48, white)
+delete_pop_up_confirm = TextButton(512, 448, "Confirm", 48, white)
+cancel_del_plr_btn = TextButton(352, 640, "Cancel", 48, white)
+# States
 create_plr_btn_state = False
 create_plr_done_btn_state = False
 already_plr = False
 inc_len = False
-delete_pop_up = False, ""
+plr_del_btn_state = False
+delete_pop_up = False
 delete_pop_up_back_state = False
 delete_pop_up_confirm_state = False
+
+who_to_del = ""
 
 def menu_background():
     # Background
@@ -367,7 +370,7 @@ def _create_player_menu():
             if player_name_input + ".json" in players:
                 already_plr = True
             else:
-                _create_player(player_name_input, str(current_time)[:19], pythontime.time()//1)
+                _create_player(player_name_input, str(current_time)[:19], time.time()//1)
                 players.append(player_name_input + ".json")
                 create_plr_done_btn_state = False
                 create_plr_btn_state = False
@@ -387,17 +390,29 @@ def _create_player_menu():
 
 player_page = 1
 def players_list(page):
+    global delete_pop_up, plr_del_btn_state, who_to_del
     # page is 0-indexed
     i = page * 5
     count = 0
-    for player in players[i:i + 5]:
-        p = player_on_list(str(player)[:-5], count)
-        if p.draw()[0]:
-            ...
-        count += 1
+
+    if plr_del_btn_state:
+        for player in players[i:i + 5]:
+            p = player_on_list(str(player)[:-5], count)
+            if p.draw():
+                delete_pop_up = True
+                who_to_del = player[:-5]
+            count += 1
+        if delete_pop_up:
+            delete_player_confirmation(who_to_del)
+    else:
+        for player in players[i:i + 5]:
+            p = player_on_list(str(player)[:-5], count)
+            if p.draw():
+                ...
+            count += 1
 
 def delete_player_confirmation(player):
-    global delete_pop_up
+    global delete_pop_up, plr_del_btn_state
     # Semi-background
     semibg = pygame.Surface((512, 256), pygame.SRCALPHA)
     semibg.fill((20, 100, 50, 0))
@@ -414,14 +429,15 @@ def delete_player_confirmation(player):
     screen.blit(title3, ((1000 - (24 * 16))//2, 364))
 
     if delete_pop_up_back.draw():
-        delete_pop_up = False, ""
+        delete_pop_up = False
 
     if delete_pop_up_confirm.draw():
         os.remove(f"data/players/{player}.json")
-        delete_pop_up = False, ""
+        delete_pop_up = False
+        plr_del_btn_state = False
 
 def level_menu():
-    global menu_state, fade_count, create_plr_btn_state, delete_pop_up, player_page
+    global menu_state, fade_count, create_plr_btn_state, delete_pop_up, player_page, plr_del_btn_state, inc_len, already_plr, player_name_input
 
     # Background
     menu_background()
@@ -445,16 +461,29 @@ def level_menu():
     # Buttons
     if create_plr_btn_state:
         _create_player_menu()
-        delete_pop_up = False, ""
+        delete_pop_up = False
 
     if play_menu_back_btn.draw():
         create_plr_btn_state = False
-        delete_pop_up = False, ""
+        delete_pop_up = False
         menu_state = "main"
         fade_count = 0
 
-    if delete_pop_up[0]:
-        delete_player_confirmation(delete_pop_up[1])
+    if plr_del_btn_state:
+        if cancel_del_plr_btn.draw():
+            plr_del_btn_state = False
+            delete_pop_up = False
+            create_plr_btn_state = False
+            inc_len = False
+            already_plr = False
+            player_name_input = ""
+    else:
+        if plr_del_btn.draw():
+            plr_del_btn_state = True
+            create_plr_btn_state = False
+            inc_len = False
+            already_plr = False
+            player_name_input = ""
 
     if page_back.draw():
         player_page = 1
