@@ -48,26 +48,43 @@ _Here are the following ways you can run the game:_
     > Tiles:
     > 
     > Player tile ('L') - Required; Only one (1) may exist; Initial position of the player.
+    > 
     > Mushroom Tile ('+') - Required; More than one (1) may exist; Main goal of the game: collect all mushrooms.
+    > 
     > Empty Tile ('.') - Used to fill in gaps between non-empty tiles; The player can move to these tiles.
+    > 
     > Tree Tile ('T') - Acts as a wall that the player can't pass through unless holding an item.
+    > 
     > Rock Tile ('R') - Can be pushed by the player.
+    > 
     > Water Tile ('~') - Hazardous tile; The player loses if they move into a water tile; Can be converted into a paved tile when a rock is pushed into a water tile.
+    > 
     > Paved Tile ('_') - Created when a rock is pushed into a water tile; The player can move to these tiles.
     >
     > Items:
+    > 
     > Axe ('x') - Used to cut down a tree the player moves to.
+    > 
     > Flamethrower ('*') - Used to burn down all the trees connected to the one the player moves to.
     >
     > Sample:
+    > 
     > TTTTTTTTT
+    > 
     > T...+...T
+    > 
     > T...~...T
+    > 
     > T...R.T.T
+    > 
     > T.T.LTT.T
+    > 
     > T.x...*.T
+    > 
     > T.......T
+    > 
     > T.......T
+    > 
     > TTTTTTTTT
   - Follow the initial steps as mentioned in the Raw Game section.
   - 
