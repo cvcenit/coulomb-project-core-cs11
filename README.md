@@ -42,7 +42,7 @@ _Here are the following ways you can run the game:_
     > python3 shroom_raider.py
 
 * Custom Map
-  - Create a text (.txt) file.
+  - Create a text (.txt) file in the same directory as the game file.
   - Open the file in a text editor.
   - Create a rectangular grid using the following characters:
     > Tiles:\
@@ -71,7 +71,7 @@ _Here are the following ways you can run the game:_
     > TTTTTTTTTTTTTT
   - Count the number of rows and columns.
   - Insert the number of rows and columns respectively in the first line of the file.
-    > R C\
+    > 10 14\
     > TTTT~\~\~\~\~TTTTT\
     > T.L.\~.xT\~\~\~\~\~T\
     > T.R.\~.\~+\~TTT\~T\
@@ -82,5 +82,10 @@ _Here are the following ways you can run the game:_
     > T\~+...~..*\~+\~T\
     > T\~\~\~\~\~\~\~\~\~\~\~\~T\
     > TTTTTTTTTTTTTT
+  - Save the file changes.
+  - Open up your operating system's terminal by using the search bar.
+  - Navigate through the computer's directory using the terminal until the directory that contains the game file.
+  - Run the following command:
+    > python3 shroom_raider.py -f name.txt
 
 
