@@ -59,7 +59,7 @@ _Here are the following ways you can run the game:_
     > Flamethrower ('*') - Used to burn down all the trees connected to the one the player moves to.
     >
     > Sample:\
-    > TTTT~~~~\~TTTTT\
+    > TTTT~\~~\~~TTTTT\
     > T.L.~.xT~~\~~~T\
     > T.R.\~.~+\~TTT~T\
     > T\~.~\~.~.\~T~T\~T\
