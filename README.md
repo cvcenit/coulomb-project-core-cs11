@@ -88,17 +88,14 @@ _Here are the following ways you can run the game:_
   - Run the following command:
     > python3 shroom_raider.py -f map.txt
 
-* With a Movement File
-  - Create a text (.txt) file in the same directory as the game file.
-  - Open the file in a text editor.
-  - Input your sequence of moves in a single line. (Note: An invalid move will stop processing the succeeding moves.)
-    > ssssssdddwwpwwwwdpdssssssddpwwwwwddsssss
-  - Save the file changes.
+* With a Movement String and an Output File
+  - Compile the sequence of moves you wish to perform.
+  - Create an empty text (.txt) file that will serve as the output file in the same directory as the game file.
   - Open up your operating system's terminal by using the search bar.
   - Navigate through the computer's directory using the terminal until the directory that contains the game file.
   - Run the following command:
-    > python3 shroom_raider.py -m moves.txt
+    > python3 shroom_raider.py -m (your string of moves) -o output.txt
   - For custom maps:
-    > python3 shroom_raider.py -f map.txt -m moves.txt
+    > python3 shroom_raider.py -f map.txt -m (your string of moves) -o output.txt
 
 
