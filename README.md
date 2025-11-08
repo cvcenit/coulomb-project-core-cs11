@@ -2,8 +2,8 @@
 
 ## Table of Contents
 
-* [User Manual](##user_manual)
-  * [Startup](##start_up)
+* [User Manual](#user_manual)
+  * [Startup](#start_up)
   * [Controls]
     * [Movement]
     * [Pickup]
@@ -98,4 +98,30 @@ _Here are the following ways you can run the game:_
   - For custom maps:
     > python3 shroom_raider.py -f map.txt -m (your string of moves) -o output.txt
 
+## Controls
+
+_After arriving into location of your adventure, here's how to navigate around the area:_
+
+### Movement
+
+* Directions - Moves the player accordingly.
+  * W - Up
+  * A - Left
+  * S - Down
+  * D - Right
+
+* Tiles - Specific tile interactions.
+  * Player to Water Tile - Player loses the game whenever they move to a water tile.
+  * Player to Tree Tile - Player cannot pass through tree tiles unless holding an item.
+  * Player to Rock Tile - Player can only push the rock to a non-empty tile, a water tile, or a paved tile.
+  * Player to Mushroom Tile - Player will automatically pickup the mushroom upon stepping on it.
+  * Rock tile to Water Tile - Converts the water tile into a paved tile.
+
+### Pickup
+
+_Press P to pick up the following items:_
+
+* Axe - Cuts down the tree along the player's path allowing them to pass through; Can only be used once.
+* Flamethrower - Burns down all the trees connected to the one along the player's path; Can only be used once.\
+  (_Note: For all mentioned items, only one can be equipped at a time._)
 
