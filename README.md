@@ -46,8 +46,7 @@ _Here are the following ways you can run the game:_
   - Open the file in a text editor.
   - Create a rectangular grid using the following characters:
     > Player tile ('L') - Required; Only one (1) may exist; Initial position of the player.
-    > 
-    > Mushroom Tile ('+') - Required; More than one (1) may exist; Main goal of the game: collect all mushrooms.
+    > \nMushroom Tile ('+') - Required; More than one (1) may exist; Main goal of the game: collect all mushrooms.
     > 
     > Empty Tile ('.') - Used to fill in gaps between non-empty tiles; The player can move to these tiles.
     > 
