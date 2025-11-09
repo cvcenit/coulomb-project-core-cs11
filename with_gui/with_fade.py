@@ -840,7 +840,7 @@ def csv_to_map(file_path):
         for row in reader:
             csv_data.append(row)
 
-    matrix = [[int(cell) for cell in row] for row in csv_data]
+    matrix = [[-1 if int(cell) == 8 else int(cell) for cell in row] for row in csv_data]
     # Transpose to check columns
     transposed = list(zip(*matrix))
 
@@ -897,15 +897,75 @@ def csv_to_map(file_path):
 
     return map_rows + ' ' + map_cols + '\n' + converted
 
-
 def editor_laro_warning():
+    # Error pop up box showing "laro can only be placed once" and exits once mouse clicks outside grid
     overlay = pygame.Surface((768, 1024 - 200), pygame.SRCALPHA)
     box_rect = pygame.Rect(165, 350, 450, 100)
-    gray_with_alpha = (128, 128, 128, 200)
+    gray_with_alpha = (128, 128, 128, 120)
     pygame.draw.rect(overlay, gray_with_alpha, box_rect, border_radius=10)
 
     text1 = create_text("Laro can only be placed once!", 26, black)[0]
     text2 = create_text("Click outside the grid to continue.", 14, black)[0]
+    text_rect1 = text1.get_rect(center=box_rect.center)
+    text_rect2 = text1.get_rect(center=box_rect.center)
+    text_rect2.y += 40
+
+    overlay.blit(text1, text_rect1)
+    screen.blit(overlay, (0, 0))
+    overlay.blit(text2, text_rect2)
+    screen.blit(overlay, (0, 0))
+
+    pygame.display.update()
+
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                waiting = False
+
+
+def laro_save_warning():
+    # Error pop up box showing "you can't play without laro craft" and exits once mouse clicks anywhere
+    overlay = pygame.Surface((768, 1024 - 200), pygame.SRCALPHA)
+    box_rect = pygame.Rect(165, 350, 500, 90)
+    gray_with_alpha = (128, 128, 128, 120)
+    pygame.draw.rect(overlay, gray_with_alpha, box_rect, border_radius=10)
+
+    text1 = create_text("You can't play without Laro Craft!", 26, black)[0]
+    text2 = create_text("Click anywhere to continue.", 14, black)[0]
+    text_rect1 = text1.get_rect(center=box_rect.center)
+    text_rect2 = text1.get_rect(center=box_rect.center)
+    text_rect2.y += 40
+
+    overlay.blit(text1, text_rect1)
+    screen.blit(overlay, (0, 0))
+    overlay.blit(text2, text_rect2)
+    screen.blit(overlay, (0, 0))
+
+    pygame.display.update()
+
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                waiting = False
+
+
+def mush_save_warning():
+    # Error pop up box showing "you can't play without mushrooms" and exits once mouse clicks anywhere
+    overlay = pygame.Surface((768, 1024 - 200), pygame.SRCALPHA)
+    box_rect = pygame.Rect(165, 350, 500, 90)
+    gray_with_alpha = (128, 128, 128, 120)
+    pygame.draw.rect(overlay, gray_with_alpha, box_rect, border_radius=10)
+
+    text1 = create_text("You can't play without mushrooms!", 26, black)[0]
+    text2 = create_text("Click anywhere to continue.", 14, black)[0]
     text_rect1 = text1.get_rect(center=box_rect.center)
     text_rect2 = text1.get_rect(center=box_rect.center)
     text_rect2.y += 40
