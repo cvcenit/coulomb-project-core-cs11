@@ -99,13 +99,13 @@ _Here are the following ways you can run the game:_
   - For custom maps:
     > python3 shroom_raider.py -f map.txt -m (your sequence of moves) -o output.txt
 
-## Main Menu
+### Main Menu
 
-## Controls
+### Controls
 
 _After arriving into location of your adventure, here's how to navigate around the area:_
 
-### Movement
+#### Movement
 
 * Directions - Moves the player accordingly.
   * W - Up
@@ -120,7 +120,7 @@ _After arriving into location of your adventure, here's how to navigate around t
   * Player to Mushroom Tile - Player will automatically pickup the mushroom upon stepping on it.
   * Rock Tile to Water Tile - Converts the water tile into a paved tile.
 
-### Pickup
+#### Pickup
 
 _Press P to pick up the following items you can encounter during your journey:_
 
@@ -128,9 +128,13 @@ _Press P to pick up the following items you can encounter during your journey:_
 * Flamethrower - Burns down all the trees connected to the one along the player's path; Can only be used once.\
   (_Note: For all mentioned items, only one can be equipped at a time._)
 
-### Restart and Exit
+#### Restart and Exit
 
 _Unfortunate events are unavoidable during an adventurer's journey, here are the controls if you wish to regroup for a while:_
 
 * Restart ('!') - Immediately go back at the start of your journey; Resets the loaded level and undos all progress made.
 * Exit ('Q') - Take some time off from your journey to regroup; Exits the program.
+
+### Level Creator
+
+## Code Organization
