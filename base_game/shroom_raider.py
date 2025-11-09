@@ -24,8 +24,7 @@ def choose_mode(output_file=None):
 
 def clear_terminal():
     """This function clears the terminal, it does not return anything"""
-    #os.system('cls' if os.name == 'nt' else 'clear')
-    print('clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 if __name__ == "__main__":
     args = add_args()
