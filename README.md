@@ -143,32 +143,52 @@ _In this section, you will get to learn about the secrets behind the world of Sh
 
 ### Start Up
 * ArgumentParser from argparse\
-   This was done to implement the -f, -m, and -o flags for a custom map file, move sequnece, and outfile file respectively through the following functions:
+
+  This was done to implement the -f, -m, and -o flags for a custom map file, move sequnece, and outfile file respectively through the following functions:
   > add_args() - Creates the custom arguments: -f, -o, -m.\
   > pick_map(stage_file=None) - If the user inputs a custom map file, the function will set the map file as 'lvlmap'; otherwise, 'lvlmap' will be the preset map.\
   > choose_mode(output_file=None) - If the user inputs an output file, it will return the mode '', where the game file will take the player's move sequence and redirect its output towards the output file; otherwise, it will return the mode 'play', where the game will run and will be taking inputs throught the terminal.\
 ### Graphical User Interface
 ### Gameplay
-* Map and Map Attributes
+* Map and Map Attributes\
+  
    The map process starts from determining whether it will load a custom map or the preset map. Then the following attributes will be determined:
  * Map Height - Count of rows in 'lvlmap'; The first number string in a map file.
    > GRID_HEIGHT = int(lvlmap[:lvlmap.index(' ')\])
  * Map Width - Count of columns in 'lvlmap'; The second number string in a map file.
    > GRID_WIDTH = int(lvlmap[lvlmap.index(' ')+1: lvlmap.index('\n')\])
- * Map Content - List of all tiles in 'lvlmap'; Tiles start after the first new line character in a map file.
-   > lvlmapcontent = list(lvlmap[lvlmap.index('\n')+1:\])
+ * Map Content - All tiles in 'lvlmap'.
+   > lvlmapcontent - Converts the characters after the first new line character in a map file to a list of characters.
  * Base Grid - Default state of the map; will not be mutated.
-   > MOTHERGRID = list(''.join(lvlmapcontent))
+   > MOTHERGRID - Converts the characters in the string from rejoining the tiles in 'lvlmapcontent' to a new list of characters; avoids accidental mutation of 'MOTHERGRID' when mutating 'grid'.
  * Active Grid - Current state of the map; mutated based on the player's input.
-   > grid = list(''.join(lvlmapcontent))
+   > grid - Converts the characters in the string from rejoining the tiles in 'lvlmapcontent' to a new list of characters; avoids accidental mutation of 'MOTHERGRID' when mutating 'grid'.
  * Mushroom Count - Amount of mushrooms found within the map.
-   > LVL_MUSHROOMS = 0
-   > for x in lvlmap:\
-   >   if x == "+":\
-   >     LVL_MUSHROOMS += 1
-* Player Attributes
-* Main Loop
-* Inputs
+   > LVL_MUSHROOMS - A for loop will increase the count by one(1) for every '+' in 'lvlmap'.
+ * New Line Character Indices - List of the indices of the new line characters in 'lvlmap'; Used as reference to avoid invalid mutation.
+   > _n_indices - Starts from the index of the first new line character and jumps to the next index with 'GRID_WIDTH' distance.
+ * Character to Emoji Conversion - The process of converting the active grid before being displayed is done by the function:
+   > char_to_emoji(map) - Returns the map converted from text characters to their respective emojis.
+* Player Attributes\
+  
+   The player's default attributes when starting the map are the following:\
+   > item = [] - The player will be holding no items.\
+   > history = {'player': ['.'\]} - The tile under the player is set to an empty tile.\
+   > found_item = None - The player isn't standing on any items.\
+   > DROWNED = False - The player can't arrive on a water tile.\
+   > player_mushroom_count = 0 - The player haven't found any mushrooms.\
+   > player_index = grid.index('L') - The player's current position is the initial position in the grid.
+* Main Loop - Loops the gameplay code while main = 0; Terminates the game otherwise.
+* Inputs\
+  
+   The valid inputs the user can use are the following:
+  * Directional - Set of moves that changes the player's position
+    > W - Moves the player up by one row; translates to the index change of -(GRID_WIDTH + 1).\
+    > S - Moves the player down by one row; translates to the index change of GRID_WIDTH + 1.\
+    > A - Moves the player left by one tile; translates to the index change of -1.\
+    > D - Moves the player right by one tile; translates to the index change of 1.
+
+  
 * Movement
 * Tiles
 * Items
