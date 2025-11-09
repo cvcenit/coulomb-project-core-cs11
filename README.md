@@ -4,6 +4,7 @@
 
 * [User Manual](#user_manual)
   * [Startup](#start_up)
+  * [Main Menu]
   * [Controls]
     * [Movement]
     * [Pickup]
@@ -97,6 +98,8 @@ _Here are the following ways you can run the game:_
     > python3 shroom_raider.py -m (your string of moves) -o output.txt
   - For custom maps:
     > python3 shroom_raider.py -f map.txt -m (your string of moves) -o output.txt
+
+## Main Menu
 
 ## Controls
 
