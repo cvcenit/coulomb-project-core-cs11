@@ -95,9 +95,9 @@ _Here are the following ways you can run the game:_
   - Open up your operating system's terminal by using the search bar.
   - Navigate through the computer's directory using the terminal until the directory that contains the game file.
   - Run the following command:
-    > python3 shroom_raider.py -m (your string of moves) -o output.txt
+    > python3 shroom_raider.py -m (your sequence of moves) -o output.txt
   - For custom maps:
-    > python3 shroom_raider.py -f map.txt -m (your string of moves) -o output.txt
+    > python3 shroom_raider.py -f map.txt -m (your sequence of moves) -o output.txt
 
 ## Main Menu
 
