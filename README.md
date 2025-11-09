@@ -145,7 +145,31 @@ _In this section, you will get to learn about the secrets behind the world of Sh
 * ArgumentParser from argparse\
    This was done to implement the -f, -m, and -o flags for a custom map file, move sequnece, and outfile file respectively through the following functions:
   > add_args() - Creates the custom arguments: -f, -o, -m.\
-  > 
+  > pick_map(stage_file=None) - If the user inputs a custom map file, the function will set the map file as 'lvlmap'; otherwise, 'lvlmap' will be the preset map.\
+  > choose_mode(output_file=None) - If the user inputs an output file, it will return the mode '', where the game file will take the player's move sequence and redirect its output towards the output file; otherwise, it will return the mode 'play', where the game will run and will be taking inputs throught the terminal.\
 ### Graphical User Interface
 ### Gameplay
+* Map and Map Attributes
+   The map process starts from determining whether it will load a custom map or the preset map. Then the following attributes will be determined:
+ * Map Height - Count of rows in 'lvlmap'; The first number string in a map file.
+   > GRID_HEIGHT = int(lvlmap[:lvlmap.index(' ')\])
+ * Map Width - Count of columns in 'lvlmap'; The second number string in a map file.
+   > GRID_WIDTH = int(lvlmap[lvlmap.index(' ')+1: lvlmap.index('\n')\])
+ * Map Content - List of all tiles in 'lvlmap'; Tiles start after the first new line character in a map file.
+   > lvlmapcontent = list(lvlmap[lvlmap.index('\n')+1:\])
+ * Base Grid - Default state of the map; will not be mutated.
+   > MOTHERGRID = list(''.join(lvlmapcontent))
+ * Active Grid - Current state of the map; mutated based on the player's input.
+   > grid = list(''.join(lvlmapcontent))
+ * Mushroom Count - Amount of mushrooms found within the map.
+   > LVL_MUSHROOMS = 0
+   > for x in lvlmap:\
+   >   if x == "+":\
+   >     LVL_MUSHROOMS += 1
+* Player Attributes
+* Main Loop
+* Inputs
+* Movement
+* Tiles
+* Items
 ### Level Creation
