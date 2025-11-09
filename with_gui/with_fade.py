@@ -1351,8 +1351,8 @@ else:
     mode = choose_mode() # Mode if to play or to output
     lvlmap = pick_map() # Map as string/raw
 
-def game_function(player="default-Player", level_map="MOTHERGRID", level_map_name="default-Map"):
-    global menu_state, gameplay_state, mode, lvlmap, playing_from_play
+def game_function(player="default-Player", level_map=None, level_map_name="default-Map"):
+    global menu_state, gameplay_state, mode, lvlmap, playing_from_play, args, lvlmap
 
     class gameplay_Text_Button():
         def __init__(self, x, y, t, s, col):
@@ -2136,125 +2136,133 @@ def game_function(player="default-Player", level_map="MOTHERGRID", level_map_nam
 
         if lose_state:
             lose()
+    if __name__ == "__main__":
+        # Outputs args.output_file if -o was called, else run the game.
+        if mode == "":
+            with open(args.output_file, "w", encoding="utf-8") as output:
+                move_player(args.movement)
 
-    while True:
-        if disposable and lose_state:
-            lost_at_time = time.time()
-            disposable = False
+                # Contents of the output file: no/clear and grid
+                if player_mushroom_count == LVL_MUSHROOMS:
+                    output.write(f"CLEAR\n{"".join(grid)}")
+                else:
+                    output.write((f"NO CLEAR\n{"".join(grid)}"))
+        else:
+            while True:
+                if disposable and lose_state:
+                    lost_at_time = time.time()
+                    disposable = False
 
-        if disposable and LVL_MUSHROOMS == player_mushroom_count:
-            won_at_time = time.time()
-            disposable = False
+                if disposable and LVL_MUSHROOMS == player_mushroom_count:
+                    won_at_time = time.time()
+                    disposable = False
 
-        if pygame.KEYDOWN and not menu_btn_state and not controls_popup_state:
-            current_map = load_map(grid)
+                if pygame.KEYDOWN and not menu_btn_state and not controls_popup_state:
+                    current_map = load_map(grid)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if not lose_state and not (LVL_MUSHROOMS == player_mushroom_count):
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        if menu_btn_state == True:
-                            menu_btn_state = False
-                        else:
-                            menu_btn_state = True
-                        controls_popup_state = False
-            if not menu_btn_state and not controls_popup_state:
-                if not (LVL_MUSHROOMS == player_mushroom_count or drowned or lose_state):
-                    if event.type == pygame.KEYDOWN:
-                        if event.unicode.upper() in moves:
-                            print(event.unicode.upper())
-                            move_player(event.unicode.upper())
-        
-        game_screen()
-        
-        pygame.display.flip()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if not lose_state and not (LVL_MUSHROOMS == player_mushroom_count):
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_ESCAPE:
+                                if menu_btn_state == True:
+                                    menu_btn_state = False
+                                else:
+                                    menu_btn_state = True
+                                controls_popup_state = False
+                    if not menu_btn_state and not controls_popup_state:
+                        if not (LVL_MUSHROOMS == player_mushroom_count or drowned or lose_state):
+                            if event.type == pygame.KEYDOWN:
+                                if event.unicode.upper() in moves:
+                                    print(event.unicode.upper())
+                                    move_player(event.unicode.upper())
+                
+                game_screen()
+                
+                pygame.display.flip()
 
-        if not gameplay_state[0]:
-            break
+                if not gameplay_state[0]:
+                    break
 
 
 if __name__ == "__main__":
     # Outputs args.output_file if -o was called, else run the game.
     if mode == "":
-        with open(args.output_file, "w", encoding="utf-8") as output:
-            move_player(args.movement)
-
-            # Contents of the output file: no/clear and grid
-            if player_mushroom_count == LVL_MUSHROOMS:
-                output.write(f"CLEAR\n{"".join(grid)}")
-            else:
-                output.write((f"NO CLEAR\n{"".join(grid)}"))
+        game_function()
     else:
-        while True:
-            if gameplay_state[0]:
-                not_needed, PLAYER_NAME, MAP_FILE, MAP_NAME = gameplay_state
-                game_function(player=PLAYER_NAME, level_map=MAP_FILE, level_map_name=MAP_NAME)
-            else:
-                while True:
+        if not args.stage_file:
+            while True:
+                if gameplay_state[0]:
+                    not_needed, PLAYER_NAME, MAP_FILE, MAP_NAME = gameplay_state
+                    game_function(player=PLAYER_NAME, level_map=MAP_FILE, level_map_name=MAP_NAME)
+                else:
+                    while True:
 
-                    players = [player for player in os.listdir("data/players")]
-                    if len(players) >= 10:
-                        max_plrs = True
-                    else:
-                        max_plrs = False
-
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            pygame.quit()
-                            sys.exit()
-
-                    # Check if editor is active
-                    if editor_active:
-                        level_editor()
-                    elif menu_state == "main":
-                        if fade_count == 0:
-                            fade_in(main_menu)
-                            fade_count += 1
-                        main_menu()
-
-                    elif menu_state == "play":
-                        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                            create_plr_btn_state = False
-                            menu_state = "main"
-                            fade_count = 0
-                        if fade_count == 1:
-                            fade_in(level_menu)
-                            fade_count += 1
+                        players = [player for player in os.listdir("data/players")]
+                        if len(players) >= 10:
+                            max_plrs = True
                         else:
-                            level_menu()
+                            max_plrs = False
 
-                    elif menu_state == "leaderboards":
-                        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                            menu_state = "main"
-                            fade_count = 0
-                        if fade_count == 1:
-                            fade_in(leaderboards_menu)
-                            fade_count += 1
-                        leaderboards_menu()
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                pygame.quit()
+                                sys.exit()
 
-                    elif menu_state == "create":
-                        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                            menu_state = "main"
-                            fade_count = 0
-                        if fade_count == 1:
-                            fade_in(create_menu)
-                            fade_count += 1
-                        else:
-                            create_menu()
+                        # Check if editor is active
+                        if editor_active:
+                            level_editor()
+                        elif menu_state == "main":
+                            if fade_count == 0:
+                                fade_in(main_menu)
+                                fade_count += 1
+                            main_menu()
 
-                    elif menu_state == "options":
-                        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                            menu_state = "main"
-                            fade_count = 0
-                        if fade_count == 1:
-                            fade_in(options_menu)
-                            fade_count += 1
-                        options_menu()
+                        elif menu_state == "play":
+                            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                                create_plr_btn_state = False
+                                menu_state = "main"
+                                fade_count = 0
+                            if fade_count == 1:
+                                fade_in(level_menu)
+                                fade_count += 1
+                            else:
+                                level_menu()
 
-                    pygame.display.flip()
+                        elif menu_state == "leaderboards":
+                            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                                menu_state = "main"
+                                fade_count = 0
+                            if fade_count == 1:
+                                fade_in(leaderboards_menu)
+                                fade_count += 1
+                            leaderboards_menu()
 
-                    if gameplay_state[0]:
-                        break
+                        elif menu_state == "create":
+                            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                                menu_state = "main"
+                                fade_count = 0
+                            if fade_count == 1:
+                                fade_in(create_menu)
+                                fade_count += 1
+                            else:
+                                create_menu()
+
+                        elif menu_state == "options":
+                            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                                menu_state = "main"
+                                fade_count = 0
+                            if fade_count == 1:
+                                fade_in(options_menu)
+                                fade_count += 1
+                            options_menu()
+
+                        pygame.display.flip()
+
+                        if gameplay_state[0]:
+                            break
+        else:
+            gameplay_state = True, "", lvlmap, ""
+            game_function(level_map=lvlmap, level_map_name=args.stage_file)
