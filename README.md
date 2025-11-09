@@ -138,3 +138,14 @@ _Unfortunate events are unavoidable during an adventurer's journey, here are the
 ### Level Creator
 
 ## Code Organization
+
+_In this section, you will get to learn about the secrets behind the world of Shroom Raider!_
+
+### Start Up
+* ArgumentParser from argparse\
+   This was done to implement the -f, -m, and -o flags for a custom map file, move sequnece, and outfile file respectively through the following functions:
+  > add_args() - Creates the custom arguments: -f, -o, -m.\
+  > 
+### Graphical User Interface
+### Gameplay
+### Level Creation
