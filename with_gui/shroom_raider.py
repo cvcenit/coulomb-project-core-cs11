@@ -1,6 +1,7 @@
 import os
 import sys
 import pygame
+import time
 from argparse import ArgumentParser
 
 pygame.init()
@@ -13,7 +14,7 @@ main_color = (180, 30, 20)
 screen = pygame.display.set_mode(SCREEN_SIZE)
 pygame.display.set_caption("Shroomraider")
 
-class gameplay_text_button():
+class gameplay_Text_Button():
     def __init__(self, x, y, t, s, col):
         self.col = col
         text, capt = create_text(t, s, col)
@@ -114,7 +115,7 @@ lvlmapcontent = list(lvlmap[lvlmap.index('\n')+1:])
 try:
     GRID_HEIGHT = int(lvlmap[:lvlmap.index(' ')])
     GRID_WIDTH = int(lvlmap[lvlmap.index(' ')+1: lvlmap.index('\n')])
-except TypeError:
+except (TypeError, IndexError):
     print("INVALID MAP")
     raise TypeError
 
@@ -285,7 +286,7 @@ def _move_player(direction):
                 if f"Rock {new_index}" in history:  # Sets the tile under the rock based on history, so that the 'moveto' function appends the correct under_tile when the player moves
                     rock_under_tile = history[f"Rock {new_index}"]
 
-                if new_rock_index > len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
+                if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
                     print("You can't move the rock there")
                     return
 
@@ -312,7 +313,11 @@ def _move_player(direction):
                 return
 
             else:
-                if grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
+                if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
+                    print("You can't move the rock there")
+                    return
+
+                elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
                     grid[new_rock_index] = "_"
                     moveto(rock_under_tile)
 
@@ -329,6 +334,8 @@ def _move_player(direction):
                     print("You can't push the rock there!")
                     return
 
+
+
             if f"Rock {new_index}" in history:  # Removes the Rock at index new_index from history after it gets moved
                     del history[f"Rock {new_index}"]
 
@@ -341,7 +348,6 @@ def _move_player(direction):
 
             # Changes the following player attributes
             drowned = True
-            main += 1
 
             return
 
@@ -353,7 +359,6 @@ def _move_player(direction):
             # Checks if the player has reached the required amount of mushrooms
             if player_mushroom_count == LVL_MUSHROOMS:
                 moveto('+')
-                main += 1
 
             # Moves the player and leaves an empty tile
             moveto('.')
@@ -457,10 +462,10 @@ flamethrower_img = pygame.image.load("assets/tiles/flamethrower.png")
 mush_img = pygame.image.load("assets/tiles/mush.png")
 
 # Pause menu buttons
-menu_resume_btn = gameplay_text_button((6 * 48)//4 + (SCREEN_WIDTH - (6 * 48))//2, 192, "Resume", 48, white)
-menu_controls_btn = gameplay_text_button((8 * 48)//4 + (SCREEN_WIDTH - (8 * 48))//2, 252, "Controls", 48, white)
-menu_return_btn = gameplay_text_button((15 * 48)//4 + (SCREEN_WIDTH - (15 * 48))//2, 310, "Back to Levels", 48, white)
-controls_back_btn = gameplay_text_button((4 * 48)//4 + (SCREEN_WIDTH - (4 * 48))//2, 368, "Back", 48, white)
+menu_resume_btn = gameplay_Text_Button((6 * 48)//4 + (SCREEN_WIDTH - (6 * 48))//2, 192, "Resume", 48, white)
+menu_controls_btn = gameplay_Text_Button((8 * 48)//4 + (SCREEN_WIDTH - (8 * 48))//2, 252, "Controls", 48, white)
+menu_return_btn = gameplay_Text_Button((15 * 48)//4 + (SCREEN_WIDTH - (15 * 48))//2, 310, "Back to Levels", 48, white)
+controls_back_btn = gameplay_Text_Button((4 * 48)//4 + (SCREEN_WIDTH - (4 * 48))//2, 368, "Back", 48, white)
 menu_btn_state = False
 menu_controls_btn_state = False
 controls_popup_state = False
@@ -471,20 +476,22 @@ lose_state = False
 
 # level bg
 level_bg = pygame.image.load("assets/cave_bluelarge.png")
-level_bg = pygame.transform.scale(level_bg, (1024, 1024))
+level_bg = pygame.transform.scale(level_bg, (1024, 768))
 
-def main_loop():
+def game_function(player="default-Player", level_map=grid, level_map_name="default-Map"):
     global main, grid, drowned, LVL_MUSHROOMS, player_mushroom_count, GRID_WIDTH, GRID_HEIGHT, menu_state
     global mush_img, flamethrower_img, axe_img, rock_img, water_img, pavement_img, empty_img, plr_img, tree_img
     global menu_resume_btn, menu_return_btn, menu_controls_btn, controls_back_btn, menu_btn_state, controls_popup_state, menu_controls_btn_state
     global level_bg, item, player_index, grid, MOTHERGRID, found_item, history
 
+    time_when_called = time.time()
+    disposable = True
+    lost_at_time = time.time()
+    won_at_time = time.time()
+
     scale1 = 704 // (GRID_WIDTH)
     y_offset = (768 - (GRID_HEIGHT * scale1)) // 2
     x_offset = (768 - 704) // 2
-
-    # 320 px left for width
-
     scale = (scale1, scale1)
 
     tile_assets = {
@@ -599,6 +606,7 @@ def main_loop():
 
     def side_bar():
         global menu_btn_state, controls_popup_state, mush_img, item, player_index, grid, MOTHERGRID, found_item, history, player_mushroom_count, LVL_MUSHROOMS, drowned
+        nonlocal time_when_called, lost_at_time, disposable, won_at_time
         # Main bg
         bg = pygame.Surface((224, (GRID_HEIGHT * scale1) + 2), pygame.SRCALPHA)
         bg.fill((0, 0, 0, 0))
@@ -607,7 +615,7 @@ def main_loop():
         screen.blit(bg, (768, (y_offset - 1)))
 
         # Menu button
-        menu_btn = gameplay_text_button(768 + (212 - (2 * 64))//2, y_offset, "MENU", 64, white)
+        menu_btn = gameplay_Text_Button(768 + (212 - (2 * 64))//2, y_offset, "MENU", 64, white)
 
         # Mushroom count
         text_lvlmush = create_text(f": {player_mushroom_count}/{LVL_MUSHROOMS}", 48, white)[0]
@@ -630,17 +638,40 @@ def main_loop():
         screen.blit(text_item_held, (768 + (212 - (5 * 28))//2, y_offset + (96 * 3 + 28)))
 
         # Restart button
-        restart_btn = gameplay_text_button(768 + (212 - (4 * 40))//2, y_offset + (96 * 4), "RESTART", 40, white)
+        restart_btn = gameplay_Text_Button(768 + (212 - (4 * 40))//2, y_offset + (96 * 4), "RESTART", 40, white)
 
         if restart_btn.draw():
             # Restores the player attributes back to default
             player_index = MOTHERGRID.index('L')
             grid = list(MOTHERGRID)
             found_item = None
-            item = []
-            history = ['.']
-            player_mushroom_count = 0
             drowned = False
+            item = []
+            history = {'player': ['.']}
+            player_mushroom_count = 0
+            lose_state = False
+            disposable = True
+            time_when_called = time.time()
+            lost_at_time = time.time()
+            won_at_time = time.time()
+
+        # Time
+        if not drowned and not (menu_btn_state or controls_popup_state):
+            time_elapsed = time.time()
+        elif (LVL_MUSHROOMS == player_mushroom_count):
+            time_elapsed = won_at_time
+        else:
+            time_elapsed = lost_at_time
+
+
+        current_time = int(time_elapsed - time_when_called)
+        seconds = str(current_time % 60)
+        if len(seconds) == 1:
+            seconds = '0' + seconds
+        minutes = current_time // 60
+
+        text_time = create_text(f"{minutes}: {seconds}", 28, white)[0]
+        screen.blit(text_time, (768 + (212 - (text_time.get_width()))//2, y_offset + (96 * 4 + 40)))
         
         if menu_btn.draw():
             menu_btn_state = True
@@ -653,12 +684,9 @@ def main_loop():
             controls_popup()
 
     def win():
-        ...
-
-    def lose():
-        global lose_state, found_item
+        global lose_state, found_item, player_mushroom_count, LVL_MUSHROOMS, player_index, grid, drowned, item, history, MOTHERGRID
+        nonlocal time_when_called, disposable, won_at_time
         found_item = None
-        lose_state = True
 
         # Cover
         cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
@@ -668,23 +696,133 @@ def main_loop():
         # Background
         bg = pygame.Surface((768, 640), pygame.SRCALPHA)
         bg.fill((0, 0, 0, 0))
-        pygame.draw.rect(bg, (0, 0, 0, 200), bg.get_rect(), border_radius=24)
+        pygame.draw.rect(bg, (0, 0, 0, 215), bg.get_rect(), border_radius=24)
+        pygame.draw.rect(bg, (255, 255, 255), bg.get_rect(), width=1, border_radius=24)
+        screen.blit(bg, (((SCREEN_WIDTH - 768)//2), 64))
+
+        # Text
+        text_you_won = create_text("You Won!", 128, main_color)[0]
+        screen.blit(text_you_won, (((SCREEN_WIDTH - text_you_won.get_width())//2), 96))
+        text_poetic_win = create_text(f"Commendable... Worthy of praise...", 34, main_color)[0]
+        x_align_on = ((SCREEN_WIDTH - text_poetic_win.get_width())//2)
+        screen.blit(text_poetic_win, (x_align_on, 224))
+
+        # Player name, current map
+        text_plr_name = create_text(f'Won as "{player}"', 28, white)[0]
+        screen.blit(text_plr_name, (x_align_on, 288))
+        text_map_name = create_text(f'Deployed on "{level_map_name}"', 28, white)[0]
+        screen.blit(text_map_name, (x_align_on, 320))
+
+        # Mushroom collected
+        text_mush_collected = create_text(f'Collected {player_mushroom_count} out of {LVL_MUSHROOMS} mushrooms', 28, white)[0]
+        screen.blit(text_mush_collected, (x_align_on, 364))
+
+        # Time
+        current_time = int(won_at_time - time_when_called)
+        seconds = current_time % 60
+        minutes = current_time // 60
+        text_time_lost = create_text(f"Lost after {minutes} minutes and {seconds} seconds", 28, white)[0]
+        screen.blit(text_time_lost, (x_align_on, 396))
+
+        # Retry, Back to map menu button
+        back_to_lvl_btn = gameplay_Text_Button(x_align_on, 484, "Back to level menu", 48, white)
+        replay_btn = gameplay_Text_Button(x_align_on, 538, "Replay", 48, white)
+        next_lvl_btn = gameplay_Text_Button(x_align_on, 595, "Next level", 48, white)
+        
+        if back_to_lvl_btn.draw():
+            # menu state to lvl menu
+            pass
+
+        if replay_btn.draw():
+            # Restores the player attributes back to default
+            player_index = MOTHERGRID.index('L')
+            grid = list(MOTHERGRID)
+            found_item = None
+            drowned = False
+            item = []
+            history = {'player': ['.']}
+            player_mushroom_count = 0
+            lose_state = False
+            disposable = True
+            time_when_called = time.time()
+            lost_at_time = time.time()
+            won_at_time = time.time()
+
+        if next_lvl_btn.draw():
+            # next level
+            pass
+
+
+    def lose():
+        global lose_state, found_item, player_mushroom_count, LVL_MUSHROOMS, player_index, grid, drowned, item, history, MOTHERGRID
+        nonlocal time_when_called, lost_at_time, disposable
+        found_item = None
+
+        # Cover
+        cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
+        cover.fill((0, 0, 0, 100))
+        screen.blit(cover, (0, 0))
+
+        # Background
+        bg = pygame.Surface((768, 640), pygame.SRCALPHA)
+        bg.fill((0, 0, 0, 0))
+        pygame.draw.rect(bg, (0, 0, 0, 215), bg.get_rect(), border_radius=24)
         pygame.draw.rect(bg, (255, 255, 255), bg.get_rect(), width=1, border_radius=24)
         screen.blit(bg, (((SCREEN_WIDTH - 768)//2), 64))
 
         # Text
         text_you_lost = create_text("You Lost", 128, main_color)[0]
         screen.blit(text_you_lost, (((SCREEN_WIDTH - text_you_lost.get_width())//2), 96))
-        text_poetic_death = create_text("One is unable to flow with the sea", 32, main_color)[0]
-        screen.blit(text_poetic_death, (((SCREEN_WIDTH - text_poetic_death.get_width())//2), 224))
+        text_poetic_death = create_text("One is unable to flow with the sea", 34, main_color)[0]
+        x_align_on = ((SCREEN_WIDTH - text_poetic_death.get_width())//2)
+        screen.blit(text_poetic_death, (x_align_on, 224))
 
-        # Data texts (mushroom, time, player name, current map)
+        # Player name, current map
+        text_plr_name = create_text(f'Lost as "{player}"', 28, white)[0]
+        screen.blit(text_plr_name, (x_align_on, 288))
+        text_map_name = create_text(f'Deployed on "{level_map_name}"', 28, white)[0]
+        screen.blit(text_map_name, (x_align_on, 320))
 
-        # Restart, Back to map menu button
+        # Mushroom collected
+        text_mush_collected = create_text(f'Collected {player_mushroom_count} out of {LVL_MUSHROOMS} mushrooms', 28, white)[0]
+        screen.blit(text_mush_collected, (x_align_on, 364))
 
+        # Time
+        lost_at_time_lost = lost_at_time
+
+        current_time = int(lost_at_time_lost - time_when_called)
+        seconds = current_time % 60
+        minutes = current_time // 60
+        text_time_lost = create_text(f"Lost after {minutes} minutes and {seconds} seconds", 28, white)[0]
+        screen.blit(text_time_lost, (x_align_on, 396))
+
+        # Retry, Back to map menu button
+        back_to_lvl_btn = gameplay_Text_Button(x_align_on, 484, "Back to level menu", 48, white)
+        retry_btn = gameplay_Text_Button(x_align_on, 538, "Retry", 48, white)
+        
+        if back_to_lvl_btn.draw():
+            # menu state to lvl menu
+            pass
+
+        if retry_btn.draw():
+            # Restores the player attributes back to default
+            player_index = MOTHERGRID.index('L')
+            grid = list(MOTHERGRID)
+            found_item = None
+            drowned = False
+            item = []
+            history = {'player': ['.']}
+            player_mushroom_count = 0
+            lose_state = False
+            disposable = True
+            time_when_called = time.time()
+            lost_at_time = time.time()
+            won_at_time = time.time()
 
     current_map = load_map(grid)
     def game_screen():
+        global lose_state
+
         screen.blit(level_bg, (0, 0))
         gray_bg = pygame.Surface((1024, 1024), pygame.SRCALPHA)
         gray_bg.fill((0, 0, 0, 50))
@@ -701,18 +839,30 @@ def main_loop():
 
         if LVL_MUSHROOMS == player_mushroom_count:
             win()
+
         if drowned:
+            lose_state = True
+
+        if lose_state:
             lose()
 
     while True:
-        if pygame.KEYDOWN and not menu_btn_state:
+        if disposable and lose_state:
+            lost_at_time = time.time()
+            disposable = False
+
+        if disposable and LVL_MUSHROOMS == player_mushroom_count:
+            won_at_time = time.time()
+            disposable = False
+
+        if pygame.KEYDOWN and not menu_btn_state and not controls_popup_state:
             current_map = load_map(grid)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if not menu_btn_state and not controls_popup_state and not lose_state:
+            if not lose_state:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         if menu_btn_state == True:
@@ -721,7 +871,7 @@ def main_loop():
                             menu_btn_state = True
                         controls_popup_state = False
             if not menu_btn_state and not controls_popup_state:
-                if not (LVL_MUSHROOMS == player_mushroom_count or drowned):
+                if not (LVL_MUSHROOMS == player_mushroom_count or drowned or lose_state):
                     if event.type == pygame.KEYDOWN:
                         if event.unicode.upper() in moves:
                             print(event.unicode.upper())
@@ -744,4 +894,4 @@ if __name__ == "__main__":
             else:
                 output.write((f"NO CLEAR\n{"".join(grid)}"))
     else:
-        main_loop()
+        game_function()

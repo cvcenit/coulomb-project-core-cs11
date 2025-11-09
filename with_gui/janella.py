@@ -1,5 +1,11 @@
-import sys, pygame, time, datetime, os, csv
-from pygame import *
+import sys
+import pygame
+import datetime
+import os
+import json
+import shroom_raider
+import time
+import csv
 import button
 
 pygame.init()
@@ -42,14 +48,15 @@ editor_button_list = []
 create_bg = pygame.image.load("assets/cave_bluelarge.png")
 create_bg = pygame.transform.scale(create_bg, (1024, 1024))
 
-clock = pygame.time.Clock()
-
 
 class text_Button_1():
-    def __init__(self, x, y, text, s):
-        text, capt = create_text(text, s, white)
+    def __init__(self, x, y, t, s, col):
+        self.col = col
+        text, capt = create_text(t, s, col)
+        outer, capt = create_text(t, s, black)
         self.s = s
         self.capt = capt
+        self.outer = outer
         self.width = text.get_width()
         self.height = text.get_height()
         self.text = text
@@ -73,51 +80,17 @@ class text_Button_1():
             self.clicked = False
 
         if not self.rect.collidepoint(pos) and self.hovered == True:
-            self.text, s = create_text(self.capt, self.s, white)
+            self.text, s = create_text(self.capt, self.s, self.col)
+            self.outer, s = create_text(self.capt, self.s, black)
             self.hovered = False
 
+        screen.blit(self.outer, (self.rect.x + 2, self.rect.y))
         screen.blit(self.text, (self.rect.x, self.rect.y))
 
         return action
+
 
 class text_Button_2():
-    # Button with gray initial color
-    def __init__(self, x, y, text, s):
-        text, capt = create_text(text, s, (75, 75, 75))
-        self.s = s
-        self.capt = capt
-        self.width = text.get_width()
-        self.height = text.get_height()
-        self.text = text
-        self.rect = self.text.get_rect()
-        self.rect.topleft = (x, y)
-        self.clicked = False
-        self.hovered = False
-
-    def draw(self):
-        action = False
-        pos = pygame.mouse.get_pos()
-
-        if self.rect.collidepoint(pos):
-            self.text, s = create_text(self.capt, self.s, main_color)
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-                self.clicked = True
-                action = True
-            self.hovered = True
-
-        if pygame.mouse.get_pressed()[0] == 0:
-            self.clicked = False
-
-        if not self.rect.collidepoint(pos) and self.hovered == True:
-            self.text, s = create_text(self.capt, self.s, white)
-            self.hovered = False
-
-        screen.blit(self.text, (self.rect.x, self.rect.y))
-
-        return action
-
-
-class text_Button_3():
     # Used for buttons in the map level menu
     def __init__(self, x, y, text, s):
         self.capt = text
@@ -175,11 +148,13 @@ class text_Button_3():
         return action
 
 
-class text_Button():
-    def __init__(self, x, y, text, s):
-        text, capt = create_text(text, s, main_color)
+class menu_Button():
+    def __init__(self, x, y, t, s):
+        text, capt = create_text(t, s, main_color)
+        outer, capt = create_text(t, s, black)
         self.s = s
         self.capt = capt
+        self.outer = outer
         self.width = text.get_width()
         self.height = text.get_height()
         self.text = text
@@ -194,6 +169,7 @@ class text_Button():
 
         if self.rect.collidepoint(pos):
             self.text, s = create_text(self.capt, self.s + 12, white)
+            self.outer, s = create_text(self.capt, self.s + 12, black)
             if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
                 self.clicked = True
                 action = True
@@ -204,8 +180,10 @@ class text_Button():
 
         if not self.rect.collidepoint(pos) and self.hovered == True:
             self.text, s = create_text(self.capt, self.s, main_color)
+            self.outer, s = create_text(self.capt, self.s, black)
             self.hovered = False
 
+        screen.blit(self.outer, (self.rect.x + 4, self.rect.y))
         screen.blit(self.text, (self.rect.x, self.rect.y))
 
         return action
@@ -271,7 +249,7 @@ def create_text(text, s, color):
 
 
 def fade_black():
-    alphaSurface = Surface((1024, 768), pygame.SRCALPHA)
+    alphaSurface = pygame.Surface((1024, 768), pygame.SRCALPHA)
     alph = 0
     clock = pygame.time.Clock()
 
@@ -292,7 +270,7 @@ def fade_black():
 
 
 def fade_in(surf):
-    alphaSurface = Surface((1024, 768), pygame.SRCALPHA)
+    alphaSurface = pygame.Surface((1024, 768), pygame.SRCALPHA)
     alph = 255
     clock = pygame.time.Clock()
 
@@ -485,35 +463,35 @@ def csv_to_map(file_path):
 
 
 # Main menu buttons
-play_btn = text_Button(128, 288, "Play", 60)
-create_btn = text_Button(128, 360, "Create Levels", 60)
-lb_btn = text_Button(128, 432, "Leaderboards", 60)
-options_btn = text_Button(128, 504, "Options", 60)
-quit_btn = text_Button(128, 576, "Quit", 60)
+play_btn = menu_Button(128, 288, "Play", 60)
+create_btn = menu_Button(128, 360, "Create Levels", 60)
+lb_btn = menu_Button(128, 432, "Leaderboards", 60)
+options_btn = menu_Button(128, 504, "Options", 60)
+quit_btn = menu_Button(128, 576, "Quit", 60)
 
 # Play menu buttons
-create_plr_btn = text_Button_1(512, 640, "New Player", 48)
-create_plr_done_btn = text_Button_1(512, 448, "Done", 48)
-create_plr_back_btn = text_Button_1(256, 448, "Back", 48)
-play_menu_back_btn = text_Button_1(128, 640, "Back", 48)
+create_plr_btn = text_Button_1(512, 640, "New Player", 48, white)
+create_plr_done_btn = text_Button_1(512, 448, "Done", 48, white)
+create_plr_back_btn = text_Button_1(256, 448, "Back", 48, white)
+play_menu_back_btn = text_Button_1(128, 640, "Back", 48, white)
 create_plr_btn_state = False
 create_plr_done_btn_state = False
 already_plr = False
 inc_len = False
-bonus_btn = text_Button_3(180, 550, "Bonus", 48)
-story_btn = text_Button_3(375, 550, "Story", 48)
-usermade_btn = text_Button_3(575, 550, "User-made", 48)
+bonus_btn = text_Button_2(180, 550, "Bonus", 48)
+story_btn = text_Button_2(375, 550, "Story", 48)
+usermade_btn = text_Button_2(575, 550, "User-made", 48)
 map_level_buttons()
 
 
 # Map editor buttons
-create_new_map_btn = text_Button_1(SCREEN_WIDTH - 500, 640, "Create New Map", 48)
-edit_map_btn = text_Button_1(284, 400, "Edit", 48)
-play_map_btn = text_Button_1(444, 400, "Play", 48)
-close_popup_btn = text_Button_1(604, 400, "Cancel", 48)
-create_map_confirm_btn = text_Button_1(580, 448, "Create", 48)
-create_map_cancel_btn = text_Button_1(280, 448, "Cancel", 48)
-max_levels_ok_btn = text_Button_1(470, 410, "OK", 48)
+create_new_map_btn = text_Button_1(SCREEN_WIDTH - 500, 640, "Create New Map", 48, white)
+edit_map_btn = text_Button_1(284, 400, "Edit", 48, white)
+play_map_btn = text_Button_1(444, 400, "Play", 48, white)
+close_popup_btn = text_Button_1(604, 400, "Cancel", 48, white)
+create_map_confirm_btn = text_Button_1(580, 448, "Create", 48, white)
+create_map_cancel_btn = text_Button_1(280, 448, "Cancel", 48, white)
+max_levels_ok_btn = text_Button_1(470, 410, "OK", 48, white)
 
 
 def main_menu():
@@ -602,6 +580,9 @@ def map_level_menu():
         print('usermade')
         # TODO: show usermade levels
 
+
+
+players = [player for player in os.listdir("data/players")]
 
 def _create_player(name, date):
     """Creates a player file as .txt"""
@@ -929,7 +910,7 @@ def create_menu():
         for i, map_name in enumerate(custom_maps):
             # Remove file extension for display
             display_name = map_name.replace('.csv', '')
-            btn = text_Button_2(160, y_pos, display_name, 32)
+            btn = text_Button_1(160, y_pos, display_name, 32, (75, 75, 75))
             map_buttons.append((btn, map_name))
             y_pos += 50
 
@@ -1076,7 +1057,13 @@ def options_menu():
     screen.blit(text, (128, 48))
 
 
-while True:
+while __name__ == "__main__":
+
+    players = [player for player in os.listdir("data/players")]
+    if len(players) >= 10:
+        max_plrs = True
+    else:
+        max_plrs = False
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

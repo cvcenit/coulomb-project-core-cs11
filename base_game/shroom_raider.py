@@ -210,7 +210,7 @@ def _move_player(direction):
                 if f"Rock {new_index}" in history:  # Sets the tile under the rock based on history, so that the 'moveto' function appends the correct under_tile when the player moves
                     rock_under_tile = history[f"Rock {new_index}"]
 
-                if new_rock_index > len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
+                if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
                     print("You can't move the rock there")
                     return
 
