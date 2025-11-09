@@ -184,6 +184,7 @@ _In this section, you will get to learn about the secrets behind the world of Sh
 * Inputs
 
    The valid inputs the user can use are the following:
+  
   * Directional - Dictionary of inputs that changes the player's position
     > W - Moves the player up by one row; translates to the index change of -(GRID_WIDTH + 1).\
     > S - Moves the player down by one row; translates to the index change of GRID_WIDTH + 1.\
@@ -192,10 +193,16 @@ _In this section, you will get to learn about the secrets behind the world of Sh
 
   * Operational - Collection of inputs the makes changes in the game's state.
     > P - Picks up the item under the player if there is one.
-    > Q - Exits the game
-    > ! - Restarts the current map; returns all player attributes to default
+    > Q - Exits the game.
+    > ! - Restarts the current map; returns all player attributes to default.
 
-* Movement
-* Tiles
+  * Sequence of Moves
+    - In a sequence of moves, the inputs will be processed individualy starting from the left; an invalid input will terminate the process prematurely.
+
+* Movement and Tiles
+
+   The functionality of the items are executed through the following functions:
+  * 
+ 
 * Items
 ### Level Creation
