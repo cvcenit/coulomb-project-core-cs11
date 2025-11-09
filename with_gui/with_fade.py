@@ -1023,10 +1023,20 @@ def level_editor():
 
     # Save button
     if save_editor_btn.draw(screen):
-        with open(f'data/maps/csv_user_made/{editor_name}.csv', 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile, delimiter=',')
-            for row in editor_world_data:
-                writer.writerow(row)
+        check_laro = any(0 in data for data in editor_world_data) # Checks if a laro craft is in the created level
+        check_mush = any(4 in data for data in editor_world_data) # Checks if a mushroom is in the created level
+        if not check_laro:
+            laro_save_warning()
+        elif not check_mush:
+            mush_save_warning()
+        else:
+            # Saves first in csv file then turns it to txt file
+            with open(f'data/maps/csv_user_made/{editor_name}.csv', 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile, delimiter=',')
+                for row in editor_world_data:
+                    writer.writerow(row)
+            with open(f'data/maps/user_made/{editor_name}.txt', 'w') as txtfile:
+                txtfile.write(csv_to_map(f'data/maps/csv_user_made/{editor_name}.csv'))
 
     # Exit button - return to create menu
     if exit_editor_btn.draw(screen):
