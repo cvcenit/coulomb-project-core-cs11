@@ -982,9 +982,12 @@ def csv_to_map(file_path):
     converted = ''.join(convert_to_ascii.get(c, c) for c in map_str if c in convert_to_ascii)
 
     map_rows = str(converted.count('\n') + 1)
-    map_cols = str(len(converted[:converted.index('\n')]))
+    if '\n' in converted:
+        map_cols = str(len(converted[:converted.index('\n')]))
+    else:
+        map_cols = str(len(converted))
 
-    return map_rows + ' ' + map_cols + '\n' + converted
+    return map_rows + ' ' + map_cols + '\n' + converted + '\n'
 
 
 def editor_laro_warning():
