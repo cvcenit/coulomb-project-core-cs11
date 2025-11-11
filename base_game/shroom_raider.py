@@ -171,8 +171,6 @@ def _move_player(direction):
 
     # Checks if either the targeted index is out of bounds
     if not (0 <= new_index < len(grid)) or new_index in _n_indices: # Avoids the mutation of \n indices: 
-        if mode == "play":
-            print("You can't move outside the grid!")
         return
 
     else:
@@ -183,11 +181,12 @@ def _move_player(direction):
         if target_tile == 'T':
             if not item: # Player will not move anywhere if not holding an axe
                 if mode == "play":
-                    print("You bumped into a tree!")
+
             elif item[0] == 'x': # Tree will turn into empty space if player is holding an axe
                 moveto('.')
                 item.clear() # Item is cleared every time after used
                 found_item = None
+                
             elif item[0] == '*': # flame_spread function is called when player is holding flamethrower
                 col = (new_index % (GRID_WIDTH+1))
                 row = (new_index - col) // GRID_WIDTH
@@ -195,6 +194,7 @@ def _move_player(direction):
                 moveto('.')
                 item.clear() # Item is cleared every time after used
                 found_item = None
+                
             return
 
         elif target_tile == 'R':
@@ -211,7 +211,6 @@ def _move_player(direction):
                     rock_under_tile = history[f"Rock {new_index}"]
 
                 if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
-                    print("You can't move the rock there")
                     return
 
                 elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
@@ -228,7 +227,6 @@ def _move_player(direction):
                     moveto(rock_under_tile)
 
                 elif grid[new_rock_index] == "R" or 'x' or '*':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
-                    print("You can't push the rock there!")
                     return
 
                 if f"Rock {new_index}" in history:    # Removes the Rock at index new_index from history after it gets moved
@@ -251,7 +249,6 @@ def _move_player(direction):
                     moveto(rock_under_tile)
 
                 elif grid[new_rock_index] == "R" or 'x' or '*':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
-                    print("You can't push the rock there!")
                     return
 
             if f"Rock {new_index}" in history:  # Removes the Rock at index new_index from history after it gets moved
