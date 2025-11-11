@@ -201,6 +201,16 @@ _In this section, you will get to learn about the secrets behind the world of Sh
     - In a sequence of moves, the inputs will be processed individualy starting from the left; an invalid input will terminate the process prematurely.
 
 * Movement and Tiles
+
+  The movement functionalities and tile interactions are executed through the following functions and/or blocks of code:
+  * Movement
+    > a) move_player(direction) - Takes an input or a string of inputs and processes based on its functionality (Directional or Operational); breaks the input processing loop after encountering an invalid move.
+    > 
+    > b) _move_player(direction) - Gets called by move_player(direction) if the processed inpur is a directional move; checks whether the desired move of the player is valid, and will process player-tile and tile-tile interactions caused by the desired move; also calls and executes item functionalities if applicable.
+    >
+    > c) moveto(under_tile) - Sub function of _move_player(direction); gets called to mutate the active grid based on the player's move.
+    >
+    > d) describe_tile(tile) -  Describes the tile in the input.
  
 * Items
   
