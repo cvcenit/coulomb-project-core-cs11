@@ -63,7 +63,7 @@ _n_indices = range(lvlmapcontent.index('\n'), len(lvlmapcontent), GRID_WIDTH + 1
 item = []
 history = {'player': ['.']}
 found_item = None
-DROWNED = False
+drowned = False
 player_mushroom_count = 0
 player_index = grid.index('L')
 
@@ -146,7 +146,7 @@ def _move_player(direction):
 
     # Takes the directional input of the player and moves the player accordingly
 
-    global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history, found_item, DROWNED, mode
+    global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history, found_item, drowned, mode
 
     def moveto(under_tile):
 
@@ -262,7 +262,7 @@ def _move_player(direction):
             moveto('~')
 
             # Changes the following player attributes
-            DROWNED = True
+            drowned = True
             main += 1
 
             return
@@ -426,7 +426,7 @@ if __name__ == "__main__":
                 print(" " * ((GRID_WIDTH // 2) + 1), "You Won!")
                 print("-" * GRID_WIDTH * 2, "\n")
 
-            if DROWNED:
+            if drowned:
                 clear_terminal()
                 print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
                 print("Grid:")
