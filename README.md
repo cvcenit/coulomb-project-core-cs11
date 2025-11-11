@@ -9,10 +9,10 @@
     * [Movement](#movement)
     * [Pickup](#pickup)
     * [Restart and Exit](#restart-and-exit)
-  * [Level Creator]
-* [Code Organization]
-  * [Graphical User Interface (GUI)]
-  * [Main Menu]
+  * [Level Creation](#level-creation)
+* [Code Organization](#code-organization)
+  * [Graphical User Interface (GUI)](#graphical-user-interface-(GUI))
+  * [Main Menu](#main-menu)
   * [Gameplay]
     * [Map]
     * [Tiles]
@@ -135,7 +135,7 @@ _Unfortunate events are unavoidable during an adventurer's journey, here are the
 * Restart ('!') - Immediately go back at the start of your journey; Resets the loaded level and undos all progress made.
 * Exit ('Q') - Take some time off from your journey to regroup; Exits the program.
 
-### Level Creator
+### Level Creation
 
 ## Code Organization
 
