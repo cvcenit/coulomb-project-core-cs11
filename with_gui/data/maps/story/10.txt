@@ -1,8 +1,18 @@
-7 14
+17 14
 L+~+~+~+~+~+~+
 +...xx........
 TTTTTTTR.....+
 +TR.TTTTTTTTTT
 ~Tx..~.....xT+
 +TR.~~~....RT~
-~Tx~~*........
+~Tx~~*~~...xT+
++TR~~*~~...RT~
+~Tx.~~~....xT+
++TR~~~~~...RT~
+~Tx~T*T~...xT+
++TR~~~~~...RT~
+~Tx.~~~....xT+
++TR........RT~
+~TxRxRxRxRxRT+
++TTTTTTTTTTTT~
+~+~+~+~+~+~+T+

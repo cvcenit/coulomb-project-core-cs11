@@ -11,7 +11,7 @@ def add_args():
 
 def pick_map(stage_file=None):
     ''' Returns default map if there's no stage_file, else returns the stage file '''
-    if stage_file == None:
+    if stage_file is None:
         return '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT.R.~.~+~TTT~T\nT~.~~.~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~T~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
     else:
         with open(stage_file, "r", encoding="utf-8") as lvl:
