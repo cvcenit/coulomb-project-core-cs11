@@ -200,9 +200,14 @@ _In this section, you will get to learn about the secrets behind the world of Sh
     - In a sequence of moves, the inputs will be processed individualy starting from the left; an invalid input will terminate the process prematurely.
 
 * Movement and Tiles
-
-   The functionality of the items are executed through the following functions:
-  * 
  
 * Items
+  
+  The functionality of the items are executed through the following functions and/or blocks of code:
+  * Axe
+    > if target_tile == 'T' and if item[0\] == 'x' - If the player is trying to move to a tree tile and is holding an axe, the tree tile will be replaced with an empty tile and the player will be able to move.
+  * Flamethrower
+    > flame_spread(start_row, start_col) - will call the sub function: flamethrowed(r, c) if the tile is a tree tile.
+    > flamethrowed(r, c) - replaces the the tile at row r, col c to an empty tile (if it is a tree tile; breaks the recursion other wise.) and repeatedly calls itself for all adjacent tiles in all four(4) directions.
+    
 ### Level Creation
