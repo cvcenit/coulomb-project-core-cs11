@@ -12,13 +12,13 @@
   * [Level Creation](#level-creation)
 * [Code Organization](#code-organization)
   * [Graphical User Interface (GUI)](#graphical-user-interface-(GUI))
-  * [Main Menu](#main-menu)
-  * [Gameplay]
-    * [Map]
-    * [Tiles]
-    * [Movement]
-    * [Input]
-  * [Level Creation]
+  * [Main Menu](#main-menu-1)
+  * [Gameplay](#gameplay)
+    * [Map](#map)
+    * [Tiles](#tiles)
+    * [Movement](#movement-1)
+    * [Input](#input)
+  * [Level Creation](#level-creation-1)
 * [Unit Tests]
 * [Bonus Features]
   * [Level Creation]
