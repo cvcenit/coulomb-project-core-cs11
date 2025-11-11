@@ -76,7 +76,7 @@ class Button():
 
         #check mouseover and clicked conditions
         if self.rect.collidepoint(pos):
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 click_sound.play()
                 action = True
                 self.clicked = True
@@ -102,7 +102,6 @@ class player_leaderboard_list():
 
     def draw(self, lb_type):
 
-        outer_color = (100, 200, 100)
         bg_color = (255, 255, 255)
 
         # Background
@@ -180,13 +179,13 @@ class player_on_list():
                 bg_outer.fill((0, 0, 0, 0))
                 pygame.draw.rect(bg_outer, outer_color, bg_outer.get_rect(), border_radius=16)
                 screen.blit(bg_outer, (self.x - 4, self.y - 4))
-                if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                     click_sound.play()
                     self.clicked = True
                     action = True
                 self.hovered = True
 
-            if not self.rect.collidepoint(pos) and self.hovered == True:
+            if not self.rect.collidepoint(pos) and self.hovered:
                 self.hovered = False
 
 
@@ -203,8 +202,6 @@ class player_on_list():
         try:
             plr = loaded_data["name"]
             dt_created = loaded_data["time_created"]
-            s = loaded_data["since_epoch"]
-            maps = loaded_data["maps_finished"]
             ply_time = loaded_data["playing_time"]
             mush_tot = loaded_data["mush_collected"]
             hours, minutes, seconds = (ply_time // 3600), ((ply_time // 60) % 60), (ply_time % 60)
@@ -255,7 +252,7 @@ class text_Button_1():
 
         if self.rect.collidepoint(pos):
             self.text, s = create_text(self.capt, self.s, main_color)
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 click_sound.play()
                 self.clicked = True
                 action = True
@@ -264,7 +261,7 @@ class text_Button_1():
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
 
-        if not self.rect.collidepoint(pos) and self.hovered == True:
+        if not self.rect.collidepoint(pos) and self.hovered:
             self.text, s = create_text(self.capt, self.s, self.col)
             self.outer, s = create_text(self.capt, self.s, black)
             self.hovered = False
@@ -302,7 +299,7 @@ class text_Button_2():
             outer_rect = pygame.Rect(self.x - 4, self.y - 4, self.width + 8, self.height + 8)
             pygame.draw.rect(screen, main_color, outer_rect, border_radius=16)
 
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 click_sound.play()
                 self.clicked = True
                 action = True
@@ -358,7 +355,7 @@ class menu_Button():
         if self.rect.collidepoint(pos):
             self.text, s = create_text(self.capt, self.s + 12, white)
             self.outer, s = create_text(self.capt, self.s + 12, black)
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 click_sound.play()
                 self.clicked = True
                 action = True
@@ -367,7 +364,7 @@ class menu_Button():
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
 
-        if not self.rect.collidepoint(pos) and self.hovered == True:
+        if not self.rect.collidepoint(pos) and self.hovered:
             self.text, s = create_text(self.capt, self.s, main_color)
             self.outer, s = create_text(self.capt, self.s, black)
             self.hovered = False
@@ -401,7 +398,7 @@ class level_Button():
             outer_rect = pygame.Rect(self.x - 4, self.y - 4, self.width + 8, self.height + 8)
             pygame.draw.rect(screen, main_color, outer_rect, border_radius=16)
 
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 click_sound.play()
                 self.clicked = True
                 action = True
@@ -613,6 +610,9 @@ def _create_player_menu():
     else:
         if 0 <= len(player_name_input) < 16:
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:
                         player_name_input = player_name_input[:-1]
@@ -692,7 +692,7 @@ def delete_player_confirmation(player):
 
     # Label
     title1 = create_text("Are you sure you", 40, white)[0]
-    title2 = create_text(f"want to delete", 40, white)[0]
+    title2 = create_text("want to delete", 40, white)[0]
     title3 = create_text(f"'{player}'?", 40, main_color)[0]
     screen.blit(title1, ((1000 - (24 * 16))//2, 268))
     screen.blit(title2, ((1000 - (24 * 16))//2, 316))
@@ -819,33 +819,34 @@ def level_menu():
         if create_plr_btn_state:
             _create_player_menu()
             delete_pop_up = False
-
-        if play_menu_back_btn.draw():
-            create_plr_btn_state = False
-            delete_pop_up = False
-            menu_state = "main"
-            fade_count = 0
-
-        if plr_del_btn_state:
-            if cancel_del_plr_btn.draw():
-                plr_del_btn_state = False
-                delete_pop_up = False
-                create_plr_btn_state = False
-                inc_len = False
-                already_plr = False
-                player_name_input = ""
         else:
-            if plr_del_btn.draw():
-                plr_del_btn_state = True
-                create_plr_btn_state = False
-                inc_len = False
-                already_plr = False
-                player_name_input = ""
 
-        if page_back.draw():
-            player_page = 1
-        if page_next.draw():
-            player_page = 2
+            if play_menu_back_btn.draw():
+                create_plr_btn_state = False
+                delete_pop_up = False
+                menu_state = "main"
+                fade_count = 0
+
+            if plr_del_btn_state:
+                if cancel_del_plr_btn.draw():
+                    plr_del_btn_state = False
+                    delete_pop_up = False
+                    create_plr_btn_state = False
+                    inc_len = False
+                    already_plr = False
+                    player_name_input = ""
+            else:
+                if plr_del_btn.draw():
+                    plr_del_btn_state = True
+                    create_plr_btn_state = False
+                    inc_len = False
+                    already_plr = False
+                    player_name_input = ""
+
+            if page_back.draw():
+                player_page = 1
+            if page_next.draw():
+                player_page = 2
 
         # Title
         text2 = create_text(f"Players      Page {player_page}/2", 60, black)[0]
@@ -1484,7 +1485,7 @@ def create_menu():
 
             # Label
             title1 = create_text("Are you sure you", 40, white)[0]
-            title2 = create_text(f"want to delete", 40, white)[0]
+            title2 = create_text("want to delete", 40, white)[0]
             title3 = create_text(f"'{selected_map[:-4]}'?", 40, main_color)[0]
             screen.blit(title1, ((1000 - (24 * 16))//2, 268))
             screen.blit(title2, ((1000 - (24 * 16))//2, 316))
@@ -1635,24 +1636,208 @@ def leaderboards_menu():
                 player_label.draw('lvl_completed')
 
     if leaderboards_back_btn.draw():
-        menu_state = 'main'
+        menu_state = "main"
         mush_total_state = True
         play_time_state = False
         maps_total_state = False
 
     # Title
-    text2 = create_text(f"Leaderboards", 60, black)[0]
+    text2 = create_text("Leaderboards", 60, black)[0]
     screen.blit(text2, ((148) + 4, 60))
-    text1 = create_text(f"Leaderboards", 60, white)[0]
+    text1 = create_text("Leaderboards", 60, white)[0]
     screen.blit(text1, (148, 60))
 
+music_volume_scale = 25
+sfx_volume_scale = 25
+music_volume_btn = text_Button_1(148, 144, 'Music Volume:', 32, white)
+sfx_volume_btn = text_Button_1(148, 176, 'Sound Effects Volume:', 32, white)
+music_volume_confirm_btn = text_Button_1(148 + (15 * 32), 144, 'Confirm', 32, white)
+sfx_volume_confirm_btn = text_Button_1(148 + (15 * 32), 176, 'Confirm', 32, white)
+music_volume_state = False
+sfx_volume_state = False
+music_volume_input = '25'
+sfx_volume_input = '25'
 
+options_back_btn = text_Button_1(148, 664, 'Back', 40, white)
+credits_page = 1
+
+credits_page_back = text_Button_1(278, 664, "<", 40, white)
+credits_page_next = text_Button_1(304, 664, ">", 40, white)
+credits_qr_code = pygame.image.load('assets/credits_qr_code.png')
+credits_qr_code = pygame.transform.scale(credits_qr_code, (250, 250))
 def options_menu():
-    text = create_text("Options", 60, main_color)[0]
-    top_bar = pygame.Surface((768, 2))
-    top_bar.fill(main_color)
-    screen.blit(top_bar, (128, 128))
-    screen.blit(text, (128, 48))
+    global music_volume_scale, music_volume_input, music_volume_state, sfx_volume_scale, sfx_volume_input, sfx_volume_state, click_sound, menu_state, credits_page, credits_qr_code
+
+    # Background
+    menu_background()
+
+    # Background surface
+    bg_surf = pygame.Surface((1024 - 192, 768 - 96), pygame.SRCALPHA)
+    bg_surf.fill((0, 0, 0, 0))
+
+    # Semi-background
+    pygame.draw.rect(bg_surf, (75, 75, 75, 100), bg_surf.get_rect(), border_radius=32)
+    screen.blit(bg_surf, (96, 48))
+
+    # Present the value
+    if not music_volume_input:
+        music_volume_input_text = '0'
+    elif int(music_volume_input) > 100:
+        music_volume_input_text = '100'
+    else:
+        music_volume_input_text = str(music_volume_input)
+
+    if not sfx_volume_input:
+        sfx_volume_input_text = '0'
+    elif int(sfx_volume_input) > 100:
+        sfx_volume_input_text = '100'
+    else:
+        sfx_volume_input_text = str(sfx_volume_input)
+
+    # Buttons
+    if credits_page_back.draw():
+        credits_page = 1
+    if credits_page_next.draw():
+        credits_page = 2
+
+    if options_back_btn.draw():
+        menu_state = "main"
+        music_volume_state = False
+        sfx_volume_state = False
+
+    if music_volume_btn.draw():
+        music_volume_input = ''
+        music_volume_state = True
+        sfx_volume_state = False
+
+    if sfx_volume_btn.draw():
+        sfx_volume_input = ''
+        music_volume_state = False
+        sfx_volume_state = True
+
+    if music_volume_state:
+        if music_volume_confirm_btn.draw():
+            music_volume_state = False
+            music_volume_scale = int(music_volume_input_text)
+            music.set_volume(music_volume_scale / 100)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if len(music_volume_input) < 3:
+                    if event.unicode in set(('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')):
+                        music_volume_input += event.unicode
+                if len(music_volume_input) <= 3:
+                    if event.key == pygame.K_BACKSPACE:
+                        music_volume_input = music_volume_input[:-1]
+
+    if sfx_volume_state:
+        if sfx_volume_confirm_btn.draw():
+            sfx_volume_state = False
+            sfx_volume_scale = int(sfx_volume_input_text)
+            click_sound.set_volume(sfx_volume_scale / 100)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if len(sfx_volume_input) < 3:
+                    if event.unicode in set(('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')):
+                        sfx_volume_input += event.unicode
+                if len(sfx_volume_input) <= 3:
+                    if event.key == pygame.K_BACKSPACE:
+                        sfx_volume_input = sfx_volume_input[:-1]
+
+    music_volume_text = create_text(f'{music_volume_input_text}%', 32, white)[0]
+    screen.blit(music_volume_text, (148 + (32 * 8), 144))
+    sfx_volume_text = create_text(f'{sfx_volume_input_text}%', 32, white)[0]
+    screen.blit(sfx_volume_text, (148 + (32 * 12), 176))
+
+    # Credits
+    credits_title_outer = create_text("Huge thanks to the following!:", 40, black)[0]
+    screen.blit(credits_title_outer, (152, 212))
+    credits_title = create_text("Huge thanks to the following!:", 40, main_color)[0]
+    screen.blit(credits_title, (148, 212))
+
+    if credits_page == 1:
+        # Music
+        main_menu_music_credits = create_text('Main Menu Music: “Loading screen” by Brandon Morris', 24, white)[0]
+        creation_menu_music_credits = create_text('Creation Menu Music: “Caketown” by Matthew Pablo', 24, white)[0]
+        level_music_1_credits = create_text('Level Music: “Path to Lake Land” by Alexandr Zhelanov', 24, white)[0]
+        level_music_2_credits = create_text('Level Music: “song18” by cynicmusic', 24, white)[0]
+        level_music_3_credits = create_text('Level Music: “The Field of Dreams” by pauliuw', 24, white)[0]
+        level_music_4_credits = create_text('Level Music: “Mystical Theme” by Alexandr Zhelanov', 24, white)[0]
+        screen.blit(main_menu_music_credits, (148, 264))
+        screen.blit(creation_menu_music_credits, (148, 288))
+        screen.blit(level_music_1_credits, (148, 312))
+        screen.blit(level_music_2_credits, (148, 336))
+        screen.blit(level_music_3_credits, (148, 360))
+        screen.blit(level_music_4_credits, (148, 384))
+
+        # Sound Effects
+        click_sfx_credits = create_text('Click SFX by curato', 24, white)[0]
+        bump_sfx_credits = create_text('Thump SFX by Wandering Door Games', 24, white)[0]
+        water_sfx_credits = create_text('Water Splash SFX by Blender Foundation', 24, white)[0]
+        chop_tree_sfx_credits = create_text('Tree Chop SFX by kheetor', 24, white)[0]
+        burn_sfx_credits = create_text('Burning SFX by Spring Spring', 24, white)[0]
+        walk_sfx_credits = create_text('Walking SFX by Blender Foundation', 24, white)[0]
+        rock_sfx_credits = create_text('Rock Move SFX by themightyglider', 24, white)[0]
+        mushroom_sfx_credits = create_text('Mushroom Pickup SFX by Brandon Morris', 24, white)[0]
+        win_sfx_credits = create_text('Win SFX by congusbongus', 24, white)[0]
+        lose_sfx_credits = create_text('Lose SFX by 0new4y', 24, white)[0]
+        screen.blit(click_sfx_credits, (148, 408))
+        screen.blit(bump_sfx_credits, (148, 432))
+        screen.blit(water_sfx_credits, (148, 456))
+        screen.blit(chop_tree_sfx_credits, (148, 480))
+        screen.blit(burn_sfx_credits, (148, 504))
+        screen.blit(walk_sfx_credits, (148, 528))
+        screen.blit(rock_sfx_credits, (148, 552))
+        screen.blit(mushroom_sfx_credits, (148, 576))
+        screen.blit(win_sfx_credits, (148, 600))
+        screen.blit(lose_sfx_credits, (148, 624))
+
+    elif credits_page == 2:
+        # Tiles credits
+        plr_tile_credits = create_text('Character tile by arikel', 24, white)[0]
+        axe_tile_credits = create_text('Axe by LordNeo', 24, white)[0]
+        pavement_tile_credits = create_text('Pavement tile by Cook et al.', 24, white)[0]
+        empty_tile_credits = create_text('Empty tile by Xooxer', 24, white)[0]
+        torch_tile_credits = create_text('Torch by XLIVE99', 24, white)[0]
+        mushroom_tile_credits = create_text('Mushroom tile by Redshrike', 24, white)[0]
+        rock_tile_credits = create_text('Rock tile by Spring Spring', 24, white)[0]
+        tree_tile_credits = create_text('Tree tile by pistachio', 24, white)[0]
+        water_tile_credits = create_text('Water tile  by Zabin', 24, white)[0]
+        shovel_tile_credits = create_text('Shovel GUI by ARoachIFoundOnMyPillow', 24, white)[0]
+        level_bg_credits = create_text('Cave Backgrounds by Blarumyrran', 24, white)[0]
+        menu_bg_credits = create_text('Jungle Background by zatfix', 24, white)[0]
+        bitly_credits = create_text('Visit the link for more info: https://bit.ly/3LCrxIg', 24, white)[0]
+        qr_credits = create_text('or scan the QR Code!', 24, white)[0]
+        screen.blit(plr_tile_credits, (148, 264))
+        screen.blit(axe_tile_credits, (148, 288))
+        screen.blit(pavement_tile_credits, (148, 312))
+        screen.blit(empty_tile_credits, (148, 336))
+        screen.blit(torch_tile_credits, (148, 360))
+        screen.blit(mushroom_tile_credits, (148, 384))
+        screen.blit(rock_tile_credits, (148, 408))
+        screen.blit(tree_tile_credits, (148, 432))
+        screen.blit(water_tile_credits, (148, 456))
+        screen.blit(shovel_tile_credits, (148, 480))
+        screen.blit(level_bg_credits, (148, 504))
+        screen.blit(menu_bg_credits, (148, 528))
+        screen.blit(bitly_credits, (148, 552))
+        screen.blit(qr_credits, (148, 576))
+        screen.blit(credits_qr_code, (644, 264))
+
+    # Title
+    text2 = create_text("Options and Credits", 60, black)[0]
+    screen.blit(text2, ((148) + 4, 60))
+    text1 = create_text("Options and Credits", 60, white)[0]
+    screen.blit(text1, (148, 60))
+
+    # Page Number
+    display_page = create_text(f"{credits_page}/2", 40, white)[0]
+    screen.blit(display_page, (360, 664))
 
 
 # GAME LOGIC STARTS HERE
@@ -1686,7 +1871,8 @@ else:
     lvlmap = pick_map() # Map as string/raw
 
 def game_function(player="default-Player", level_map=None, level_map_path="default-Map"):
-    global menu_state, gameplay_state, mode, lvlmap, playing_from_play, args, lvlmap
+    global menu_state, gameplay_state, mode, lvlmap, playing_from_play, args, lvlmap, sfx_volume_scale
+    playing_from_play = True
 
     class gameplay_Text_Button():
         def __init__(self, x, y, t, s, col):
@@ -1714,7 +1900,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                 if not menu_btn_state and not controls_popup_state and not lose_state and not LVL_MUSHROOMS == player_mushroom_count:
                     if self.rect.collidepoint(pos):
                         self.text, s = create_text(self.capt, self.s, main_color)
-                        if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                             self.clicked = True
                             action = True
                         self.hovered = True
@@ -1722,14 +1908,14 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                     if pygame.mouse.get_pressed()[0] == 0:
                         self.clicked = False
 
-                    if not self.rect.collidepoint(pos) and self.hovered == True:
+                    if not self.rect.collidepoint(pos) and self.hovered:
                         self.text, s = create_text(self.capt, self.s, self.col)
                         self.outer, s = create_text(self.capt, self.s, black)
                         self.hovered = False
             else:
                 if self.rect.collidepoint(pos):
                     self.text, s = create_text(self.capt, self.s, main_color)
-                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                    if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                         click_sound.play()
                         self.clicked = True
                         action = True
@@ -1738,7 +1924,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                 if pygame.mouse.get_pressed()[0] == 0:
                     self.clicked = False
 
-                if not self.rect.collidepoint(pos) and self.hovered == True:
+                if not self.rect.collidepoint(pos) and self.hovered:
                     self.text, s = create_text(self.capt, self.s, self.col)
                     self.outer, s = create_text(self.capt, self.s, black)
                     self.hovered = False
@@ -1772,17 +1958,17 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
     walk_sfx = pygame.mixer.Sound('assets/sfx/walk_sfx.flac')
     win_sfx = pygame.mixer.Sound('assets/sfx/win_sfx.ogg')
 
-    bump_sfx.set_volume(0.25)
-    burn_sfx.set_volume(0.25)
-    chop_tree_sfx.set_volume(0.25)
-    lose_sfx.set_volume(0.25)
-    move_rock_sfx.set_volume(0.25)
-    move_rock_to_water_sfx.set_volume(0.25)
-    mushroom_pickup_sfx.set_volume(0.25)
-    player_fall_to_water_sfx.set_volume(0.25)
-    rock_fall_to_water_sfx.set_volume(0.25)
-    walk_sfx.set_volume(0.25)
-    win_sfx.set_volume(0.25)
+    bump_sfx.set_volume(sfx_volume_scale / 100)
+    burn_sfx.set_volume(sfx_volume_scale / 100)
+    chop_tree_sfx.set_volume(sfx_volume_scale / 100)
+    lose_sfx.set_volume(sfx_volume_scale / 100)
+    move_rock_sfx.set_volume(sfx_volume_scale / 100)
+    move_rock_to_water_sfx.set_volume(sfx_volume_scale / 100)
+    mushroom_pickup_sfx.set_volume(sfx_volume_scale / 100)
+    player_fall_to_water_sfx.set_volume(sfx_volume_scale / 100)
+    rock_fall_to_water_sfx.set_volume(sfx_volume_scale / 100)
+    walk_sfx.set_volume(sfx_volume_scale / 100)
+    win_sfx.set_volume(sfx_volume_scale / 100)
 
     # Pause menu buttons
     menu_resume_btn = gameplay_Text_Button((6 * 48)//4 + (SCREEN_WIDTH - (6 * 48))//2, 192, "Resume", 48, white)
@@ -2252,7 +2438,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
 
     def pause_menu():
         nonlocal menu_resume_btn, menu_return_btn, menu_controls_btn, controls_back_btn, menu_btn_state, controls_popup_state, menu_controls_btn_state
-        nonlocal player_mushroom_count, LVL_MUSHROOMS, found_item
+        nonlocal player_mushroom_count, LVL_MUSHROOMS, found_item, time_when_called
         global SCREEN_WIDTH, gameplay_state
         # Cover
         cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
@@ -2273,17 +2459,17 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
         if menu_return_btn.draw():
             menu_btn_state = False
             menu_controls_btn_state = False
+            time_val = int(time.time() - time_when_called)
+            save_player_data(time_val)
             gameplay_state = False, gameplay_state[1:]
 
         if menu_controls_btn.draw():
             menu_btn_state = False
             controls_popup_state = True
 
-    paused_at_time = 0
-    paused_state = False
     def side_bar():
         nonlocal menu_btn_state, controls_popup_state, mush_img, item, player_index, grid, MOTHERGRID, found_item, history, player_mushroom_count, LVL_MUSHROOMS, drowned
-        nonlocal time_when_called, lost_at_time, disposable, won_at_time, paused_at_time, lose_state, win_state, saved, time_val
+        nonlocal time_when_called, lost_at_time, disposable, won_at_time, lose_state, win_state, saved, time_val
         # Main bg
         bg = pygame.Surface((224, 720), pygame.SRCALPHA)
         bg.fill((0, 0, 0, 0))
@@ -2385,7 +2571,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
         # Text
         text_you_won = create_text("You Won!", 128, main_color)[0]
         screen.blit(text_you_won, (((SCREEN_WIDTH - text_you_won.get_width())//2), 96))
-        text_poetic_win = create_text(f"Commendable... Worthy of praise...", 34, main_color)[0]
+        text_poetic_win = create_text("Commendable... Worthy of praise...", 34, main_color)[0]
         x_align_on = ((SCREEN_WIDTH - text_poetic_win.get_width())//2)
         screen.blit(text_poetic_win, (x_align_on, 224))
 
@@ -2501,7 +2687,6 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             history = {'player': ['.']}
             player_mushroom_count = 0
             lose_state = False
-            win_state = False
             disposable = True
             time_when_called = time.time()
             lost_at_time = 0
@@ -2620,7 +2805,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                     if not lose_state and not (LVL_MUSHROOMS == player_mushroom_count):
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_ESCAPE:
-                                if menu_btn_state == True:
+                                if menu_btn_state:
                                     menu_btn_state = False
                                 else:
                                     menu_btn_state = True
