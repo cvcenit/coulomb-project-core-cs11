@@ -4,11 +4,11 @@
 
 * [User Manual](#user-manual)
   * [Startup](#start-up)
-  * [Main Menu]
-  * [Controls]
-    * [Movement]
-    * [Pickup]
-    * [Restart and Exit]
+  * [Main Menu](#main-menu)
+  * [Controls](#controls)
+    * [Movement](#movement)
+    * [Pickup](#pickup)
+    * [Restart and Exit](#restart-and-exit)
   * [Level Creator]
 * [Code Organization]
   * [Graphical User Interface (GUI)]
