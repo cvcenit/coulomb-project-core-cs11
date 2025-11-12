@@ -152,6 +152,20 @@ _In this section, you will get to learn about the secrets behind the world of Sh
   > choose_mode(output_file=None) - If the user inputs an output file, it will return the mode '', where the game file will take the player's move sequence and redirect its output towards the output file; otherwise, it will return the mode 'play', where the game will run and will be taking inputs throught the terminal.
   
 ### Graphical User Interface (GUI)
+* Main Menu
+  * Play Menu
+    - Only allows ten(10) unique player names.
+    - A dialogue box pops up whenever a player inputs an existing character name and when existing character names exceeds maximum amount.
+    - Has two(2) pages that the user can flip through.
+
+  * Leaderboards Menu
+    - Filters through the saved character data based on the leaderboards' category.
+
+  * Options Menu
+    - Sets the volume for music and special effects from a scale of 0% - 100% based on user input.
+
+  * Quit Button
+    - Terminates the main loop; exits the game.
 
 ### Gameplay
 * Map and Map Attributes
@@ -182,6 +196,7 @@ _In this section, you will get to learn about the secrets behind the world of Sh
    > DROWNED = False - The player can't arrive on a water tile.\
    > player_mushroom_count = 0 - The player haven't found any mushrooms.\
    > player_index = grid.index('L') - The player's current position is the initial position in the grid.
+   
 * Main Loop - Loops the gameplay code while main = 0; Terminates the game otherwise.
 * Inputs
 
@@ -221,6 +236,36 @@ _In this section, you will get to learn about the secrets behind the world of Sh
   * Flamethrower
     > flame_spread(start_row, start_col) - will call the sub function: flamethrowed(r, c) if the tile is a tree tile.
     > flamethrowed(r, c) - replaces the the tile at row r, col c to an empty tile (if it is a tree tile; breaks the recursion other wise.) and repeatedly calls itself for all adjacent tiles in all four(4) directions.
+
+* Side Bar
+
+  Everytime a player loads a level, a sidebar is shown. The sidebar possesses the following functionalities:
+
+  - Shows the amount of mushroom collected.
+  - Shows the time spent playing the current level.
+  - Shows the item held.
+  - Shows the item on the ground.
+  - Has a menu button that pauses the game and allows the player to resume, check the controls, and go back to map selection.
+  - Has a restart button that restarts the current level.
+
+* Winning or Losing
+
+When the player wins or loses, the following dialogue boxes pops up that contains the following:
+  * Winning
+    - Shows a win message.
+    - Shows the name of the player.
+    - Shows the name of the level won.
+    - Shows the amount of mushroom collected.
+    - Shows the total time played.
+    - Options to go back to map menu, replay, and go to next level (for story levels only).
+
+  * Losing
+    - Shows a defeat message.
+    - Shows the name of the player.
+    - Shows the name of the level won.
+    - Shows the amount of mushroom collected.
+    - Shows the total time played.
+    - Options to go back to map menu, and replay.
     
 ### Level Creation
 
