@@ -230,17 +230,35 @@ _In this section, you will get to learn about the secrets behind the world of Sh
 In addition to the base game, the following features have been added in the following sections:
 
 ### Graphical User Interface (GUI)
+
 * Main Menu - The main menu gives the following options to the player:
+  
   * Play Menu
+   
     - Allows the player to input their character's name; alternatively, the player can also delete existing character names.
+      
       * Character Name
         - Contains the date of creation, number of mushrooms collected, and total amount of time played.
         - Updates after each game, win or lose.
+          
     - The player can select from different level options:
+      
       * Story
         - Contains ten(10) levels that are increasing in difficulty.
+          
       * Bonus
-        - Special level made by the creators.
+        - Special level made by the creators
+       
       * User-made
         - Allows the player to create and edit their own level.
-    - 
+          
+  * Leaderboards Menu - Shows the top players, along with their details (date of creation, number of mushrooms created, and total amount of time played), in terms of mushrooms collected, playing time (fastest time completed), and total number of maps completed.
+    
+  * Options Menu
+    - Allows the player to change the music voluem and special effects volume.
+    - Displays the credits of the assets used during the game development.
+
+  * Create Level Menu
+    - Allows the player to create a level and give it a name; Alternatively, the user can also delete existing levels.
+
+  * Quit Button - Exits the game.
