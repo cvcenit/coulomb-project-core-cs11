@@ -151,7 +151,7 @@ _In this section, you will get to learn about the secrets behind the world of Sh
   > 
   > choose_mode(output_file=None) - If the user inputs an output file, it will return the mode '', where the game file will take the player's move sequence and redirect its output towards the output file; otherwise, it will return the mode 'play', where the game will run and will be taking inputs throught the terminal.
   
-### Graphical User Interface
+### Graphical User Interface (GUI)
 
 ### Gameplay
 * Map and Map Attributes
