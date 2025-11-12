@@ -12,7 +12,6 @@
   * [Level Creation](#level-creation)
 * [Code Organization](#code-organization)
   * [Graphical User Interface (GUI)](#graphical-user-interface-(GUI))
-  * [Main Menu](#main-menu-1)
   * [Gameplay](#gameplay)
     * [Map](#map)
     * [Tiles](#tiles)
@@ -150,8 +149,9 @@ _In this section, you will get to learn about the secrets behind the world of Sh
   > pick_map(stage_file=None) - If the user inputs a custom map file, the function will set the map file as 'lvlmap'; otherwise, 'lvlmap' will be the preset map.
   > 
   > choose_mode(output_file=None) - If the user inputs an output file, it will return the mode '', where the game file will take the player's move sequence and redirect its output towards the output file; otherwise, it will return the mode 'play', where the game will run and will be taking inputs throught the terminal.
+  
 ### Graphical User Interface
-### Main Menu
+
 ### Gameplay
 * Map and Map Attributes
   
@@ -222,3 +222,25 @@ _In this section, you will get to learn about the secrets behind the world of Sh
     > flamethrowed(r, c) - replaces the the tile at row r, col c to an empty tile (if it is a tree tile; breaks the recursion other wise.) and repeatedly calls itself for all adjacent tiles in all four(4) directions.
     
 ### Level Creation
+
+## Unit Test
+
+## Additional Features
+
+In addition to the base game, the following features have been added in the following sections:
+
+### Graphical User Interface (GUI)
+* Main Menu - The main menu gives the following options to the player:
+  * Play Menu
+    - Allows the player to input their character's name; alternatively, the player can also delete existing character names.
+      * Character Name
+        - Contains the date of creation, number of mushrooms collected, and total amount of time played.
+        - Updates after each game, win or lose.
+    - The player can select from different level options:
+      * Story
+        - Contains ten(10) levels that are increasing in difficulty.
+      * Bonus
+        - Special level made by the creators.
+      * User-made
+        - Allows the player to create and edit their own level.
+    - 
