@@ -20,7 +20,8 @@
   * [Level Creation](#level-creation-1)
 * [Unit Tests]
 * [Bonus Features]
-  * [Level Creation]
+  * [Graphical User Interface (GUI)](#graphical-user-interface-(GUI)-1)
+  * [Level Creation](#level-creation-2)
 
 ## User Manual
 
@@ -225,6 +226,12 @@ _In this section, you will get to learn about the secrets behind the world of Sh
 
 ## Unit Test
 
+- Unit tests were done to test whether functions and/or blocks are code are working as intended. Below are the details on how to:
+  * Run the existing tests
+  * Add additional tests
+
+- The existing tests are properly asserted for all cases because
+
 ## Additional Features
 
 In addition to the base game, the following features have been added in the following sections:
@@ -263,3 +270,7 @@ In addition to the base game, the following features have been added in the foll
 
   * Quit Button
     - Exits the game.
+      
+### Level Creation
+- The player is given a limited space where they can customize each tile.
+- Levels can be saved under a unique name.
