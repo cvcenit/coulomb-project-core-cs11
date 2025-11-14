@@ -310,7 +310,7 @@ When the player selects the lever creation menu, the features are organized as f
         
     - Navagite to the directory where "test.py" is located.
     - Run the following command through terminal:
-      > pytest test.py
+      > pytest
   
   * Add additional tests
     * Pre-requisites
