@@ -309,7 +309,7 @@ When the player selects the lever creation menu, the features are organized as f
       - Navigating the computer using the [terminal.](https://terminalcheatsheet.com/guides/navigate-terminal)
         
     - Navagite to the directory where "test.py" is located.
-    - Run the following command through termina:
+    - Run the following command through terminal:
       > pytest test.py
   
   * Add additional tests
@@ -320,13 +320,31 @@ When the player selects the lever creation menu, the features are organized as f
       - Python syntax and custom function knowledge.
       - Download [text editors](https://kinsta.com/blog/best-text-editors/)
      
-    - Edit the file 'test.py' using your text editor and add lines in the form off:
-      > func    #runs a specific function
-      > assert var == expected_outcome    #tests if the function modifies a variable correctly
+    - Edit the file 'test.py' using your text editor.
+    - Add the specific functions and/or variables you want to test among the other functions in the first line after the "import".
+      > from shroom_raider import char_to_emoji, flame_spread, pickup, describe_tile, item, move_player    #add it here
+    - Add test cases in the form of:
+      > def test_function():
+      > test_1 = var_1, var_2 ...
+      > test_2 = var_2, var_2 ...
+      > ...
       >
       > Example:
-      > 
+      > def test_pickup():
+      > test1, test2, test3 = 'x', '*', '.'
 
+    - Assert the expected result based on the functionality of the functions, and reset to default before conducting a new test.
+      > func(test_n)
+      > assert var == expected_var_value
+      > move_player('!')    # A function that resets every attributes in the game
+      >
+      > Example:
+      > pickup(test1)    # Runs a test case
+      > assert test1 in item    # Asserts the following functionalities of the function
+      > assert len(item) == 1
+      > assert pickup(test1) == '🪓'
+      > item.clear()    # Restores the variable back to default
+     
 - The existing tests are properly asserted for all cases because
 
 ## Additional Features
