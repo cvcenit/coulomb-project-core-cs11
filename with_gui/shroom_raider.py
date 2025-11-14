@@ -1975,9 +1975,23 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
     menu_controls_btn = gameplay_Text_Button((8 * 48)//4 + (SCREEN_WIDTH - (8 * 48))//2, 252, "Controls", 48, white)
     menu_return_btn = gameplay_Text_Button((13 * 48)//4 + (SCREEN_WIDTH - (13 * 48))//2, 310, "Back to Maps", 48, white)
     controls_back_btn = gameplay_Text_Button((4 * 48)//4 + (SCREEN_WIDTH - (4 * 48))//2, 368, "Back", 48, white)
-    menu_btn_state = False
-    menu_controls_btn_state = False
-    controls_popup_state = False
+    
+    if player != 'default-Player':
+        with open(f"data/players/{player}.json", 'r') as player_file_for_controls:
+            data_player_file_for_controls = json.load(player_file_for_controls)
+        if data_player_file_for_controls['playing_time'] <= 5:
+            menu_btn_state = False
+            menu_controls_btn_state = False
+            controls_popup_state = True
+        else:
+            menu_btn_state = False
+            menu_controls_btn_state = False
+            controls_popup_state = False
+    else:
+        menu_btn_state = False
+        menu_controls_btn_state = False
+        controls_popup_state = True
+
 
     # level bg
     level_bg = pygame.image.load(level_map_bg[random.randint(0, 2)])
@@ -2124,7 +2138,6 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                 if not item: # Player will not move anywhere if not holding an axe
                     if mode == "play":
                         bump_sfx.play()
-                        print("You bumped into a tree!")
                 elif item[0] == 'x': # Tree will turn into empty space if player is holding an axe
                     chop_tree_sfx.play()
                     moveto('.')
@@ -2155,7 +2168,6 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
 
                     if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
                         bump_sfx.play()
-                        print("You can't move the rock there")
                         return
 
                     elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
@@ -2175,9 +2187,8 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                         history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
                         moveto(rock_under_tile)
 
-                    elif grid[new_rock_index] == "R" or 'x' or '*':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
+                    elif grid[new_rock_index] == "R" or 'x' or '*' or '+':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
                         bump_sfx.play()
-                        print("You can't push the rock there!")
                         return
 
                     if f"Rock {new_index}" in history:    # Removes the Rock at index new_index from history after it gets moved
@@ -2186,9 +2197,15 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                     return
 
                 else:
+                    # Checks if it is possible to move the rock to the new index
+                    rock_under_tile = '.'
+
+                    if f"Rock {new_index}" in history:  # Sets the tile under the rock based on history, so that the 'moveto' function appends the correct under_tile when the player moves
+                        rock_under_tile = history[f"Rock {new_index}"]
+
                     if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
-                        print("You can't move the rock there")
                         return
+
                     elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
                         grid[new_rock_index] = "_"
                         moveto(rock_under_tile)
@@ -2202,8 +2219,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                         history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
                         moveto(rock_under_tile)
 
-                    elif grid[new_rock_index] == "R" or 'x' or '*':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
-                        print("You can't push the rock there!")
+                    elif grid[new_rock_index] == "R" or 'x' or '*' or '+':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
                         return
 
                 if f"Rock {new_index}" in history:  # Removes the Rock at index new_index from history after it gets moved
@@ -2460,7 +2476,8 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             menu_btn_state = False
             menu_controls_btn_state = False
             time_val = int(time.time() - time_when_called)
-            save_player_data(time_val)
+            if player != 'default-Player':
+                save_player_data(time_val)
             gameplay_state = False, gameplay_state[1:]
 
         if menu_controls_btn.draw():
@@ -2774,7 +2791,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
 
     if __name__ == "__main__":
         # Outputs args.output_file if -o was called, else run the game.
-        if mode == "":
+        if not mode:
             with open(args.output_file, "w", encoding="utf-8") as output:
                 move_player(args.movement)
 
@@ -2832,7 +2849,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
 
 if __name__ == "__main__":
     # Outputs args.output_file if -o was called, else run the game.
-    if mode == "":
+    if not mode:
         game_function()
     else:
         if not args.stage_file:

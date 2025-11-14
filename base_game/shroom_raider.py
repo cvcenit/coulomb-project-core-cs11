@@ -204,57 +204,33 @@ def _move_player(direction):
             # New position of the rock as it moves along with the player
             new_rock_index = new_index + moves[direction]
 
-            if mode == "play":
+            # Checks if it is possible to move the rock to the new index
+            rock_under_tile = '.'
 
-                # Checks if it is possible to move the rock to the new index
-                rock_under_tile = '.'
+            if f"Rock {new_index}" in history:  # Sets the tile under the rock based on history, so that the 'moveto' function appends the correct under_tile when the player moves
+                rock_under_tile = history[f"Rock {new_index}"]
 
-                if f"Rock {new_index}" in history:  # Sets the tile under the rock based on history, so that the 'moveto' function appends the correct under_tile when the player moves
-                    rock_under_tile = history[f"Rock {new_index}"]
-
-                if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
-                    return
-
-                elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
-                    grid[new_rock_index] = "_"
-                    moveto(rock_under_tile)
-
-                elif grid[new_rock_index] == ".":    # Moves the rock along an empty tile
-                    grid[new_rock_index] = "R"
-                    moveto(rock_under_tile)
-
-                elif grid[new_rock_index] == "_":   # Moves the rock along a paved tile
-                    grid[new_rock_index] = "R"
-                    history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
-                    moveto(rock_under_tile)
-
-                elif grid[new_rock_index] == "R" or 'x' or '*':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
-                    return
-
-                if f"Rock {new_index}" in history:    # Removes the Rock at index new_index from history after it gets moved
-                    del history[f"Rock {new_index}"]
-
+            if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
                 return
 
-            else:
-                if grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
-                    grid[new_rock_index] = "_"
-                    moveto(rock_under_tile)
+            elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
+                grid[new_rock_index] = "_"
+                moveto(rock_under_tile)
 
-                elif grid[new_rock_index] == ".":    # Moves the rock along an empty tile
-                    grid[new_rock_index] = "R"
-                    moveto(rock_under_tile)
+            elif grid[new_rock_index] == ".":    # Moves the rock along an empty tile
+                grid[new_rock_index] = "R"
+                moveto(rock_under_tile)
 
-                elif grid[new_rock_index] == "_":   # Moves the rock along a paved tile
-                    grid[new_rock_index] = "R"
-                    history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
-                    moveto(rock_under_tile)
+            elif grid[new_rock_index] == "_":   # Moves the rock along a paved tile
+                grid[new_rock_index] = "R"
+                history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
+                moveto(rock_under_tile)
 
-                elif grid[new_rock_index] == "R" or 'x' or '*':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
-                    return
+            elif grid[new_rock_index] == "R" or 'x' or '*' or '+':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
+                return
 
-            if f"Rock {new_index}" in history:  # Removes the Rock at index new_index from history after it gets moved
-                    del history[f"Rock {new_index}"]
+            if f"Rock {new_index}" in history:    # Removes the Rock at index new_index from history after it gets moved
+                del history[f"Rock {new_index}"]
 
             return
 
@@ -331,9 +307,9 @@ def move_player(direction):
                 # Picks up the found item
                 if mode == "play":
                     if not found_item:
-                        print("Invalid move. Use W, A, S, D.")
+                        pass
                     elif len(item) == 1:
-                        print('You already have an item, you can\'t pickup another')
+                        pass
                     else:
                         pickup(found_item)
                         found_item = None
@@ -371,7 +347,7 @@ def move_player(direction):
 
 if __name__ == "__main__":
     # Outputs args.output_file if -o was called, else run the game.
-    if mode == "":
+    if not mode:
         with open(args.output_file, "w", encoding="utf-8") as output:
             move_player(args.movement)
 
