@@ -181,7 +181,7 @@ def _move_player(direction):
         if target_tile == 'T':
             if not item: # Player will not move anywhere if not holding an axe
                 if mode == "play":
-
+                    pass
             elif item[0] == 'x': # Tree will turn into empty space if player is holding an axe
                 moveto('.')
                 item.clear() # Item is cleared every time after used
