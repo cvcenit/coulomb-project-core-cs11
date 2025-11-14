@@ -18,8 +18,8 @@
     * [Movement](#movement-1)
     * [Input](#input)
   * [Level Creation](#level-creation-1)
-* [Unit Tests]
-* [Bonus Features]
+* [Unit Tests](#unit-tests)
+* [Bonus Features](#bonus-features)
   * [Graphical User Interface (GUI)](#graphical-user-interface-gui-1)
   * [Level Creation](#level-creation-2)
 
@@ -299,7 +299,7 @@ When the player selects the lever creation menu, the features are organized as f
   - Only ten(10) custom maps can exist simultaneously.
   - The empty grids within the rectangle formed when connecting the furthest top-left tile and furthest bottom right tile and vice versa are converted into empty tiles and serves as the completed map.
 
-## Unit Test
+## Unit Tests
 
 - Unit tests were done to test whether functions and/or blocks are code are working as intended. Below are the details on how to:
   
