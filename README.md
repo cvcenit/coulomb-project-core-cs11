@@ -345,7 +345,7 @@ When the player selects the lever creation menu, the features are organized as f
       > assert pickup(test1) == '🪓'
       > item.clear()    # Restores the variable back to default
      
-- The existing tests are properly asserted for all cases because
+- The existing tests are properly asserted for all cases because the following tests considered possible combinations of moves when given various directions and items. It includes cases when the player tries distinct moves that may lead to drowning, bumping into a tree, bumping into the edge, holding items, using items, and picking up multiple items.
 
 ## Additional Features
 
