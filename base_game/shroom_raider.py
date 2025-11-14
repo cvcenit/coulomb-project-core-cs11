@@ -1,6 +1,8 @@
 from argparse import ArgumentParser
 import os
 
+
+# PREREQUISITE FUNCTIONS
 def add_args():
     ''' Adds arguments, will only be called if __name__ == "__main__" below '''
     parser = ArgumentParser(add_help=False)
@@ -26,6 +28,7 @@ def clear_terminal():
     """This function clears the terminal, it does not return anything"""
     os.system('cls' if os.name == 'nt' else 'clear')
 
+# Checks if the command is running from shroom_raider.py, and not as a module/from another file
 if __name__ == "__main__":
     args = add_args()
     mode = choose_mode(args.output_file) # Mode if to play or to output
@@ -179,9 +182,8 @@ def _move_player(direction):
 
         # Checks the nature of the targeted tile
         if target_tile == 'T':
-            if not item: # Player will not move anywhere if not holding an axe
-                if mode == "play":
-                    pass
+            if not item: # Player will not move anywhere if not holding an axe/flamethrower
+                pass
             elif item[0] == 'x': # Tree will turn into empty space if player is holding an axe
                 moveto('.')
                 item.clear() # Item is cleared every time after used
@@ -439,4 +441,5 @@ if __name__ == "__main__":
             clear_terminal()
 
             if main > 0:
+                print(char_to_emoji(grid))
                 print("Goodbye!")
