@@ -250,7 +250,7 @@ _In this section, you will get to learn about the secrets behind the world of Sh
 
 * Winning or Losing
 
-When the player wins or loses, the following dialogue boxes pops up that contains the following:
+  When the player wins or loses, the following dialogue boxes pops up that contains the following:
   * Winning
     - Shows a win message.
     - Shows the name of the player.
