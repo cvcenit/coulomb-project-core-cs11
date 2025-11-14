@@ -29,7 +29,7 @@ _Hello, aspiring adventurer. Welcome to Shroom Raider! Here's a quick rundown on
 
 ### Start Up
 
-_Here are the following ways you can run the game:_
+Here are the following ways you can run the game:
 
 * Pre-requisites
   - [Download python](https://realpython.com/installing-python/) in your computer.
@@ -101,9 +101,16 @@ _Here are the following ways you can run the game:_
 
 ### Main Menu
 
+After booting up the game, you can select from the following menus:
+
+* Play Menu - Brings you to the character creation/selection and level selection.
+* Leaderboards Menu - Shows each character's standings in different categories.
+* Options Menu - Allows you to change the volume settings and shows the credits.
+* Quit Button - Exits the game.
+
 ### Controls
 
-_After arriving into location of your adventure, here's how to navigate around the area:_
+After arriving into location of your adventure, here's how to navigate around the area:
 
 #### Movement
 
@@ -122,7 +129,7 @@ _After arriving into location of your adventure, here's how to navigate around t
 
 #### Pickup
 
-_Press P to pick up the following items you can encounter during your journey:_
+Press P to pick up the following items you can encounter during your journey:
 
 * Axe - Cuts down the tree along the player's path allowing them to pass through; Can only be used once.
 * Flamethrower - Burns down all the trees connected to the one along the player's path; Can only be used once.\
@@ -130,16 +137,23 @@ _Press P to pick up the following items you can encounter during your journey:_
 
 #### Restart and Exit
 
-_Unfortunate events are unavoidable during an adventurer's journey, here are the controls if you wish to regroup for a while:_
+Unfortunate events are unavoidable during an adventurer's journey, here are the controls if you wish to regroup for a while:
 
 * Restart ('!') - Immediately go back at the start of your journey; Resets the loaded level and undos all progress made.
 * Exit ('Q') - Take some time off from your journey to regroup; Exits the program.
 
 ### Level Creation
 
+Here are some guides on how to create your own level:
+
+- Select a tile from the side bar.
+- And select a tile from the grid where you wish to put the tile you selected.
+- Put only one character tile, and at least one mushroom tile.
+- Save under a unique name.
+
 ## Code Organization
 
-_In this section, you will get to learn about the secrets behind the world of Shroom Raider!_
+In this section, you will get to learn about the secrets behind the world of Shroom Raider!
 
 ### Start Up
 * ArgumentParser from argparse
@@ -288,8 +302,30 @@ When the player selects the lever creation menu, the features are organized as f
 ## Unit Test
 
 - Unit tests were done to test whether functions and/or blocks are code are working as intended. Below are the details on how to:
+  
   * Run the existing tests
+    * Pre-requisites
+      - [Install pytest](https://pypi.org/project/pytest/) in your environment.\
+      - Navigating the computer using the [terminal.](https://terminalcheatsheet.com/guides/navigate-terminal)
+        
+    - Navagite to the directory where "test.py" is located.
+    - Run the following command through termina:
+      > pytest test.py
+  
   * Add additional tests
+    * Pre-requisites
+      - [Install pytest](https://pypi.org/project/pytest/) in your environment.\
+      - Navigating the computer using the [terminal.](https://terminalcheatsheet.com/guides/navigate-terminal)
+      - [Download python](https://realpython.com/installing-python/) in your computer.
+      - Python syntax and custom function knowledge.
+      - Download [text editors](https://kinsta.com/blog/best-text-editors/)
+     
+    - Edit the file 'test.py' using your text editor and add lines in the form off:
+      > func    #runs a specific function
+      > assert var == expected_outcome    #tests if the function modifies a variable correctly
+      >
+      > Example:
+      > 
 
 - The existing tests are properly asserted for all cases because
 
@@ -335,3 +371,25 @@ In addition to the base game, the following features have been added in the foll
 ### Level Creation
 - The player is given a limited space where they can customize each tile.
 - Levels can be saved under a unique name.
+
+### Textures, Music, and Special Effects.
+
+Some textures, music, special effects were modified and/or added:
+
+* Textures
+- Main menu background
+- Level backgrounds
+- Tile textures
+- Item Textures
+- GUI Textures
+
+* Music
+- Main menu music
+- Level music
+- Level creation music
+
+* Special Effeccts
+- GUI SFXs (Clicking)
+- Movement SFXs
+- Tile interactions SFXs
+- Item SFXs
