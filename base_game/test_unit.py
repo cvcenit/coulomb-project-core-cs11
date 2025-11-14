@@ -1,6 +1,7 @@
 import shroom_raider
 from shroom_raider import move_player
 
+
 def test_char_to_emoji():
     test1 = '''\
 TTTTTTTTT
@@ -47,7 +48,7 @@ T._____.****LLLL.______,xXXTTT'''
 　🪓　　　🔥　
 🌲　　　🌲
 🌲🌲🌲🌲🌲🔥🔥🌲🌲'''
-    
+
     assert shroom_raider.char_to_emoji(test3) == """\
 🌲🌲🌲🌲🌲🌲🌲🌲🌲　　　　　　　　　　　　　　　　　　　　　
 🌲　　　🍄　🪨🪨🪨🪨🪨🪨🪨🪨🪨🪨🍄🍄🍄🍄🍄🍄🍄⬜⬜⬜⬜　　🌲
@@ -56,8 +57,8 @@ T._____.****LLLL.______,xXXTTT'''
 
 
 def test_pickup():
-    test1, test2, test3 = 'x', '*', '.' 
-    
+    test1, test2, test3 = 'x', '*', '.'
+
     shroom_raider.item.clear()
     shroom_raider.pickup(test1)
     assert test1 in shroom_raider.item
@@ -76,8 +77,9 @@ def test_pickup():
     assert len(shroom_raider.item) == 1
     assert shroom_raider.pickup(test3) == '　'
 
+
 def test_flame_spread():
-    
+
     assert ''.join(shroom_raider.flame_spread(0, 1)) == """\
 ....~~~~~.....
 ..L.~.xT~~~~~.
@@ -135,6 +137,7 @@ def test_describe_tile():
     assert shroom_raider.describe_tile('_') == 'paved'
     assert shroom_raider.describe_tile('x') == 'axe'
     assert shroom_raider.describe_tile('*') == 'flamethrower'
+
 
 def test_move_player():
 
@@ -290,7 +293,7 @@ R..R..R""")
     'S': 7 + 1,
     'A': -1,
     'D': 1,
-    'P': 0
+    'P': 0,
 }
 
     # Test case 22: player try to push rock to axe.
@@ -358,7 +361,7 @@ R..R..R""")
     'S': 7 + 1,
     'A': -1,
     'D': 1,
-    'P': 0
+    'P': 0,
 }
 
     # Test case 30: player picks up axe while holding flamethrower.

@@ -1,26 +1,38 @@
-from argparse import ArgumentParser
 import os
+from argparse import ArgumentParser
 
 
 # PREREQUISITE FUNCTIONS
 def add_args():
-    ''' Adds arguments, will only be called if __name__ == "__main__" below '''
+    """Returns parsed arguments, will only be called if __name__ == "__main__" below."""
     parser = ArgumentParser(add_help=False)
     parser.add_argument('-f', '--stage_file')
     parser.add_argument('-m', '--movement')
     parser.add_argument('-o', '--output_file')
     return parser.parse_args()
 
+
 def pick_map(stage_file=None):
-    ''' Returns default map if there's no stage_file, else returns the stage file '''
+    """Returns default map if there's no stage_file, else returns the stage file."""
     if stage_file is None:
-        return '10 14\nTTTT~~~~~TTTTT\nT.L.~.xT~~~~~T\nT.R.~.~+~TTT~T\nT~.~~.~.~T~T~T\nT~~~~.~R~T~T~T\nT...~x~~~T~T~T\nTT.T~.~T~T~T~T\nT~+...~..*~+~T\nT~~~~~~~~~~~~T\nTTTTTTTTTTTTTT'
+        return '''10 14
+TTTT~~~~~TTTTT
+T.L.~.xT~~~~~T
+T.R.~.~+~TTT~T
+T~.~~.~.~T~T~T
+T~~~~.~R~T~T~T
+T...~x~~~T~T~T
+TT.T~.~T~T~T~T
+T~+...~..*~+~T
+T~~~~~~~~~~~~T
+TTTTTTTTTTTTTT'''
     else:
-        with open(stage_file, "r", encoding="utf-8") as lvl:
+        with open(stage_file, encoding="utf-8") as lvl:
           return lvl.read()
 
+
 def choose_mode(output_file=None):
-    ''' Checks if -o has an argument, returns either "play" or an empty string to determine the mode'''
+    """Checks if -o has an argument, returns either "play" or an empty string to determine the mode"""
     return 'play' if output_file is None else ''
 
 
@@ -28,14 +40,15 @@ def clear_terminal():
     """This function clears the terminal, it does not return anything"""
     os.system('cls' if os.name == 'nt' else 'clear')
 
+
 # Checks if the command is running from shroom_raider.py, and not as a module/from another file
 if __name__ == "__main__":
     args = add_args()
-    mode = choose_mode(args.output_file) # Mode if to play or to output
-    lvlmap = pick_map(args.stage_file) # Map as string/raw
+    mode = choose_mode(args.output_file)  # Mode if to play or to output
+    lvlmap = pick_map(args.stage_file)  # Map as string/raw
 else:
-    mode = choose_mode() # Mode if to play or to output
-    lvlmap = pick_map() # Map as string/raw
+    mode = choose_mode()  # Mode if to play or to output
+    lvlmap = pick_map()  # Map as string/raw
 
 # Main loop 'count'
 main = 0
@@ -76,11 +89,12 @@ moves = {
     'S': GRID_WIDTH + 1,
     'A': -1,
     'D': 1,
-    'P': 0
+    'P': 0,
 }
 
+
 def char_to_emoji(map):
-    # Returns the map converted from text characters to emoji
+    """Returns the map converted from text characters to emoji"""
     emoji = {
         '.': '　',
         'L': '🧑',
@@ -91,18 +105,19 @@ def char_to_emoji(map):
         '_': '⬜',
         'x': '🪓',
         '*': '🔥',
-        '\n': '\n'
+        '\n': '\n',
         }
     return ''.join(emoji.get(c, c) for c in map if c in emoji)
 
+
 def pickup(tile):
-    # Adds current tile to the list of items held by the player
+    """Adds current tile to the list of items held by the player. Returns the current tile in emoji form"""
     item.append(tile)
-    # Returns the current tile in emoji form
     return char_to_emoji(tile)
 
+
 def flame_spread(start_row, start_col):
-    # Returns the new map when flamethrower is used, or when player approaches tree while holding flamethrower
+    """Returns the new map when flamethrower is used, or when player approaches tree while holding flamethrower"""
     global grid
 
     grid_string = ''.join(grid)
@@ -110,7 +125,7 @@ def flame_spread(start_row, start_col):
     row, col = len(grid_2d_list), len(grid_2d_list[0])
 
     def in_bounds(r, c):
-        # Returns True if 2d index is within the range of row and column
+        """Returns True if 2d index is within the range of row and column"""
         return 0 <= r < row and 0 <= c < col
 
     def flamethrowed(r, c):
@@ -119,8 +134,8 @@ def flame_spread(start_row, start_col):
             return
         grid_2d_list[r][c] = '.'
 
-        # Continously calls itself for every direction 
-        for change_row, change_col in [(-1,0), (1,0), (0,-1), (0,1)]:
+        # Continously calls itself for every direction
+        for change_row, change_col in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             flamethrowed(r + change_row, c + change_col)
 
     # Will only call flamethrowed if the player is approaching 'T'
@@ -131,8 +146,9 @@ def flame_spread(start_row, start_col):
 
     return list(new_grid_string)
 
+
 def describe_tile(tile):
-    # Returns a tile converted from ASCII character to its tile name
+    """Returns a tile converted from ASCII character to its tile name"""
     return {
         '.': 'empty',
         'T': 'tree',
@@ -142,13 +158,12 @@ def describe_tile(tile):
         '`': 'water',
         '_': 'paved',
         'x': 'axe',
-        '*': 'flamethrower'
+        '*': 'flamethrower',
     }.get(tile, 'unknown')
 
+
 def _move_player(direction):
-
-    # Takes the directional input of the player and moves the player accordingly
-
+    """Takes the directional input of the player and moves the player accordingly"""
     global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history, found_item, drowned, mode
 
     def moveto(under_tile):
@@ -157,7 +172,7 @@ def _move_player(direction):
         global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history
 
         # Sets the tile left behind by the player as the tile it previously was based on the history list
-        grid[player_index] = f"{history['player'][0]}" 
+        grid[player_index] = f"{history['player'][0]}"
         history['player'].pop()
 
         # Sets the tile at new_index as the player tile
@@ -173,7 +188,7 @@ def _move_player(direction):
     new_index = player_index + moves[direction]
 
     # Checks if either the targeted index is out of bounds
-    if not (0 <= new_index < len(grid)) or new_index in _n_indices: # Avoids the mutation of \n indices: 
+    if not (0 <= new_index < len(grid)) or new_index in _n_indices:  # Avoids the mutation of \n indices:
         return
 
     else:
@@ -182,21 +197,21 @@ def _move_player(direction):
 
         # Checks the nature of the targeted tile
         if target_tile == 'T':
-            if not item: # Player will not move anywhere if not holding an axe/flamethrower
+            if not item:  # Player will not move anywhere if not holding an axe/flamethrower
                 pass
-            elif item[0] == 'x': # Tree will turn into empty space if player is holding an axe
+            elif item[0] == 'x':  # Tree will turn into empty space if player is holding an axe
                 moveto('.')
-                item.clear() # Item is cleared every time after used
+                item.clear()  # Item is cleared every time after used
                 found_item = None
-                
-            elif item[0] == '*': # flame_spread function is called when player is holding flamethrower
+
+            elif item[0] == '*':  # flame_spread function is called when player is holding flamethrower
                 col = (new_index % (GRID_WIDTH+1))
                 row = (new_index - col) // GRID_WIDTH
                 grid = flame_spread(row, col)
                 moveto('.')
-                item.clear() # Item is cleared every time after used
+                item.clear()  # Item is cleared every time after used
                 found_item = None
-                
+
             return
 
         elif target_tile == 'R':
@@ -210,7 +225,7 @@ def _move_player(direction):
             if f"Rock {new_index}" in history:  # Sets the tile under the rock based on history, so that the 'moveto' function appends the correct under_tile when the player moves
                 rock_under_tile = history[f"Rock {new_index}"]
 
-            if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
+            if new_rock_index >= len(grid) or new_rock_index in _n_indices:  # Checks if it will go out of bounds or in a '\n' index
                 return
 
             elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
@@ -223,7 +238,7 @@ def _move_player(direction):
 
             elif grid[new_rock_index] == "_":   # Moves the rock along a paved tile
                 grid[new_rock_index] = "R"
-                history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
+                history[f"Rock {new_rock_index}"] = "_"  # Takes note of the tile under the rock
                 moveto(rock_under_tile)
 
             elif grid[new_rock_index] == "R" or 'x' or '*' or '+':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
@@ -291,12 +306,13 @@ def _move_player(direction):
 
             return
 
+
 def move_player(direction):
 
     # Takes the user input and proceeds accordingly
     global player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history, found_item
 
-    # Processes each input in a string of inputs
+    '''Processes each input in a string of inputs'''
     for inp in direction:
         inp = inp.upper()
         if main == 0:
@@ -306,23 +322,18 @@ def move_player(direction):
             elif inp == 'P':
                 # Picks up the found item
                 if mode == "play":
-                    if not found_item:
-                        pass
-                    elif len(item) == 1:
+                    if not found_item or len(item) == 1:
                         pass
                     else:
                         pickup(found_item)
                         found_item = None
-                        history['player'][-1] = '.' # Sets the previous tile as an empty tile after picking up the item
+                        history['player'][-1] = '.'  # Sets the previous tile as an empty tile after picking up the item
+                elif not found_item or len(item) == 1:
+                    pass
                 else:
-                    if not found_item:
-                        pass
-                    elif len(item) == 1:
-                        pass
-                    else:
-                        pickup(found_item)
-                        found_item = None
-                        history['player'][-1] = '.' # Sets the previous tile as an empty tile after picking up the item
+                    pickup(found_item)
+                    found_item = None
+                    history['player'][-1] = '.'  # Sets the previous tile as an empty tile after picking up the item
 
             elif inp == "!":
                 # Restarts the game
@@ -353,9 +364,9 @@ if __name__ == "__main__":
 
             # Contents of the output file: no/clear and grid
             if player_mushroom_count == LVL_MUSHROOMS:
-                output.write(f"CLEAR\n{"".join(grid)}")
+                output.write(f"CLEAR\n{GRID_HEIGHT} {GRID_WIDTH}\n{"".join(grid)}")
             else:
-                output.write((f"NO CLEAR\n{"".join(grid)}"))
+                output.write(f"NO CLEAR\n{GRID_HEIGHT} {GRID_WIDTH}\n{"".join(grid)}")
 
     else:
         while main == 0:

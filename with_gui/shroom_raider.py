@@ -1,12 +1,14 @@
-import sys
-import pygame
-import datetime
-import os
-import json
-import time
 import csv
+import datetime
+import json
+import os
+import pathlib
 import random
+import sys
+import time
 from argparse import ArgumentParser
+
+import pygame
 
 pygame.init()
 
@@ -58,8 +60,9 @@ create_bg = pygame.transform.scale(create_bg, (1024, 1024))
 
 clock = pygame.time.Clock()
 
-class Button():
-    def __init__(self,x, y, image, scale):
+
+class Button:
+    def __init__(self, x, y, image, scale):
         width = image.get_width()
         height = image.get_height()
         self.image = pygame.transform.scale(image, (int(width * scale), int(height * scale)))
@@ -71,10 +74,10 @@ class Button():
         global click_sound
         action = False
 
-        #get mouse position
+        # get mouse position
         pos = pygame.mouse.get_pos()
 
-        #check mouseover and clicked conditions
+        # check mouseover and clicked conditions
         if self.rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 click_sound.play()
@@ -84,19 +87,19 @@ class Button():
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
 
-        #draw button
+        # draw button
         surface.blit(self.image, (self.rect.x, self.rect.y))
 
         return action
 
 
-class player_leaderboard_list():
+class player_leaderboard_list:
     def __init__(self, name, count):
         self.name = name
         self.count = count
         width, height = 728, 45
         x, y = 148, 200 + (50 * count)
-        self.width, self.height, self.x, self.y = width, height, x ,y
+        self.width, self.height, self.x, self.y = width, height, x, y
         self.clicked, self.hovered = False, False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -111,9 +114,9 @@ class player_leaderboard_list():
         screen.blit(bg, (self.x, self.y))
 
         # Player data
-        with open(f"data/players/{self.name}.json", "r") as player_file:
+        with open(f"data/players/{self.name}.json") as player_file:
             loaded_data = json.load(player_file)
-        
+
         try:
             plr = loaded_data["name"]
             dt_created = loaded_data["time_created"]
@@ -150,13 +153,13 @@ class player_leaderboard_list():
             screen.blit(lvl_total_text, (self.x + 30 + dt_created_text.get_width(), self.y + 8))
 
 
-class player_on_list():
+class player_on_list:
     def __init__(self, name, count):
         self.name = name
         self.count = count
         width, height = 728, 80
         x, y = 148, 148 + (100 * count)
-        self.width, self.height, self.x, self.y = width, height, x ,y
+        self.width, self.height, self.x, self.y = width, height, x, y
         self.clicked, self.hovered = False, False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -188,7 +191,6 @@ class player_on_list():
             if not self.rect.collidepoint(pos) and self.hovered:
                 self.hovered = False
 
-
         # Background
         bg = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         bg.fill((0, 0, 0, 0))
@@ -196,9 +198,9 @@ class player_on_list():
         screen.blit(bg, (self.x, self.y))
 
         # Player data
-        with open(f"data/players/{self.name}.json", "r") as f:
+        with open(f"data/players/{self.name}.json") as f:
             loaded_data = json.load(f)
-        
+
         try:
             plr = loaded_data["name"]
             dt_created = loaded_data["time_created"]
@@ -229,7 +231,7 @@ class player_on_list():
         return action
 
 
-class text_Button_1():
+class text_Button_1:
     def __init__(self, x, y, t, s, col):
         self.col = col
         text, capt = create_text(t, s, col)
@@ -272,7 +274,7 @@ class text_Button_1():
         return action
 
 
-class text_Button_2():
+class text_Button_2:
     # Used for buttons in the map level menu
     def __init__(self, x, y, text, s):
         self.capt = text
@@ -332,7 +334,7 @@ class text_Button_2():
         return action
 
 
-class menu_Button():
+class menu_Button:
     def __init__(self, x, y, t, s):
         text, capt = create_text(t, s, main_color)
         outer, capt = create_text(t, s, black)
@@ -375,7 +377,7 @@ class menu_Button():
         return action
 
 
-class level_Button():
+class level_Button:
     # Used for the level buttons in the map menu
     def __init__(self, x, y, level_num):
         self.level_num = level_num
@@ -529,6 +531,7 @@ map_level_menu_state = False, 'playername'
 
 who_to_del = ""
 
+
 def menu_background():
     # Background
     screen.blit(menu_bg_img5, (0, 0))
@@ -542,6 +545,7 @@ def menu_background():
     blur.fill((0, 0, 0, 50))
     screen.blit(blur, (0, 0))
 
+
 def main_menu():
     global menu_state
 
@@ -554,13 +558,11 @@ def main_menu():
     pygame.draw.rect(semibg, (20, 50, 30, 150), semibg.get_rect(), border_radius=32)
     screen.blit(semibg, (92, 264))
 
-
     # Title
     title = create_text("SHROOM RAIDER", 112, main_color)[0]
     title_outer = create_text("SHROOM RAIDER", 112, black)[0]
     screen.blit(title_outer, ((1024 - title_outer.get_width()) // 2, 92))
     screen.blit(title, (((1024 - title.get_width()) // 2) - 4, 92))
-
 
     # Buttons
     if play_btn.draw():
@@ -578,7 +580,9 @@ def main_menu():
     elif quit_btn.draw():
         sys.exit()
 
+
 players = [player for player in os.listdir("data/players")]
+
 
 def _create_player(name, date, s):
     """Creates a player file as .txt"""
@@ -587,7 +591,10 @@ def _create_player(name, date, s):
     with open(f"data/players/{name}.json", "w") as f:
         json.dump(data, f, indent=4)
 
+
 player_name_input = ""
+
+
 def _create_player_menu():
     global player_name_input, create_plr_done_btn_state, players, create_plr_btn_state, already_plr, inc_len, delete_pop_up
 
@@ -607,21 +614,20 @@ def _create_player_menu():
 
     if max_plrs:
         screen.blit(create_text("Maximum of 10 players only", 22, white)[0], ((1000 - (24 * 16))//2, 408))
+    elif 0 <= len(player_name_input) < 16:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    player_name_input = player_name_input[:-1]
+                    inc_len = False
+                elif event.key != pygame.K_ESCAPE and event.key != pygame.K_MINUS:
+                    player_name_input += event.unicode
     else:
-        if 0 <= len(player_name_input) < 16:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_BACKSPACE:
-                        player_name_input = player_name_input[:-1]
-                        inc_len = False
-                    elif event.key != pygame.K_ESCAPE and event.key != pygame.K_MINUS:
-                        player_name_input += event.unicode
-        else:
-            player_name_input = player_name_input[:-1]
-            inc_len = True
+        player_name_input = player_name_input[:-1]
+        inc_len = True
 
     screen.blit(text, ((1000 - (24 * 16))//2, 336))
 
@@ -658,7 +664,10 @@ def _create_player_menu():
         screen.blit(create_text("Name must have at least 1 character,", 22, white)[0], ((1000 - (24 * 16))//2, 384))
         screen.blit(create_text("and a maximum of 15 characters", 22, white)[0], ((1000 - (24 * 16))//2, 408))
 
+
 player_page = 1
+
+
 def players_list(page):
     global delete_pop_up, plr_del_btn_state, who_to_del, map_level_menu_state, players
     # page is 0-indexed
@@ -681,6 +690,7 @@ def players_list(page):
                 map_level_menu_state = True, player[:-5]
             count += 1
 
+
 def delete_player_confirmation(player):
     global delete_pop_up, plr_del_btn_state
     # Semi-background
@@ -702,17 +712,19 @@ def delete_player_confirmation(player):
         delete_pop_up = False
 
     if delete_pop_up_confirm.draw():
-        os.remove(f"data/players/{player}.json")
+        pathlib.Path(f"data/players/{player}.json").unlink()
         delete_pop_up = False
         plr_del_btn_state = False
+
 
 story_btn_state = False
 bonus_btn_state = False
 usermade_btn_state = False
 level_buttons = []
+
+
 def map_level_menu(player):
-    global menu_state, fade_count, map_level_menu_state, gameplay_state, story_btn_state
-    global bonus_btn_state, usermade_btn_state, bonus_levels_buttons, usermade_levels_buttons
+    global menu_state, fade_count, map_level_menu_state, gameplay_state, story_btn_state, bonus_btn_state, usermade_btn_state, bonus_levels_buttons, usermade_levels_buttons
 
     # Background
     screen.blit(menu_bg_img5, (0, 0))
@@ -766,27 +778,24 @@ def map_level_menu(player):
         # Draw all level buttons
         for btn in level_buttons:
             if btn.draw():
-                level = btn.level_num # This is the level number, should be same with the file name of the map in txt
-                with open(f'data/maps/story/{level}.txt') as mapfile:
-                    to_text = mapfile.read()
+                level = btn.level_num  # This is the level number, should be same with the file name of the map in txt
+                to_text = pathlib.Path(f'data/maps/story/{level}.txt').read_text()
                 gameplay_state = True, player, to_text, f'data/maps/story/{level}.txt'
 
     if bonus_btn_state:
         bonus_level_buttons()
         for btn in bonus_levels_buttons:
             if btn.draw():
-                level = btn.level_num # This is the level number, should be same with the file name of the map in txt
-                with open(f'data/maps/bonus/{level}.txt') as mapfile:
-                    to_text = mapfile.read()
+                level = btn.level_num  # This is the level number, should be same with the file name of the map in txt
+                to_text = pathlib.Path(f'data/maps/bonus/{level}.txt').read_text()
                 gameplay_state = True, player, to_text, f'data/maps/bonus/{level}.txt'
 
     if usermade_btn_state:
         usermade_level_buttons()
         for btn in usermade_levels_buttons:
             if btn.draw():
-                level = btn.level_num # This is the level number, should be same with the file name of the map in txt
-                with open(f'data/maps/user_made/{level}.txt') as mapfile:
-                    to_text = mapfile.read()
+                level = btn.level_num  # This is the level number, should be same with the file name of the map in txt
+                to_text = pathlib.Path(f'data/maps/user_made/{level}.txt').read_text()
                 gameplay_state = True, player, to_text, f'data/maps/user_made/{level}.txt'
 
 
@@ -835,13 +844,12 @@ def level_menu():
                     inc_len = False
                     already_plr = False
                     player_name_input = ""
-            else:
-                if plr_del_btn.draw():
-                    plr_del_btn_state = True
-                    create_plr_btn_state = False
-                    inc_len = False
-                    already_plr = False
-                    player_name_input = ""
+            elif plr_del_btn.draw():
+                plr_del_btn_state = True
+                create_plr_btn_state = False
+                inc_len = False
+                already_plr = False
+                player_name_input = ""
 
             if page_back.draw():
                 player_page = 1
@@ -853,6 +861,7 @@ def level_menu():
         screen.blit(text2, ((148) + 4, 60))
         text1 = create_text(f"Players      Page {player_page}/2", 60, white)[0]
         screen.blit(text1, (148, 60))
+
 
 # Map editor buttons
 create_new_map_btn = text_Button_1(SCREEN_WIDTH - 500, 640, "Create New Map", 48, white)
@@ -879,8 +888,11 @@ def reset_editor_data():
         r = [-1] * EDITOR_MAX_COLS
         editor_world_data.append(r)
 
+
 bonus_levels = [level for level in os.listdir("data/maps/bonus")]
 bonus_levels_buttons = []
+
+
 def bonus_level_buttons():
     global bonus_levels, bonus_levels_buttons
     bonus_levels_buttons = []
@@ -898,8 +910,11 @@ def bonus_level_buttons():
         y = start_y + (row * spacing_y)
         bonus_levels_buttons.append(level_Button(x, y, level[:-4]))
 
+
 usermade_levels = [level for level in os.listdir("data/maps/user_made")]
 usermade_levels_buttons = []
+
+
 def usermade_level_buttons():
     global usermade_levels, usermade_levels_buttons
     usermade_levels_buttons = []
@@ -916,6 +931,7 @@ def usermade_level_buttons():
         x = start_x + (col * spacing_x)
         y = start_y + (row * spacing_y)
         usermade_levels_buttons.append(level_Button(x, y, level[:-4]))
+
 
 def map_level_buttons():
     global level_buttons
@@ -936,8 +952,7 @@ def map_level_buttons():
 
 
 def load_editor_assets():
-    global editor_img_list, editor_world_data, editor_button_list, save_editor_btn, exit_editor_btn
-    global editor_active, create_new_map_state, map_action_popup, selected_map, new_map_name_input, map_name_exists, map_name_invalid, menu_state, fade_count
+    global editor_img_list, editor_world_data, editor_button_list, save_editor_btn, exit_editor_btn, editor_active, create_new_map_state, map_action_popup, selected_map, new_map_name_input, map_name_exists, map_name_invalid, menu_state, fade_count
 
     # Load tile images
     editor_img_list = []
@@ -981,7 +996,7 @@ def load_editor_assets():
             EDITOR_SCREEN_WIDTH + (60 * button_row) + 35,  # Adjust tile buttons horizontally
             (60 * button_col) + 55,  # Adjust tile buttons vertically
             editor_img_list[i],
-            1.5
+            1.5,
         )
         editor_button_list.append(tile_button)
         button_col += 1
@@ -1062,7 +1077,7 @@ def csv_to_map(file_path):
         '5': 'R',
         '6': 'x',
         '7': '*',
-        '\n': '\n'
+        '\n': '\n',
     }
 
     converted = ''.join(convert_to_ascii.get(c, c) for c in map_str if c in convert_to_ascii)
@@ -1104,6 +1119,7 @@ def editor_laro_warning():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 waiting = False
+
 
 def laro_save_warning():
     # Error pop up box showing "you can't play without laro craft" and exits once mouse clicks anywhere
@@ -1164,9 +1180,9 @@ def mush_save_warning():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 waiting = False
 
+
 def level_editor():
-    global menu_state, editor_active, editor_current_tile, editor_world_data, fade_count
-    global map_action_popup, selected_map, new_map_name_input, map_name_exists, map_name_invalid, create_new_map_state, usermade_levels
+    global menu_state, editor_active, editor_current_tile, editor_world_data, fade_count, map_action_popup, selected_map, new_map_name_input, map_name_exists, map_name_invalid, create_new_map_state, usermade_levels
 
     screen.blit(create_bg, (0, 0))
     gray_bg = pygame.Surface((1024, 1024), pygame.SRCALPHA)
@@ -1200,8 +1216,8 @@ def level_editor():
 
     # Save button
     if save_editor_btn.draw(screen):
-        check_laro = any(0 in data for data in editor_world_data) # Checks if a laro craft is in the created level
-        check_mush = any(4 in data for data in editor_world_data) # Checks if a mushroom is in the created level
+        check_laro = any(0 in data for data in editor_world_data)  # Checks if a laro craft is in the created level
+        check_mush = any(4 in data for data in editor_world_data)  # Checks if a mushroom is in the created level
         if not check_laro:
             laro_save_warning()
         elif not check_mush:
@@ -1212,8 +1228,7 @@ def level_editor():
                 writer = csv.writer(csvfile, delimiter=',')
                 for row in editor_world_data:
                     writer.writerow(row)
-            with open(f'data/maps/user_made/{editor_name}.txt', 'w') as txtfile:
-                txtfile.write(csv_to_map(f'data/maps/csv_user_made/{editor_name}.csv'))
+            pathlib.Path(f'data/maps/user_made/{editor_name}.txt').write_text(csv_to_map(f'data/maps/csv_user_made/{editor_name}.csv'))
             usermade_levels.append(f"{editor_name}.txt")
 
     # Exit button - return to create menu
@@ -1262,8 +1277,7 @@ def level_editor():
 
 
 def _create_new_map_dialog():
-    global new_map_name_input, create_new_map_state, map_name_exists, map_name_invalid, editor_active, editor_name
-    global editor_world_data
+    global new_map_name_input, create_new_map_state, map_name_exists, map_name_invalid, editor_active, editor_name, editor_world_data
 
     # Background overlay
     overlay = pygame.Surface((1024, 768), pygame.SRCALPHA)
@@ -1295,7 +1309,7 @@ def _create_new_map_dialog():
                 map_name_invalid = False
             elif event.key == pygame.K_RETURN:
                 if 0 < len(new_map_name_input) < 30:
-                    existing_maps = os.listdir('data/maps/csv_user_made') if os.path.exists('data/maps/csv_user_made') else []
+                    existing_maps = os.listdir('data/maps/csv_user_made') if pathlib.Path('data/maps/csv_user_made').exists() else []
                     if new_map_name_input + '.csv' not in existing_maps:
                         # Launch editor internally
                         editor_name = new_map_name_input
@@ -1324,7 +1338,7 @@ def _create_new_map_dialog():
     # Create button
     if create_map_confirm_btn.draw():
         if 0 < len(new_map_name_input) < 30:
-            existing_maps = os.listdir('data/maps/csv_user_made') if os.path.exists('data/maps/csv_user_made') else []
+            existing_maps = os.listdir('data/maps/csv_user_made') if pathlib.Path('data/maps/csv_user_made').exists() else []
             if new_map_name_input + '.csv' not in existing_maps:
                 # Launch editor internally
                 editor_name = new_map_name_input
@@ -1349,10 +1363,7 @@ def _create_new_map_dialog():
 
 
 def create_menu():
-    global menu_state, fade_count, selected_map, map_action_popup, map_buttons, create_new_map_state, editor_active, editor_world_data
-    global editor_name, new_map_name_input, map_name_exists, map_name_invalid, gameplay_state, playing_from_play
-    global map_delete_popup_back, map_delete_popup_confirm, map_delete_btn, map_delete_cancel, map_delete_btn_state, map_delete_popup, usermade_levels
-
+    global menu_state, fade_count, selected_map, map_action_popup, map_buttons, create_new_map_state, editor_active, editor_world_data, editor_name, new_map_name_input, map_name_exists, map_name_invalid, gameplay_state, playing_from_play, map_delete_popup_back, map_delete_popup_confirm, map_delete_btn, map_delete_cancel, map_delete_btn_state, map_delete_popup, usermade_levels
 
     # Background
     menu_background()
@@ -1371,7 +1382,7 @@ def create_menu():
 
     # Get custom maps
     custom_maps = []
-    if os.path.exists('data/maps/csv_user_made'):
+    if pathlib.Path('data/maps/csv_user_made').exists():
         for maps in os.listdir('data/maps/csv_user_made'):
             custom_maps.append(maps)
 
@@ -1463,7 +1474,7 @@ def create_menu():
             load_editor_assets()
 
         if play_map_btn.draw():
-            level_map = csv_to_map(f'data/maps/csv_user_made/{selected_map}') # This is the string format of the map
+            level_map = csv_to_map(f'data/maps/csv_user_made/{selected_map}')  # This is the string format of the map
             gameplay_state = True, 'default-Player', level_map, f'data/maps/csv_user_made/{selected_map}'
             playing_from_play = False
             map_action_popup = False
@@ -1495,12 +1506,11 @@ def create_menu():
                 map_delete_popup = False
 
             if map_delete_popup_confirm.draw():
-                os.remove(f"data/maps/csv_user_made/{selected_map}")
-                os.remove(f"data/maps/user_made/{selected_map[:-4]}.txt")
+                pathlib.Path(f"data/maps/csv_user_made/{selected_map}").unlink()
+                pathlib.Path(f"data/maps/user_made/{selected_map[:-4]}.txt").unlink()
                 usermade_levels.remove(f'{selected_map[:-4]}.txt')
                 map_delete_popup = False
                 map_delete_btn_state = False
-
 
     # stay in create menu
     if not map_action_popup and editor_active:
@@ -1510,7 +1520,7 @@ def create_menu():
     # Show new map creation dialog
     if create_new_map_state:
         saved_dir_path = r'data/maps/csv_user_made'
-        saved_count = len([entry for entry in os.listdir(saved_dir_path) if os.path.isfile(os.path.join(saved_dir_path, entry))])
+        saved_count = len([entry for entry in os.listdir(saved_dir_path) if pathlib.Path(os.path.join(saved_dir_path, entry)).is_file()])
         if saved_count < 10:
             _create_new_map_dialog()
         else:
@@ -1550,9 +1560,9 @@ def create_menu():
         if map_delete_btn_state:
             if map_delete_cancel_button.draw():
                 map_delete_btn_state = False
-        else:
-            if map_delete_btn.draw():
-                map_delete_btn_state = True
+        elif map_delete_btn.draw():
+            map_delete_btn_state = True
+
 
 # Leaderboard buttons
 mush_total_btn = text_Button_1(148, 144, '| Mushrooms |', 28, white)
@@ -1565,6 +1575,7 @@ maps_total_state = False
 mush_total_list = []
 play_time_list = []
 maps_total_list = []
+
 
 def leaderboards_menu():
     global mush_total_state, play_time_state, maps_total_state, menu_state, players, mush_total_list, play_time_list, map_total_list, maps_total_list
@@ -1647,6 +1658,7 @@ def leaderboards_menu():
     text1 = create_text("Leaderboards", 60, white)[0]
     screen.blit(text1, (148, 60))
 
+
 music_volume_scale = 25
 sfx_volume_scale = 25
 music_volume_btn = text_Button_1(148, 144, 'Music Volume:', 32, white)
@@ -1665,6 +1677,8 @@ credits_page_back = text_Button_1(278, 664, "<", 40, white)
 credits_page_next = text_Button_1(304, 664, ">", 40, white)
 credits_qr_code = pygame.image.load('assets/credits_qr_code.png')
 credits_qr_code = pygame.transform.scale(credits_qr_code, (250, 250))
+
+
 def options_menu():
     global music_volume_scale, music_volume_input, music_volume_state, sfx_volume_scale, sfx_volume_input, sfx_volume_state, click_sound, menu_state, credits_page, credits_qr_code
 
@@ -1842,39 +1856,43 @@ def options_menu():
 
 # GAME LOGIC STARTS HERE
 def add_args():
-    ''' Adds arguments, will only be called if __name__ == "__main__" below '''
+    """Adds arguments, will only be called if __name__ == "__main__" below"""
     parser = ArgumentParser(add_help=False)
     parser.add_argument('-f', '--stage_file')
     parser.add_argument('-m', '--movement')
     parser.add_argument('-o', '--output_file')
     return parser.parse_args()
 
+
 def pick_map(stage_file=None):
-    ''' Returns default map if there's no stage_file, else returns the stage file '''
+    """Returns default map if there's no stage_file, else returns the stage file"""
     global default_map
     if stage_file is None:
         return default_map
     else:
-        with open(stage_file, "r", encoding="utf-8") as lvl:
+        with open(stage_file, encoding="utf-8") as lvl:
           return lvl.read()
 
+
 def choose_mode(output_file=None):
-    ''' Checks if -o has an argument, returns either "play" or an empty string to determine the mode'''
+    """Checks if -o has an argument, returns either "play" or an empty string to determine the mode"""
     return 'play' if output_file is None else ''
+
 
 if __name__ == "__main__":
     args = add_args()
-    mode = choose_mode(args.output_file) # Mode if to play or to output
-    lvlmap = pick_map(args.stage_file) # Map as string/raw
+    mode = choose_mode(args.output_file)  # Mode if to play or to output
+    lvlmap = pick_map(args.stage_file)  # Map as string/raw
 else:
-    mode = choose_mode() # Mode if to play or to output
-    lvlmap = pick_map() # Map as string/raw
+    mode = choose_mode()  # Mode if to play or to output
+    lvlmap = pick_map()  # Map as string/raw
+
 
 def game_function(player="default-Player", level_map=None, level_map_path="default-Map"):
     global menu_state, gameplay_state, mode, lvlmap, playing_from_play, args, lvlmap, sfx_volume_scale
     playing_from_play = True
 
-    class gameplay_Text_Button():
+    class gameplay_Text_Button:
         def __init__(self, x, y, t, s, col):
             self.col = col
             text, capt = create_text(t, s, col)
@@ -1897,7 +1915,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             pos = pygame.mouse.get_pos()
 
             if self.capt == "MENU" or self.capt == "RESTART":
-                if not menu_btn_state and not controls_popup_state and not lose_state and not LVL_MUSHROOMS == player_mushroom_count:
+                if not menu_btn_state and not controls_popup_state and not lose_state and not player_mushroom_count == LVL_MUSHROOMS:
                     if self.rect.collidepoint(pos):
                         self.text, s = create_text(self.capt, self.s, main_color)
                         if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
@@ -1975,9 +1993,9 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
     menu_controls_btn = gameplay_Text_Button((8 * 48)//4 + (SCREEN_WIDTH - (8 * 48))//2, 252, "Controls", 48, white)
     menu_return_btn = gameplay_Text_Button((13 * 48)//4 + (SCREEN_WIDTH - (13 * 48))//2, 310, "Back to Maps", 48, white)
     controls_back_btn = gameplay_Text_Button((4 * 48)//4 + (SCREEN_WIDTH - (4 * 48))//2, 368, "Back", 48, white)
-    
+
     if player != 'default-Player':
-        with open(f"data/players/{player}.json", 'r') as player_file_for_controls:
+        with open(f"data/players/{player}.json") as player_file_for_controls:
             data_player_file_for_controls = json.load(player_file_for_controls)
         if data_player_file_for_controls['playing_time'] <= 5:
             menu_btn_state = False
@@ -1991,7 +2009,6 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
         menu_btn_state = False
         menu_controls_btn_state = False
         controls_popup_state = True
-
 
     # level bg
     level_bg = pygame.image.load(level_map_bg[random.randint(0, 2)])
@@ -2043,7 +2060,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
         'S': GRID_WIDTH + 1,
         'A': -1,
         'D': 1,
-        'P': 0
+        'P': 0,
     }
 
     def pickup(tile):
@@ -2068,8 +2085,8 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                 return
             grid_2d_list[r][c] = '.'
 
-            # Continously calls itself for every direction 
-            for change_row, change_col in [(-1,0), (1,0), (0,-1), (0,1)]:
+            # Continously calls itself for every direction
+            for change_row, change_col in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 flamethrowed(r + change_row, c + change_col)
 
         # Will only call flamethrowed if the player is approaching 'T'
@@ -2108,7 +2125,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             nonlocal player_index, grid, MOTHERGRID, main, player_mushroom_count, item, history
 
             # Sets the tile left behind by the player as the tile it previously was based on the history list
-            grid[player_index] = f"{history['player'][0]}" 
+            grid[player_index] = f"{history['player'][0]}"
             history['player'].pop()
 
             # Sets the tile at new_index as the player tile
@@ -2124,7 +2141,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
         new_index = player_index + moves[direction]
 
         # Checks if either the targeted index is out of bounds
-        if not (0 <= new_index < len(grid)) or new_index in _n_indices: # Avoids the mutation of \n indices: 
+        if not (0 <= new_index < len(grid)) or new_index in _n_indices:  # Avoids the mutation of \n indices:
             if mode == "play":
                 print("You can't move outside the grid!")
             return
@@ -2135,21 +2152,21 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
 
             # Checks the nature of the targeted tile
             if target_tile == 'T':
-                if not item: # Player will not move anywhere if not holding an axe
+                if not item:  # Player will not move anywhere if not holding an axe
                     if mode == "play":
                         bump_sfx.play()
-                elif item[0] == 'x': # Tree will turn into empty space if player is holding an axe
+                elif item[0] == 'x':  # Tree will turn into empty space if player is holding an axe
                     chop_tree_sfx.play()
                     moveto('.')
-                    item.clear() # Item is cleared every time after used
+                    item.clear()  # Item is cleared every time after used
                     found_item = None
-                elif item[0] == '*': # flame_spread function is called when player is holding flamethrower
+                elif item[0] == '*':  # flame_spread function is called when player is holding flamethrower
                     burn_sfx.play()
                     col = (new_index % (GRID_WIDTH+1))
                     row = (new_index - col) // GRID_WIDTH
                     grid = flame_spread(row, col)
                     moveto('.')
-                    item.clear() # Item is cleared every time after used
+                    item.clear()  # Item is cleared every time after used
                     found_item = None
                 return
 
@@ -2166,7 +2183,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                     if f"Rock {new_index}" in history:  # Sets the tile under the rock based on history, so that the 'moveto' function appends the correct under_tile when the player moves
                         rock_under_tile = history[f"Rock {new_index}"]
 
-                    if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
+                    if new_rock_index >= len(grid) or new_rock_index in _n_indices:  # Checks if it will go out of bounds or in a '\n' index
                         bump_sfx.play()
                         return
 
@@ -2184,7 +2201,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                     elif grid[new_rock_index] == "_":   # Moves the rock along a paved tile
                         move_rock_sfx.play()
                         grid[new_rock_index] = "R"
-                        history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
+                        history[f"Rock {new_rock_index}"] = "_"  # Takes note of the tile under the rock
                         moveto(rock_under_tile)
 
                     elif grid[new_rock_index] == "R" or 'x' or '*' or '+':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
@@ -2203,7 +2220,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                     if f"Rock {new_index}" in history:  # Sets the tile under the rock based on history, so that the 'moveto' function appends the correct under_tile when the player moves
                         rock_under_tile = history[f"Rock {new_index}"]
 
-                    if new_rock_index >= len(grid) or new_rock_index in _n_indices: # Checks if it will go out of bounds or in a '\n' index
+                    if new_rock_index >= len(grid) or new_rock_index in _n_indices:  # Checks if it will go out of bounds or in a '\n' index
                         return
 
                     elif grid[new_rock_index] == "~":   # Converts a water tile into a paved tile
@@ -2216,7 +2233,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
 
                     elif grid[new_rock_index] == "_":   # Moves the rock along a paved tile
                         grid[new_rock_index] = "R"
-                        history[f"Rock {new_rock_index}"] = "_" # Takes note of the tile under the rock
+                        history[f"Rock {new_rock_index}"] = "_"  # Takes note of the tile under the rock
                         moveto(rock_under_tile)
 
                     elif grid[new_rock_index] == "R" or 'x' or '*' or '+':   # Checks if the player is trying to move two rocks at the same time or into a non-empty tile
@@ -2320,16 +2337,13 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                             bump_sfx.play()
                             pickup(found_item)
                             found_item = None
-                            history['player'][-1] = '.' # Sets the previous tile as an empty tile after picking up the item
+                            history['player'][-1] = '.'  # Sets the previous tile as an empty tile after picking up the item
+                    elif not found_item or len(item) == 1:
+                        pass
                     else:
-                        if not found_item:
-                            pass
-                        elif len(item) == 1:
-                            pass
-                        else:
-                            pickup(found_item)
-                            found_item = None
-                            history['player'][-1] = '.' # Sets the previous tile as an empty tile after picking up the item
+                        pickup(found_item)
+                        found_item = None
+                        history['player'][-1] = '.'  # Sets the previous tile as an empty tile after picking up the item
 
                 elif inp == "!":
                     # Restarts the game
@@ -2350,7 +2364,6 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                     break
             else:
                 break
-
 
     if GRID_WIDTH >= GRID_HEIGHT:
         scale1 = 704 // (GRID_WIDTH)
@@ -2373,7 +2386,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
     '_': pavement_img,
     'x': axe_img,
     '*': flamethrower_img,
-    '\n': '\n'
+    '\n': '\n',
     }
 
     tile_assets_scaled = {
@@ -2386,7 +2399,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
     '_': pygame.transform.scale(pavement_img, scale),
     'x': pygame.transform.scale(axe_img, scale),
     '*': pygame.transform.scale(flamethrower_img, scale),
-    '\n': '\n'
+    '\n': '\n',
     }
 
     def load_map(level):
@@ -2399,7 +2412,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             if tile != '\n':
                 if tile == '+':
                     map_surface.blit(tile_assets_scaled.get('.'), ((scale1 * current_col), (scale1 * current_row)))
-                    map_surface.blit(tile_assets_scaled.get(tile, tile), ((scale1 * current_col) + (scale1 // 4), (scale1 * current_row ) + (scale1 // 4)))
+                    map_surface.blit(tile_assets_scaled.get(tile, tile), ((scale1 * current_col) + (scale1 // 4), (scale1 * current_row) + (scale1 // 4)))
                     current_col += 1
                 else:
                     if tile == 'L' and drowned:
@@ -2416,7 +2429,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
     def controls_popup():
         nonlocal controls_back_btn, controls_popup_state, menu_btn_state
         global SCREEN_WIDTH
-        
+
         # Cover
         cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
         cover.fill((0, 0, 0, 100))
@@ -2446,15 +2459,13 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             controls_popup_state = False
             menu_btn_state = True
 
-
     time_when_called = time.time()
     disposable = True
     win_state = False
     lose_state = False
 
     def pause_menu():
-        nonlocal menu_resume_btn, menu_return_btn, menu_controls_btn, controls_back_btn, menu_btn_state, controls_popup_state, menu_controls_btn_state
-        nonlocal player_mushroom_count, LVL_MUSHROOMS, found_item, time_when_called
+        nonlocal menu_resume_btn, menu_return_btn, menu_controls_btn, controls_back_btn, menu_btn_state, controls_popup_state, menu_controls_btn_state, player_mushroom_count, LVL_MUSHROOMS, found_item, time_when_called
         global SCREEN_WIDTH, gameplay_state
         # Cover
         cover = pygame.Surface((1024, 768), pygame.SRCALPHA)
@@ -2485,8 +2496,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             controls_popup_state = True
 
     def side_bar():
-        nonlocal menu_btn_state, controls_popup_state, mush_img, item, player_index, grid, MOTHERGRID, found_item, history, player_mushroom_count, LVL_MUSHROOMS, drowned
-        nonlocal time_when_called, lost_at_time, disposable, won_at_time, lose_state, win_state, saved, time_val
+        nonlocal menu_btn_state, controls_popup_state, mush_img, item, player_index, grid, MOTHERGRID, found_item, history, player_mushroom_count, LVL_MUSHROOMS, drowned, time_when_called, lost_at_time, disposable, won_at_time, lose_state, win_state, saved, time_val
         # Main bg
         bg = pygame.Surface((224, 720), pygame.SRCALPHA)
         bg.fill((0, 0, 0, 0))
@@ -2537,7 +2547,6 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             plr_img = pygame.image.load("assets/tiles/plr.png")
             tile_assets["L"] = plr_img
             tile_assets_scaled["L"] = pygame.transform.scale(plr_img, scale)
-            
 
         # Time
         if lose_state:
@@ -2556,7 +2565,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
 
         text_time = create_text(f"{minutes}: {seconds}", 28, white)[0]
         screen.blit(text_time, (768 + (212 - (text_time.get_width()))//2, 768 - 744 + (96 * 4 + 40)))
-        
+
         if menu_btn.draw():
             menu_btn_state = True
             controls_popup_state = False
@@ -2568,8 +2577,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             controls_popup()
 
     def win():
-        nonlocal lose_state, found_item, player_mushroom_count, LVL_MUSHROOMS, player_index, grid, drowned, item, history, MOTHERGRID
-        nonlocal time_when_called, disposable, won_at_time, lost_at_time, saved, time_val, win_state
+        nonlocal lose_state, found_item, player_mushroom_count, LVL_MUSHROOMS, player_index, grid, drowned, item, history, MOTHERGRID, time_when_called, disposable, won_at_time, lost_at_time, saved, time_val, win_state
         global SCREEN_WIDTH, gameplay_state, playing_from_play
         found_item = None
 
@@ -2613,7 +2621,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
         back_to_lvl_btn = gameplay_Text_Button(x_align_on, 484, "Back to map menu", 48, white)
         replay_btn = gameplay_Text_Button(x_align_on, 538, "Replay", 48, white)
         next_lvl_btn = gameplay_Text_Button(x_align_on, 595, "Next level", 48, white)
-        
+
         if back_to_lvl_btn.draw():
             gameplay_state = False, gameplay_state[1:]
 
@@ -2639,14 +2647,12 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
 
         if playing_from_play and level_map_path[:15] == 'data/maps/story' and level_map_path != 'data/maps/story/10.txt':
             if next_lvl_btn.draw():
-                with open(f'data/maps/story/{str(int(level_map_path[16]) + 1)}.txt') as new_level:
-                    new_map = new_level.read()
+                new_map = pathlib.Path(f'data/maps/story/{int(level_map_path[16]) + 1!s}.txt').read_text()
                 gameplay_state = True, gameplay_state[1], new_map, {str(int(level_map_path[16]) + 1)}
-                game_function(player=gameplay_state[1], level_map=new_map, level_map_path=f'data/maps/story/{str(int(level_map_path[16]) + 1)}.txt')
+                game_function(player=gameplay_state[1], level_map=new_map, level_map_path=f'data/maps/story/{int(level_map_path[16]) + 1!s}.txt')
 
     def lose():
-        nonlocal lose_state, found_item, player_mushroom_count, LVL_MUSHROOMS, player_index, grid, drowned, item, history, MOTHERGRID
-        nonlocal time_when_called, lost_at_time, disposable, won_at_time, saved, time_val
+        nonlocal lose_state, found_item, player_mushroom_count, LVL_MUSHROOMS, player_index, grid, drowned, item, history, MOTHERGRID, time_when_called, lost_at_time, disposable, won_at_time, saved, time_val
         global SCREEN_WIDTH, gameplay_state
         found_item = None
 
@@ -2690,7 +2696,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
         # Retry, Back to map menu button
         back_to_lvl_btn = gameplay_Text_Button(x_align_on, 484, "Back to map menu", 48, white)
         retry_btn = gameplay_Text_Button(x_align_on, 538, "Retry", 48, white)
-        
+
         if back_to_lvl_btn.draw():
             gameplay_state = False, gameplay_state[1:]
 
@@ -2712,14 +2718,13 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
             tile_assets["L"] = plr_img
             tile_assets_scaled["L"] = pygame.transform.scale(plr_img, scale)
             return True
-            
 
     def save_player_data(time_exited_lost_won, mushroom_collected_after_win=0, time_won=0):
-        with open(f"data/players/{player}.json", 'r') as player_data:
+        with open(f"data/players/{player}.json") as player_data:
             data = json.load(player_data)
 
         if level_map_path in data["maps_finished"]:
-            data["maps_finished"][level_map_path]= max(data["maps_finished"][level_map_path], time_won)
+            data["maps_finished"][level_map_path] = max(data["maps_finished"][level_map_path], time_won)
         else:
             data["maps_finished"].setdefault(level_map_path, time_won)
         data["playing_time"] += time_exited_lost_won
@@ -2733,6 +2738,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
     current_map = load_map(grid)
     won_at_time = 0
     lost_at_time = 0
+
     def game_screen():
         nonlocal lose_state, win_state, time_val, saved, won_at_time, lost_at_time
 
@@ -2750,7 +2756,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
         screen.blit(current_map, (x_offset, y_offset))
         side_bar()
 
-        if LVL_MUSHROOMS == player_mushroom_count:
+        if player_mushroom_count == LVL_MUSHROOMS:
             win_state = True
             if not won_at_time:
                 won_at_time = time.time()
@@ -2782,7 +2788,6 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                         save_player_data(time_val)
                         saved = True
 
-
     # Music
     music.stop()
     music.unload()
@@ -2797,18 +2802,17 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
 
                 # Contents of the output file: no/clear and grid
                 if player_mushroom_count == LVL_MUSHROOMS:
-                    output.write(f"CLEAR\n{"".join(grid)}")
+                    output.write(f"CLEAR\n{GRID_HEIGHT} {GRID_WIDTH}\n{"".join(grid)}")
                 else:
-                    output.write((f"NO CLEAR\n{"".join(grid)}"))
+                    output.write(f"NO CLEAR\n{GRID_HEIGHT} {GRID_WIDTH}\n{"".join(grid)}")
         else:
             while True:
-
 
                 if disposable and lose_state:
                     lost_at_time = time.time()
                     disposable = False
 
-                if disposable and LVL_MUSHROOMS == player_mushroom_count:
+                if disposable and player_mushroom_count == LVL_MUSHROOMS:
                     won_at_time = time.time()
                     disposable = False
 
@@ -2819,7 +2823,7 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
-                    if not lose_state and not (LVL_MUSHROOMS == player_mushroom_count):
+                    if not lose_state and not (player_mushroom_count == LVL_MUSHROOMS):
                         if event.type == pygame.KEYDOWN:
                             if event.key == pygame.K_ESCAPE:
                                 if menu_btn_state:
@@ -2828,16 +2832,16 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                                     menu_btn_state = True
                                 controls_popup_state = False
                     if not menu_btn_state and not controls_popup_state:
-                        if not (LVL_MUSHROOMS == player_mushroom_count or drowned or lose_state):
+                        if not (player_mushroom_count == LVL_MUSHROOMS or drowned or lose_state):
                             if event.type == pygame.KEYDOWN:
                                 if event.unicode.upper() in moves:
                                     plr_img = pygame.image.load(f"assets/plr_{event.unicode.upper()}.png")
                                     tile_assets["L"] = plr_img
                                     tile_assets_scaled["L"] = pygame.transform.scale(plr_img, scale)
                                     move_player(event.unicode.upper())
-                
+
                 game_screen()
-                
+
                 pygame.display.flip()
 
                 if not gameplay_state[0]:
@@ -2847,91 +2851,90 @@ def game_function(player="default-Player", level_map=None, level_map_path="defau
                     music.play(-1)
                     break
 
+
 if __name__ == "__main__":
     # Outputs args.output_file if -o was called, else run the game.
     if not mode:
         game_function()
-    else:
-        if not args.stage_file:
-            while True:
-                if gameplay_state[0]:
-                    not_needed, PLAYER_NAME, MAP_FILE, MAP_PATH = gameplay_state
-                    game_function(player=PLAYER_NAME, level_map=MAP_FILE, level_map_path=MAP_PATH)
-                else:
-                    while True:
-                        players = [player for player in os.listdir("data/players")]
+    elif not args.stage_file:
+        while True:
+            if gameplay_state[0]:
+                not_needed, PLAYER_NAME, MAP_FILE, MAP_PATH = gameplay_state
+                game_function(player=PLAYER_NAME, level_map=MAP_FILE, level_map_path=MAP_PATH)
+            else:
+                while True:
+                    players = [player for player in os.listdir("data/players")]
 
+                    if len(players) >= 10:
+                        max_plrs = True
+                    else:
+                        max_plrs = False
 
-                        if len(players) >= 10:
-                            max_plrs = True
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            sys.exit()
+
+                    # Check if editor is active
+                    if editor_active:
+                        level_editor()
+                    elif menu_state == "main":
+                        if fade_count == 0:
+                            fade_in(main_menu)
+                            fade_count += 1
+                            music.stop()
+                            music.unload()
+                            music.load('assets/sounds/menu_music.wav')
+                            music.play(-1)
+                        main_menu()
+
+                    elif menu_state == "play":
+                        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                            create_plr_btn_state = False
+                            menu_state = "main"
+                            fade_count = 0
+                        if fade_count == 1:
+                            fade_in(level_menu)
+                            fade_count += 1
                         else:
-                            max_plrs = False
+                            level_menu()
 
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                pygame.quit()
-                                sys.exit()
+                    elif menu_state == "leaderboards":
+                        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                            menu_state = "main"
+                            fade_count = 0
+                        if fade_count == 1:
+                            fade_in(leaderboards_menu)
+                            fade_count += 1
+                        leaderboards_menu()
 
-                        # Check if editor is active
-                        if editor_active:
-                            level_editor()
-                        elif menu_state == "main":
-                            if fade_count == 0:
-                                fade_in(main_menu)
-                                fade_count += 1
-                                music.stop()
-                                music.unload()
-                                music.load('assets/sounds/menu_music.wav')
-                                music.play(-1)
-                            main_menu()
+                    elif menu_state == "create":
+                        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                            menu_state = "main"
+                            fade_count = 0
+                        if fade_count == 1:
+                            fade_in(create_menu)
+                            fade_count += 1
+                            music.stop()
+                            music.unload()
+                            music.load('assets/sounds/creation_menu_music.mp3')
+                            music.play(-1)
+                        else:
+                            create_menu()
 
-                        elif menu_state == "play":
-                            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                                create_plr_btn_state = False
-                                menu_state = "main"
-                                fade_count = 0
-                            if fade_count == 1:
-                                fade_in(level_menu)
-                                fade_count += 1
-                            else:
-                                level_menu()
+                    elif menu_state == "options":
+                        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+                            menu_state = "main"
+                            fade_count = 0
+                        if fade_count == 1:
+                            fade_in(options_menu)
+                            fade_count += 1
+                        options_menu()
 
-                        elif menu_state == "leaderboards":
-                            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                                menu_state = "main"
-                                fade_count = 0
-                            if fade_count == 1:
-                                fade_in(leaderboards_menu)
-                                fade_count += 1
-                            leaderboards_menu()
+                    pygame.display.flip()
 
-                        elif menu_state == "create":
-                            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                                menu_state = "main"
-                                fade_count = 0
-                            if fade_count == 1:
-                                fade_in(create_menu)
-                                fade_count += 1
-                                music.stop()
-                                music.unload()
-                                music.load('assets/sounds/creation_menu_music.mp3')
-                                music.play(-1)
-                            else:
-                                create_menu()
-
-                        elif menu_state == "options":
-                            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
-                                menu_state = "main"
-                                fade_count = 0
-                            if fade_count == 1:
-                                fade_in(options_menu)
-                                fade_count += 1
-                            options_menu()
-
-                        pygame.display.flip()
-
-                        if gameplay_state[0]:
-                            break
-        else:
-            gameplay_state = True, "default-Player", lvlmap, "default-Map"
-            game_function(level_map=lvlmap, level_map_path=args.stage_file)
+                    if gameplay_state[0]:
+                        break
+    else:
+        gameplay_state = True, "default-Player", lvlmap, "default-Map"
+        game_function(level_map=lvlmap, level_map_path=args.stage_file)
