@@ -269,6 +269,22 @@ _In this section, you will get to learn about the secrets behind the world of Sh
     
 ### Level Creation
 
+When the player selects the lever creation menu, the features are organized as follows:
+
+* Customizable Grid
+  - A twentyfive by twentyfive (25 x 25) grid where each tile can be customized by the player.
+  - Can only contain exactly one player tile.
+  - Must contain atleast 1 mushroom tile.
+ 
+* Side Bar
+  - Contains all the tiles that can be placed by the player
+  - Contains save map and delete tile buttons.
+
+* Saving
+  - The player can save custom maps under unique names.
+  - Only ten(10) custom maps can exist simultaneously.
+  - The empty grids within the rectangle formed when connecting the furthest top-left tile and furthest bottom right tile and vice versa are converted into empty tiles and serves as the completed map.
+
 ## Unit Test
 
 - Unit tests were done to test whether functions and/or blocks are code are working as intended. Below are the details on how to:
