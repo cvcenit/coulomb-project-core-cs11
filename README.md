@@ -11,7 +11,7 @@
     * [Restart and Exit](#restart-and-exit)
   * [Level Creation](#level-creation)
 * [Code Organization](#code-organization)
-  * [Graphical User Interface (GUI)](#graphical-user-interface-(GUI))
+  * [Graphical User Interface (GUI)](#graphical-user-interface-gui)
   * [Gameplay](#gameplay)
     * [Map](#map)
     * [Tiles](#tiles)
@@ -20,7 +20,7 @@
   * [Level Creation](#level-creation-1)
 * [Unit Tests]
 * [Bonus Features]
-  * [Graphical User Interface (GUI)](#graphical-user-interface-(GUI)-1)
+  * [Graphical User Interface (GUI)](#graphical-user-interface-gui-1)
   * [Level Creation](#level-creation-2)
 
 ## User Manual
