@@ -13,7 +13,7 @@
 * [Code Organization](#code-organization)
   * [Graphical User Interface (GUI)](#graphical-user-interface-gui)
   * [Gameplay](#gameplay)
-    * [Map](#map)
+    * [Map](#map-and-attributes)
     * [Tiles](#tiles)
     * [Movement](#movement-1)
     * [Input](#input)
@@ -182,7 +182,7 @@ In this section, you will get to learn about the secrets behind the world of Shr
     - Terminates the main loop; exits the game.
 
 ### Gameplay
-* Map and Map Attributes
+* Map and Attributes
   
    The map process starts from determining whether it will load a custom map or the preset map. Then the following attributes will be determined:
  * Map Height - Count of rows in 'lvlmap'; The first number string in a map file.
