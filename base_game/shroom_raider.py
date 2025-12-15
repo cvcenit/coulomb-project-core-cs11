@@ -85,7 +85,7 @@ for x in lvlmap:
 _n_indices = range(lvlmapcontent.index('\n'), len(lvlmapcontent), GRID_WIDTH + 1)
 
 class Player:
-    """docstring for Laro"""
+    """The Player class contains all the necessary attributes and methods connected to the player input"""
 
     # Library of inputs with their corresponding change in index (+1 in width to accommodate for the '\n' characters)
     moves = {
@@ -98,6 +98,7 @@ class Player:
     }
 
     def __init__(self, start):
+        """Sets the default attributes"""
         super(Player, self).__init__()
         self.start = start
         self.item = []
@@ -108,6 +109,7 @@ class Player:
         self.player_index = self.start
 
     def reset(self):
+        """Resets the addributes back to default"""
         self.item = []
         self.history = {'player': ['.']}
         self.found_item = None
@@ -399,7 +401,7 @@ def move_player(direction, Name, grid):
                         Name.pickup(Name.found_item)
                         Name.found_item = None
                         Name.history['player'][-1] = '.'  # Sets the previous tile as an empty tile after picking up the item
-                        return Name._move_player("P", grid)
+                        Name._move_player("P", grid)
                 elif not Name.found_item or len(Name.item) == 1:
                     pass
                 else:
@@ -420,7 +422,7 @@ def move_player(direction, Name, grid):
             elif inp not in Name.moves:
                 return Name._move_player(inp, grid)
 
-            Name._move_player(inp, grid)
+            grid = Name._move_player(inp, grid)
     return grid
 
 if __name__ == "__main__":
