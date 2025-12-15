@@ -9,9 +9,8 @@
     * [Movement](#movement)
     * [Pickup](#pickup)
     * [Restart and Exit](#restart-and-exit)
-  * [Level Creation](#level-creation)
 * [Code Organization](#code-organization)
-  * [Graphical User Interface (GUI)](#graphical-user-interface-gui)
+  * [Startup](#startup)
   * [Gameplay](#gameplay)
     * [Map](#map-and-attributes)
     * [Tiles](#tiles)
@@ -19,9 +18,6 @@
     * [Input](#input)
   * [Level Creation](#level-creation-1)
 * [Unit Tests](#unit-tests)
-* [Bonus Features](#bonus-features)
-  * [Graphical User Interface (GUI)](#graphical-user-interface-gui-1)
-  * [Level Creation](#level-creation-2)
 
 ## User Manual
 
@@ -99,15 +95,6 @@ Here are the following ways you can run the game:
   - For custom maps:
     > python3 shroom_raider.py -f map.txt -m (your sequence of moves) -o output.txt
 
-### Main Menu
-
-After booting up the game, you can select from the following menus:
-
-* Play Menu - Brings you to the character creation/selection and level selection.
-* Leaderboards Menu - Shows each character's standings in different categories.
-* Options Menu - Allows you to change the volume settings and shows the credits.
-* Quit Button - Exits the game.
-
 ### Controls
 
 After arriving into location of your adventure, here's how to navigate around the area:
@@ -142,15 +129,6 @@ Unfortunate events are unavoidable during an adventurer's journey, here are the 
 * Restart ('!') - Immediately go back at the start of your journey; Resets the loaded level and undos all progress made.
 * Exit ('Q') - Take some time off from your journey to regroup; Exits the program.
 
-### Level Creation
-
-Here are some guides on how to create your own level:
-
-- Select a tile from the side bar.
-- And select a tile from the grid where you wish to put the tile you selected.
-- Put only one character tile, and at least one mushroom tile.
-- Save under a unique name.
-
 ## Code Organization
 
 In this section, you will get to learn about the secrets behind the world of Shroom Raider!
@@ -164,22 +142,6 @@ In this section, you will get to learn about the secrets behind the world of Shr
   > pick_map(stage_file=None) - If the user inputs a custom map file, the function will set the map file as 'lvlmap'; otherwise, 'lvlmap' will be the preset map.
   > 
   > choose_mode(output_file=None) - If the user inputs an output file, it will return the mode '', where the game file will take the player's move sequence and redirect its output towards the output file; otherwise, it will return the mode 'play', where the game will run and will be taking inputs throught the terminal.
-  
-### Graphical User Interface (GUI)
-* Main Menu
-  * Play Menu
-    - Only allows ten(10) unique player names.
-    - A dialogue box pops up whenever a player inputs an existing character name and when existing character names exceeds maximum amount.
-    - Has two(2) pages that the user can flip through.
-
-  * Leaderboards Menu
-    - Filters through the saved character data based on the leaderboards' category.
-
-  * Options Menu
-    - Sets the volume for music and special effects from a scale of 0% - 100% based on user input.
-
-  * Quit Button
-    - Terminates the main loop; exits the game.
 
 ### Gameplay
 * Map and Attributes
@@ -251,54 +213,6 @@ In this section, you will get to learn about the secrets behind the world of Shr
     > flame_spread(start_row, start_col) - will call the sub function: flamethrowed(r, c) if the tile is a tree tile.
     > flamethrowed(r, c) - replaces the the tile at row r, col c to an empty tile (if it is a tree tile; breaks the recursion other wise.) and repeatedly calls itself for all adjacent tiles in all four(4) directions.
 
-* Side Bar
-
-  Everytime a player loads a level, a sidebar is shown. The sidebar possesses the following functionalities:
-
-  - Shows the amount of mushroom collected.
-  - Shows the time spent playing the current level.
-  - Shows the item held.
-  - Shows the item on the ground.
-  - Has a menu button that pauses the game and allows the player to resume, check the controls, and go back to map selection.
-  - Has a restart button that restarts the current level.
-
-* Winning or Losing
-
-  When the player wins or loses, the following dialogue boxes pops up that contains the following:
-  * Winning
-    - Shows a win message.
-    - Shows the name of the player.
-    - Shows the name of the level won.
-    - Shows the amount of mushroom collected.
-    - Shows the total time played.
-    - Options to go back to map menu, replay, and go to next level (for story levels only).
-
-  * Losing
-    - Shows a defeat message.
-    - Shows the name of the player.
-    - Shows the name of the level won.
-    - Shows the amount of mushroom collected.
-    - Shows the total time played.
-    - Options to go back to map menu, and replay.
-    
-### Level Creation
-
-When the player selects the lever creation menu, the features are organized as follows:
-
-* Customizable Grid
-  - A twentyfive by twentyfive (25 x 25) grid where each tile can be customized by the player.
-  - Can only contain exactly one player tile.
-  - Must contain atleast 1 mushroom tile.
- 
-* Side Bar
-  - Contains all the tiles that can be placed by the player
-  - Contains save map and delete tile buttons.
-
-* Saving
-  - The player can save custom maps under unique names.
-  - Only ten(10) custom maps can exist simultaneously.
-  - The empty grids within the rectangle formed when connecting the furthest top-left tile and furthest bottom right tile and vice versa are converted into empty tiles and serves as the completed map.
-
 ## Unit Tests
 
 - Unit tests were done to test whether functions and/or blocks are code are working as intended. Below are the details on how to:
@@ -346,68 +260,3 @@ When the player selects the lever creation menu, the features are organized as f
       > item.clear()    # Restores the variable back to default
      
 - The existing tests are properly asserted for all cases because the following tests considered possible combinations of moves when given various directions and items. It includes cases when the player tries distinct moves that may lead to drowning, bumping into a tree, bumping into the edge, holding items, using items, and picking up multiple items.
-
-## Additional Features
-
-In addition to the base game, the following features have been added in the following sections:
-
-### Graphical User Interface (GUI)
-
-* Main Menu - The main menu gives the following options to the player:
-  
-  * Play Menu
-    - Allows the player to input their character's name; alternatively, the player can also delete existing character names.
-      
-      * Character Name
-        - Contains the date of creation, number of mushrooms collected, and total amount of time played.
-        - Updates after each game, win or lose.
-          
-    - The player can select from different level options:
-      
-      * Story
-        - Contains ten(10) levels that are increasing in difficulty.
-          
-      * Bonus
-        - Special level made by the creators
-       
-      * User-made 
-        - Allows the player to create and edit their own level.
-          
-  * Leaderboards Menu
-    - Shows the top players, along with their details (date of creation, number of mushrooms created, and total amount of time played), in terms of mushrooms collected, playing time (fastest time completed), and total number of maps completed.
-    
-  * Options Menu 
-    - Allows the player to change the music voluem and special effects volume.
-    - Displays the credits of the assets used during the game development.
-
-  * Create Level Menu
-    - Allows the player to create a level and give it a name; Alternatively, the user can also delete existing levels.
-
-  * Quit Button
-    - Exits the game.
-      
-### Level Creation
-- The player is given a limited space where they can customize each tile.
-- Levels can be saved under a unique name.
-
-### Textures, Music, and Special Effects.
-
-Some textures, music, special effects were modified and/or added:
-
-* Textures
-- Main menu background
-- Level backgrounds
-- Tile textures
-- Item Textures
-- GUI Textures
-
-* Music
-- Main menu music
-- Level music
-- Level creation music
-
-* Special Effeccts
-- GUI SFXs (Clicking)
-- Movement SFXs
-- Tile interactions SFXs
-- Item SFXs
