@@ -396,19 +396,19 @@ def move_player(direction, Name, grid):
                 # Picks up the found item
                 if is_playing:
                     if not Name.found_item or len(Name.item) == 1:
-                        pass
+                        continue
                     else:
                         Name.pickup(Name.found_item)
                         Name.found_item = None
                         Name.history['player'][-1] = '.'  # Sets the previous tile as an empty tile after picking up the item
                         Name._move_player("P", grid)
                 elif not Name.found_item or len(Name.item) == 1:
-                    pass
+                    continue
                 else:
                     Name.pickup(Name.found_item)
                     Name.found_item = None
                     Name.history['player'][-1] = '.'  # Sets the previous tile as an empty tile after picking up the item
-                    return Name._move_player("P", grid)
+                    return grid
  
             elif inp == "!":
                 # Restarts the game
