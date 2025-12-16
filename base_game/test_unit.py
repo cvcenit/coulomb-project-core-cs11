@@ -1,5 +1,6 @@
-import shroom_raider
-from shroom_raider import move_player_with_string
+from src import shroom_raider
+from shroom_raider import move_player
+
 
 def test_char_to_emoji():
     test1 = '''\
@@ -55,26 +56,30 @@ T._____.****LLLL.______,xXXTTT'''
 🌲　⬜⬜⬜⬜⬜　🔥🔥🔥🔥🧑🧑🧑🧑　⬜⬜⬜⬜⬜⬜🪓🌲🌲🌲"""
 
 
-def test_pickup():
-    test1, test2, test3 = 'x', '*', '.'
+class TestPlayer:
 
-    shroom_raider.item.clear()
-    shroom_raider.pickup(test1)
-    assert test1 in shroom_raider.item
-    assert len(shroom_raider.item) == 1
-    assert shroom_raider.pickup(test1) == '🪓'
+    def test_pickup(self):
+        player = shroom_raider.Player(starting_index=0)
 
-    shroom_raider.item.clear()
-    shroom_raider.pickup(test2)
-    assert test2 in shroom_raider.item
-    assert len(shroom_raider.item) == 1
-    assert shroom_raider.pickup(test2) == '🔥'
+        test1, test2, test3 = 'x', '*', '.'
 
-    shroom_raider.item.clear()
-    shroom_raider.pickup(test3)
-    assert test3 in shroom_raider.item
-    assert len(shroom_raider.item) == 1
-    assert shroom_raider.pickup(test3) == '　'
+        player.item.clear()
+        player.pickup(test1)
+        assert test1 in player.item
+        assert len(player.item) == 1
+        assert player.pickup(test1) == '🪓'
+
+        player.item.clear()
+        player.pickup(test2)
+        assert test2 in player.item
+        assert len(player.item) == 1
+        assert player.pickup(test2) == '🔥'
+
+        player.item.clear()
+        player.pickup(test3)
+        assert test3 in player.item
+        assert len(player.item) == 1
+        assert player.pickup(test3) == '　'
 
 
 def test_flame_spread():
@@ -296,49 +301,49 @@ R..R..R""")
 }
 
     # Test case 22: player try to push rock to axe.
-    move_player_with_string('waaaa')
+    move_player('waaaa')
     assert shroom_raider.grid == ['R', '.', '.', 'R', '.', '.', 'R', '\n', '.', '.', '.', 'R', '.', 'R', 'T', '\n', 'x', 'R', 'L', '.', '.', 'R', '*', '\n', 'R', 'R', '.', '.', '.', 'R', 'R', '\n', '~', 'R', 'R', '.', '.', 'R', '+', '\n', '.', '.', '_', 'R', '.', '.', '.', '\n', 'R', '.', '.', 'R', '.', '.', 'R']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 23: player try to push rock to flamethrower.
-    move_player_with_string('wdddd')
+    move_player('wdddd')
     assert shroom_raider.grid == ['R', '.', '.', 'R', '.', '.', 'R', '\n', '.', '.', '.', 'R', '.', 'R', 'T', '\n', 'x', 'R', '.', '.', 'L', 'R', '*', '\n', 'R', 'R', '.', '.', '.', 'R', 'R', '\n', '~', 'R', 'R', '.', '.', 'R', '+', '\n', '.', '.', '_', 'R', '.', '.', '.', '\n', 'R', '.', '.', 'R', '.', '.', 'R']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 24: player try to push rock to tree.
-    move_player_with_string('dwwdddd')
+    move_player('dwwdddd')
     assert shroom_raider.grid == ['R', '.', '.', 'R', '.', '.', 'R', '\n', '.', '.', '.', 'R', 'L', 'R', 'T', '\n', 'x', 'R', '.', '.', '.', 'R', '*', '\n', 'R', 'R', '.', '.', '.', 'R', 'R', '\n', '~', 'R', 'R', '.', '.', 'R', '+', '\n', '.', '.', '_', 'R', '.', '.', '.', '\n', 'R', '.', '.', 'R', '.', '.', 'R']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 25.1: player try to push rock to edge (from leftwards then upwards).
-    move_player_with_string('wawwaaaaaasaww')
+    move_player('wawwaaaaaasaww')
     assert shroom_raider.grid == ['R', '.', '.', 'R', '.', '.', 'R', '\n', 'L', '.', '.', 'R', '.', 'R', 'T', '\n', 'x', 'R', '.', '.', '.', 'R', '*', '\n', 'R', 'R', '.', '.', '.', 'R', 'R', '\n', '~', 'R', 'R', '.', '.', 'R', '+', '\n', '.', '.', '_', 'R', '.', '.', '.', '\n', 'R', '.', '.', 'R', '.', '.', 'R']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 25.2: player try to push rock to edge (from rightwards then downwards).
-    move_player_with_string('sdssddddddwdss')
+    move_player('sdssddddddwdss')
     assert shroom_raider.grid == ['R', '.', '.', 'R', '.', '.', 'R', '\n', '.', '.', '.', 'R', '.', 'R', 'T', '\n', 'x', 'R', '.', '.', '.', 'R', '*', '\n', 'R', 'R', '.', '.', '.', 'R', 'R', '\n', '~', 'R', 'R', '.', '.', 'R', '+', '\n', '.', '.', '_', 'R', '.', '.', 'L', '\n', 'R', '.', '.', 'R', '.', '.', 'R']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 26: player try to push rock to another rock (upwards, leftwards, downwards, rightwards).
-    move_player_with_string('wwwwwwsaaaaadssssswdddddawwwww')
+    move_player('wwwwwwsaaaaadssssswdddddawwwww')
     assert shroom_raider.grid == ['R', '.', '.', 'R', '.', '.', 'R', '\n', '.', '.', '.', 'R', '.', 'R', 'T', '\n', 'x', 'R', '.', 'L', '.', 'R', '*', '\n', 'R', 'R', '.', '.', '.', 'R', 'R', '\n', '~', 'R', 'R', '.', '.', 'R', '+', '\n', '.', '.', '_', 'R', '.', '.', '.', '\n', 'R', '.', '.', 'R', '.', '.', 'R']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 27: player try to push rock past pavement.
-    move_player_with_string('asssa')
+    move_player('asssa')
     assert shroom_raider.grid == ['R', '.', '.', 'R', '.', '.', 'R', '\n', '.', '.', '.', 'R', '.', 'R', 'T', '\n', 'x', 'R', '.', '.', '.', 'R', '*', '\n', 'R', 'R', '.', '.', '.', 'R', 'R', '\n', '~', 'R', '.', '.', '.', 'R', '+', '\n', '.', 'L', '_', 'R', '.', '.', '.', '\n', 'R', '.', 'R', 'R', '.', '.', 'R']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 28: player try to push rock to water
-    move_player_with_string('asssadwaad')
+    move_player('asssadwaad')
     assert shroom_raider.grid == ['R', '.', '.', 'R', '.', '.', 'R', '\n', '.', '.', '.', 'R', '.', 'R', 'T', '\n', 'x', 'R', '.', '.', '.', 'R', '*', '\n', 'R', 'R', '.', '.', '.', 'R', 'R', '\n', '_', 'L', '.', '.', '.', 'R', '+', '\n', '.', '.', '_', 'R', '.', '.', '.', '\n', 'R', '.', 'R', 'R', '.', '.', 'R']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 29: player try to push rock to mushroom
-    move_player_with_string('sdddd')
+    move_player('sdddd')
     assert shroom_raider.grid == ['R', '.', '.', 'R', '.', '.', 'R', '\n', '.', '.', '.', 'R', '.', 'R', 'T', '\n', 'x', 'R', '.', '.', '.', 'R', '*', '\n', 'R', 'R', '.', '.', '.', 'R', 'R', '\n', '~', 'R', 'R', '.', 'L', 'R', '+', '\n', '.', '.', '_', 'R', '.', '.', '.', '\n', 'R', '.', '.', 'R', '.', '.', 'R']
-    move_player_with_string('!')
+    move_player('!')
 
     # Map is TEST_MAP_2, set all the vars according to new map
     shroom_raider.GRID_HEIGHT, shroom_raider.GRID_WIDTH = 7, 7
@@ -364,21 +369,21 @@ R..R..R""")
 }
 
     # Test case 30: player picks up axe while holding flamethrower.
-    move_player_with_string('spwappppd')
+    move_player('spwappppd')
     assert shroom_raider.grid == ['.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', 'x', '.', '.', '.', '\n', '.', '.', 'x', 'L', '*', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '+']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 31: player picks up flamethrower while holding axe.
-    move_player_with_string('wpsdppppa')
+    move_player('wpsdppppa')
     assert shroom_raider.grid == ['.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', 'x', 'L', '*', '.', '.', '\n', '.', '.', '.', '*', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '+']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 32: player picks up axe while holding axe.
-    move_player_with_string('wpaspd')
+    move_player('wpaspd')
     assert shroom_raider.grid == ['.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', 'x', 'L', '*', '.', '.', '\n', '.', '.', '.', '*', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '+']
-    move_player_with_string('!')
+    move_player('!')
 
     # Test case 33: player picks up flamethrower while holding flamethrower.
-    move_player_with_string('spdwpa')
+    move_player('spdwpa')
     assert shroom_raider.grid == ['.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', 'x', '.', '.', '.', '\n', '.', '.', 'x', 'L', '*', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '.', '\n', '.', '.', '.', '.', '.', '.', '+']
-    move_player_with_string('!')
+    move_player('!')
