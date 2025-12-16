@@ -4,6 +4,7 @@
 
 import os
 from argparse import ArgumentParser, Namespace
+from posix import remove
 
 
 # PREREQUISITE FUNCTIONS
@@ -17,9 +18,11 @@ def add_args() -> Namespace:
     """
 
     parser = ArgumentParser(add_help=False)
-    parser.add_argument('-f', '--stage_file')
-    parser.add_argument('-m', '--movement')
-    parser.add_argument('-o', '--output_file')
+    if __name__ == "__main__":
+        parser.add_argument('-f', '--stage_file')
+        parser.add_argument('-m', '--movement')
+        parser.add_argument('-o', '--output_file')
+    assert isinstance(parser.parse_args(), Namespace)
     return parser.parse_args()
 
 
@@ -74,12 +77,13 @@ def clear_terminal() -> None:
 
 # Checks if the command is running from shroom_raider.py, and not as a module/from another file
 if __name__ == "__main__":
-    args = add_args()
-    is_playing: bool = is_user_playing(args.output_file)  # Mode if to play or to output
-    lvlmap = pick_map(args.stage_file)  # Map as string/raw
+    terminal_args: Namespace = add_args()
+    is_playing: bool = is_user_playing(terminal_args.output_file)  # Mode if to play or to output
+    lvlmap: str = pick_map(terminal_args.stage_file)  # Map as string/raw
 else:
+    terminal_args: Namespace = add_args()
     is_playing: bool = is_user_playing()  # Mode if to play or to output
-    lvlmap = pick_map()  # Map as string/raw
+    lvlmap: str = pick_map()  # Map as string/raw
 
 # Determines if the player is still playing the game
 playing_game: bool = True
@@ -88,58 +92,57 @@ playing_game: bool = True
 lvlmapcontent: list = list(lvlmap[lvlmap.index('\n') + 1:])
 
 # Takes the integer strings at their respective indices then converts them into integers
-GRID_HEIGHT = int(lvlmap[:lvlmap.index(' ')])  # height is before ' '
-GRID_WIDTH = int(lvlmap[lvlmap.index(' ') + 1: lvlmap.index('\n')])  # width is after ' ' and before the first \n
+GRID_HEIGHT: int = int(lvlmap[:lvlmap.index(' ')])  # height is before ' '
+GRID_WIDTH: int = int(lvlmap[lvlmap.index(' ') + 1: lvlmap.index('\n')])  # width is after ' ' and before the first \n
 
 # Serves as the base grid for the level (will not be mutated)
-MOTHERGRID = list(''.join(lvlmapcontent))
+MOTHERGRID: list = list(''.join(lvlmapcontent))
 
 # Serves as the starting index for the level
-START = MOTHERGRID.index("L")
+START: int = MOTHERGRID.index("L")
 
 # Serves as the working grid for the level (will be mutated)
-grid = list(''.join(lvlmapcontent))
+global_grid: list = list(''.join(lvlmapcontent))
 
 # Counts the amount of mushrooms needed to win the level
-LVL_MUSHROOMS = 0
+LVL_MUSHROOMS: int = 0
 for x in lvlmap:
     if x == "+":
         LVL_MUSHROOMS += 1
 
 # Lists the indices of '\n' characters
-_n_indices = range(lvlmapcontent.index('\n'), len(lvlmapcontent), GRID_WIDTH + 1)
+_n_indices: range = range(lvlmapcontent.index('\n'), len(lvlmapcontent), GRID_WIDTH + 1)
 
 
 class Player:
     """The Player class contains all the necessary attributes and methods connected to the player input"""
 
     # Library of inputs with their corresponding change in index (+1 in width to accommodate for the '\n' characters)
-    moves = {
+    moves: dict[str, int] = {
         'W': -(GRID_WIDTH + 1),
         'S': GRID_WIDTH + 1,
         'A': -1,
         'D': 1,
-        'P': 0,
-        'L': 0,
+        'P': 0
     }
 
-    def __init__(self, starting_index: int):
+    def __init__(self, starting_index: int) -> None:
         """
-        Sets the default attributes
+        Sets the default attributes, initiating the class
 
         Args:
             starting_index (int): starting position of player before any movements are done
         """
         super(Player, self).__init__()
-        self.starting_index = starting_index
-        self.item = []
-        self.history = {'player': ['.']}
-        self.found_item = None
-        self.drowned = False
-        self.player_mushroom_count = 0
-        self.player_index = self.starting_index
+        self.starting_index: int = starting_index
+        self.item: list = []
+        self.history: dict = {'player': ['.']}
+        self.found_item: None | str = None
+        self.drowned: bool = False
+        self.player_mushroom_count: int = 0
+        self.player_index: int = self.starting_index
 
-    def reset(self):
+    def reset(self) -> None:
         """Resets the attributes back to default"""
         self.item = []
         self.history = {'player': ['.']}
@@ -148,7 +151,7 @@ class Player:
         self.player_mushroom_count = 0
         self.player_index = self.starting_index
 
-    def pickup(self, tile: str | None) -> str:
+    def pickup(self, tile: str | None) -> str | None:
         """
         Adds current tile to the list of items held by the player, then returns the picked up tile in emoji.
 
@@ -161,9 +164,9 @@ class Player:
         """
 
         self.item.append(tile)
-        return char_to_emoji(tile)
+        return tile if tile is None else char_to_emoji(tile)
 
-    def _move_player(self, direction: str, grid: list) -> list:
+    def move_self(self, direction: str, grid: list) -> list:
         """
         Takes the directional input of the player and moves the player accordingly
 
@@ -171,12 +174,12 @@ class Player:
             direction (str): movement of the player in string
             grid (list): 2D representation of the playing grid
 
-        The function does not return anything but only changes the grid
+        Returns:
+            a list of characters representing the new grid after applying the directions
         """
 
         global playing_game
 
-        grid = grid
 
         def moveto(under_tile: str) -> None:
             """
@@ -332,31 +335,50 @@ class Player:
 
 
 class Leaderboard:
-    def __init__(self, title):
+    def __init__(self, title: str) -> None:
         super(Leaderboard, self).__init__()
-        self.title = title
-        self.max_players = 10
-        self.max_character = 12
-        self.player_folder = os.listdir(f'players')
-        self.players = {}
+        self.title: str = title
+        self.max_players: int = 10
+        self.max_character: int = 12
+        self.player_folder: list[str] = os.listdir(f'players')
+        self.players: dict[str, int] = {}
         for player_file in self.player_folder:
             with open(f'players/{player_file}', 'r') as plr:
-                self.players[player_file] = plr.read()
+                self.players[player_file] = int(plr.read())
 
-    def draw_board(self):
-        print("\nWin Leaderboard")
-        print("|----Player----|Wins")
-        for player in self.players:
-            print(f"|{player[:-4]}", " " * (self.max_character - len(player[:-4])), f"|{self.players[player]}")
+    def show_board(self) -> None:
+        """
+        Shows the leaderboard to the screen, returns None
+        """
+        print(f"\n{self.title}")
+        print("|----Player----|--Wins--")
+        for player in sorted(self.players, reverse=True, key=lambda x: self.players[x]):
+            print(f"|{player[:-4]}",
+            " " * (self.max_character - len(player[:-4])),
+                f"|{self.players[player]}")
         print('\n')
 
-    def add_player(self, player_name):
+    def add_player(self, player_name: str) -> bool:
+        """
+        Adds a player to player saves and the list
+        
+        Args:
+            player_name (str): name of the player to be played as
+        Returns:
+            True if the player already exists (play as the existing) or
+            the player does not exist and there are less than 10 players and 
+            player_name have 1 to 12 characters and all characters are in the English alphabet
+
+            False otherwise
+        """
+
+        if f'{player_name}.txt' in self.players:
+            return True
         if len(self.player_folder) < self.max_players:
             if 0 < len(player_name) <= self.max_character:
-                for ch in player_name:
-                    if ch.lower() not in "qwertyuiopasdfghjklzxcvbnm":
-                        print("Invalid player name, only use the English alphabet")
-                        return
+                if not player_name.isalpha():
+                    print("Invalid player name, only use the English alphabet")
+                    return False
                 if f'{player_name}.txt' not in self.players:
                     self.players[f'{player_name}.txt'] = 0  # updates current list
                     with open(f'players/{player_name}.txt', 'w') as plr:
@@ -367,19 +389,39 @@ class Leaderboard:
                     return True
             else:
                 print("Player name should have at least 1 and at most 12 characters")
+                return False
         else:
             print("Maximum player number reached")
+            return False
 
-    def remove_player(self, player_name):
+    def remove_player(self, player_name: str) -> bool:
+        """
+        Removes a player from the player saves and the list
+        
+        Args:
+            player_name (str): name of the player to be removed
+        Returns:
+            Always returns True
+        """
         if player_name in self.player_folder:
             self.player_folder.remove(player_name)
             self.players.pop(player_name)
             os.remove(f'players/{player_name}')
         else:
             print("Not a player")
+        return True
 
-    def add_player_win(self, player_name):
-        pass
+    def add_player_win(self, player_name: str) -> None:
+        """
+        Adds a win to the player's save
+        
+        Args:
+            player_name (str): name of the player that won
+        Returns nothing
+        """
+        self.players[f'{player_name}.txt'] += 1
+        with open(f'players/{player_name}.txt', 'w') as plr:
+            plr.write(str(self.players[f'{player_name}.txt']))
 
 
 def char_to_emoji(tiles: str | list) -> str:
@@ -420,9 +462,9 @@ def flame_spread(start_row: int, start_col: int) -> list:
         list: the resulting grid after flamethrower is used
     """
 
-    global grid
+    global global_grid
 
-    grid_string = ''.join(grid)
+    grid_string = ''.join(global_grid)
     grid_2d_list = [list(row) for row in grid_string.strip().split('\n')]
     row, col = len(grid_2d_list), len(grid_2d_list[0])
 
@@ -497,7 +539,7 @@ Leaderboard_opened = False
 Lb = Leaderboard("Win Leaderboard")
 
 
-def move_player(direction: str, name: Player, grid: list) -> list:
+def move_player_with_string(direction: str, name: Player, grid: list) -> list:
     """
     Takes the user input and proceeds accordingly
 
@@ -529,7 +571,7 @@ def move_player(direction: str, name: Player, grid: list) -> list:
                         name.pickup(name.found_item)
                         name.found_item = None
                         name.history['player'][-1] = '.'  # Sets the previous tile to empty tile after picking up item
-                        name._move_player("P", grid)
+                        name.move_self("P", grid)
                 elif not name.found_item or len(name.item) == 1:
                     continue
                 else:
@@ -547,10 +589,22 @@ def move_player(direction: str, name: Player, grid: list) -> list:
             elif inp == "L":
                 Leaderboard_opened = False if Leaderboard_opened else True
 
-            elif inp not in name.moves:
-                return name._move_player(inp, grid)
+            elif inp == "R": 
+                Lb.show_board()  
+                while True:
+                    remove_this_player = input("Which one? (Type any number to exit deletion) ")
+                    if remove_this_player != new_player:
+                        if Lb.remove_player(f'{remove_this_player}.txt'):
+                            break
+                    else:
+                        print("Can't delete current player!")
+                break
 
-            grid = name._move_player(inp, grid)
+            elif inp not in name.moves:
+                break
+
+            else:
+                grid = name.move_self(inp, grid)
     return grid
 
 
@@ -558,14 +612,14 @@ if __name__ == "__main__":
     # Outputs args.output_file if -o was called, else run the game.
     if not is_playing:
         Laro = Player(START)
-        with open(args.output_file, "w", encoding="utf-8") as output:
-            move_player(args.movement, Laro, grid)
+        with open(terminal_args.output_file, "w", encoding="utf-8") as output:
+            move_player_with_string(terminal_args.movement, Laro, global_grid)
 
             # Contents of the output file: no/clear and grid
             if Laro.player_mushroom_count == LVL_MUSHROOMS:
-                output.write(f"CLEAR\n{GRID_HEIGHT} {GRID_WIDTH}\n{"".join(grid)}")
+                output.write(f"CLEAR\n{GRID_HEIGHT} {GRID_WIDTH}\n{"".join(global_grid)}")
             else:
-                output.write(f"NO CLEAR\n{GRID_HEIGHT} {GRID_WIDTH}\n{"".join(grid)}")
+                output.write(f"NO CLEAR\n{GRID_HEIGHT} {GRID_WIDTH}\n{"".join(global_grid)}")
     else:
         Laro = Player(START)
         while True:
@@ -581,7 +635,7 @@ if __name__ == "__main__":
                 print(f"Playing as: {new_player}\n")
                 print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
                 print("Grid:")
-                print(char_to_emoji(grid))
+                print(char_to_emoji(global_grid))
 
                 # Prints the collected mushroom count, and the valid moves
                 print(f"{Laro.player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected")
@@ -593,6 +647,7 @@ if __name__ == "__main__":
         [!] Reset
         [Q] Quit
         [L] Show/Hide leaderboard
+        [R] Delete a player
                 ''')
 
                 # Prints the available item beneath the player, if any or none
@@ -610,32 +665,37 @@ if __name__ == "__main__":
                     print(f"Currently holding {char_to_emoji(Laro.item[0])}")
 
                 if Leaderboard_opened:
-                    Lb.draw_board()
+                    Lb.show_board()
 
                 # Player input
                 move = input("What will you do? ").strip().upper()
-                grid = move_player(move, Laro, grid)
-
-                if Laro.player_mushroom_count == LVL_MUSHROOMS:
-                    clear_terminal()
-                    print("Grid:")
-                    print(char_to_emoji(grid))
-                    print("-" * GRID_WIDTH * 2)
-                    print(" " * ((GRID_WIDTH // 2) + 1), "You Won!")
-                    print("-" * GRID_WIDTH * 2, "\n")
-
-                if Laro.drowned:
-                    clear_terminal()
-                    print(f"You need {LVL_MUSHROOMS} mushroom/s to win!")
-                    print("Grid:")
-                    print(char_to_emoji(grid))
-                    print("---------------------------------")
-                    print("Game Over! Laro Craft can't swim!")
-                    print("---------------------------------")
-                    print(f"{Laro.player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected\n")
+                global_grid = move_player_with_string(move, Laro, global_grid)
 
                 clear_terminal()
             else:
-                print(char_to_emoji(grid))
-                print("Goodbye!")
+                if Laro.player_mushroom_count == LVL_MUSHROOMS:
+                    clear_terminal()
+                    print(f"Won as {new_player} on:\n")
+                    print(char_to_emoji(global_grid))
+                    print("-" * GRID_WIDTH * 2)
+                    print(" " * ((GRID_WIDTH // 2) + 1), "You Won!")
+                    print("-" * GRID_WIDTH * 2, "\n")
+                    Lb.add_player_win(new_player)
+                    Lb.show_board()
+
+                elif Laro.drowned:
+                    clear_terminal()
+                    print(f"Lost as {new_player} on:\n")
+                    print(char_to_emoji(global_grid))
+                    print("-----------------------------------")
+                    print(f"Game Over! {new_player} can't swim!")
+                    print("-----------------------------------")
+                    print(f"{Laro.player_mushroom_count} out of {LVL_MUSHROOMS} mushroom/s collected\n")
+                    Lb.show_board()
+                else:
+                    clear_terminal()
+                    print("Grid:")
+                    print(char_to_emoji(global_grid))
+                    Lb.show_board()
+                    print("Goodbye!")
                 break
